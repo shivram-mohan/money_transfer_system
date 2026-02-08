@@ -1,0 +1,28 @@
+spring:
+  application:
+    name: money-transfer-system
+  datasource:
+    url: jdbc:mysql://localhost:3306/money_transfer_db?createDatabaseIfNotExist=true
+    username: root
+    password: Root123$
+    driver-class-name: com.mysql.cj.jdbc.Driver
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: true
+    properties:
+      hibernate:
+        format_sql: true
+        dialect: org.hibernate.dialect.MySQLDialect
+  security:
+    user:
+      name: admin
+      password: admin123
+
+server:
+  port: 8080
+
+logging:
+  level:
+    com.fidelity.moneytransfer: DEBUG
+    org.springframework.web: INFO
