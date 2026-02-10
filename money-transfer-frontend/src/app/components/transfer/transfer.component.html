@@ -1,0 +1,157 @@
+<!-- src/app/components/transfer/transfer.component.html -->
+
+<app-navbar></app-navbar>
+
+<div class="transfer-container">
+  <div class="header-section">
+    <button mat-icon-button (click)="backToDashboard()" class="back-button">
+      <mat-icon>arrow_back</mat-icon>
+    </button>
+    <h1>Transfer Money</h1>
+  </div>
+
+  <div class="transfer-content">
+    <!-- Account Info Card -->
+    <mat-card class="account-info-card">
+      <mat-card-content>
+        <div class="info-row">
+          <span class="label">From Account:</span>
+          <span class="value">{{ holderName }} (ID: {{ currentAccountId }})</span>
+        </div>
+        <div class="info-row">
+          <span class="label">Available Balance:</span>
+          <span class="value balance-amount">₹{{ currentBalance | number:'1.2-2' }}</span>
+        </div>
+      </mat-card-content>
+    </mat-card>
+
+    <!-- Transfer Form Card -->
+    <mat-card class="transfer-form-card" *ngIf="!transferSuccess">
+      <mat-card-header>
+        <mat-icon class="card-icon">swap_horiz</mat-icon>
+        <mat-card-title>Transfer Details</mat-card-title>
+      </mat-card-header>
+      <mat-card-content>
+        <form [formGroup]="transferForm" (ngSubmit)="onSubmit()">
+          <mat-form-field appearance="outline" class="full-width">
+            <mat-label>To Account ID</mat-label>
+            <input 
+              matInput 
+              type="number" 
+              formControlName="toAccountId"
+              placeholder="Enter destination account ID"
+            />
+            <mat-icon matPrefix>account_box</mat-icon>
+            <mat-error *ngIf="transferForm.get('toAccountId')?.hasError('required')">
+              Destination account is required
+            </mat-error>
+            <mat-error *ngIf="transferForm.get('toAccountId')?.hasError('min')">
+              Invalid account ID
+            </mat-error>
+            <mat-hint>Available test accounts: 2, 3, 4</mat-hint>
+          </mat-form-field>
+
+          <mat-form-field appearance="outline" class="full-width">
+            <mat-label>Amount</mat-label>
+            <input 
+              matInput 
+              type="number" 
+              formControlName="amount"
+              placeholder="0.00"
+              step="0.01"
+            />
+            <span matPrefix>₹&nbsp;</span>
+            <mat-icon matSuffix>payments</mat-icon>
+            <mat-error *ngIf="transferForm.get('amount')?.hasError('required')">
+              Amount is required
+            </mat-error>
+            <mat-error *ngIf="transferForm.get('amount')?.hasError('min')">
+              Amount must be greater than 0
+            </mat-error>
+            <mat-hint>Maximum: ₹{{ currentBalance | number:'1.2-2' }}</mat-hint>
+          </mat-form-field>
+
+          <div class="form-actions">
+            <button 
+              mat-raised-button 
+              type="button" 
+              (click)="resetForm()"
+              [disabled]="isLoading"
+            >
+              <mat-icon>clear</mat-icon>
+              Cancel
+            </button>
+            <button 
+              mat-raised-button 
+              color="primary" 
+              type="submit"
+              [disabled]="!transferForm.valid || isLoading"
+            >
+              <mat-spinner *ngIf="isLoading" diameter="20" class="button-spinner"></mat-spinner>
+              <mat-icon *ngIf="!isLoading">send</mat-icon>
+              <span *ngIf="!isLoading">Transfer</span>
+            </button>
+          </div>
+        </form>
+      </mat-card-content>
+    </mat-card>
+
+    <!-- Success Card -->
+    <mat-card class="success-card" *ngIf="transferSuccess && transferResult">
+      <mat-card-content>
+        <div class="success-icon">
+          <mat-icon>check_circle</mat-icon>
+        </div>
+        <h2>Transfer Successful!</h2>
+        <p class="success-message">{{ transferResult.message }}</p>
+        
+        <div class="transaction-details">
+          <div class="detail-row">
+            <span class="label">Transaction ID:</span>
+            <span class="value">{{ transferResult.transactionId }}</span>
+          </div>
+          <div class="detail-row">
+            <span class="label">Amount Transferred:</span>
+            <span class="value amount">₹{{ transferResult.amount | number:'1.2-2' }}</span>
+          </div>
+          <div class="detail-row">
+            <span class="label">From Account:</span>
+            <span class="value">{{ transferResult.debitedFrom }}</span>
+          </div>
+          <div class="detail-row">
+            <span class="label">To Account:</span>
+            <span class="value">{{ transferResult.creditedTo }}</span>
+          </div>
+        </div>
+
+        <div class="success-actions">
+          <button mat-raised-button (click)="resetForm()">
+            <mat-icon>add</mat-icon>
+            New Transfer
+          </button>
+          <button mat-raised-button color="primary" (click)="viewHistory()">
+            <mat-icon>history</mat-icon>
+            View History
+          </button>
+        </div>
+      </mat-card-content>
+    </mat-card>
+
+    <!-- Info Card -->
+    <mat-card class="info-card">
+      <mat-card-header>
+        <mat-icon class="info-icon">info</mat-icon>
+        <mat-card-title>Transfer Guidelines</mat-card-title>
+      </mat-card-header>
+      <mat-card-content>
+        <ul>
+          <li>Verify the destination account ID before confirming</li>
+          <li>Ensure you have sufficient balance for the transfer</li>
+          <li>All transfers are processed instantly</li>
+          <li>You cannot transfer to your own account</li>
+          <li>Transaction history is available in the History section</li>
+        </ul>
+      </mat-card-content>
+    </mat-card>
+  </div>
+</div>

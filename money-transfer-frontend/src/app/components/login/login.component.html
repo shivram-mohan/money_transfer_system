@@ -1,0 +1,67 @@
+<!-- src/app/components/login/login.component.html -->
+
+<div class="login-container">
+  <mat-card class="login-card">
+    <mat-card-header>
+      <mat-card-title class="login-title">
+        <mat-icon class="title-icon">account_balance</mat-icon>
+        Money Transfer System
+      </mat-card-title>
+      <mat-card-subtitle>Please sign in to continue</mat-card-subtitle>
+    </mat-card-header>
+
+    <mat-card-content>
+      <form [formGroup]="loginForm" (ngSubmit)="onSubmit()">
+        <mat-form-field appearance="outline" class="full-width">
+          <mat-label>Username</mat-label>
+          <input matInput formControlName="username" autocomplete="username" />
+          <mat-icon matPrefix>person</mat-icon>
+          <mat-error *ngIf="loginForm.get('username')?.hasError('required')">
+            Username is required
+          </mat-error>
+        </mat-form-field>
+
+        <mat-form-field appearance="outline" class="full-width">
+          <mat-label>Password</mat-label>
+          <input 
+            matInput 
+            [type]="hidePassword ? 'password' : 'text'" 
+            formControlName="password"
+            autocomplete="current-password" 
+          />
+          <mat-icon matPrefix>lock</mat-icon>
+          <button 
+            mat-icon-button 
+            matSuffix 
+            type="button"
+            (click)="togglePasswordVisibility()"
+            [attr.aria-label]="'Hide password'" 
+            [attr.aria-pressed]="hidePassword"
+          >
+            <mat-icon>{{hidePassword ? 'visibility_off' : 'visibility'}}</mat-icon>
+          </button>
+          <mat-error *ngIf="loginForm.get('password')?.hasError('required')">
+            Password is required
+          </mat-error>
+        </mat-form-field>
+
+        <div class="demo-credentials">
+          <p><strong>Demo Credentials:</strong></p>
+          <p>Username: <code>demo</code> | Password: <code>demo</code></p>
+          <p>Username: <code>john.doe</code> | Password: <code>password123</code></p>
+        </div>
+
+        <button 
+          mat-raised-button 
+          color="primary" 
+          type="submit" 
+          class="full-width login-button"
+          [disabled]="!loginForm.valid || isLoading"
+        >
+          <mat-spinner *ngIf="isLoading" diameter="20" class="button-spinner"></mat-spinner>
+          <span *ngIf="!isLoading">Sign In</span>
+        </button>
+      </form>
+    </mat-card-content>
+  </mat-card>
+</div>
