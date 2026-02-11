@@ -72,10 +72,10 @@ export class TransferComponent implements OnInit {
   loadBalance(): void {
     if (this.currentAccountId) {
       this.accountService.getBalance(this.currentAccountId).subscribe({
-        next: (response) => {
-          this.currentBalance = response.balance;
+        next: (response: number) => {
+          this.currentBalance = response;
         },
-        error: (error) => {
+        error: (error: any) => {
           console.error('Error loading balance:', error);
         }
       });
@@ -117,7 +117,7 @@ export class TransferComponent implements OnInit {
       };
 
       this.transferService.transfer(transferRequest).subscribe({
-        next: (response) => {
+        next: (response: any) => {
           this.isLoading = false;
           this.transferSuccess = true;
           this.transferResult = response;
@@ -132,7 +132,7 @@ export class TransferComponent implements OnInit {
           // Reset form
           this.transferForm.reset();
         },
-        error: (error) => {
+        error: (error: { message: string; }) => {
           this.isLoading = false;
           const errorMessage = error.message || 'Transfer failed. Please try again.';
           this.snackBar.open(errorMessage, 'Close', {

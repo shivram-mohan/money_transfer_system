@@ -7,7 +7,11 @@
     <list default="true" id="9abde197-823a-4056-bf58-1fba2e1bff4f" name="Changes" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/misc.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/misc.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/pom.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../money-transfer-frontend/package-lock.json" beforeDir="false" afterPath="$PROJECT_DIR$/../../money-transfer-frontend/package-lock.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../money-transfer-frontend/src/app/interceptors/auth.interceptor.ts" beforeDir="false" afterPath="$PROJECT_DIR$/../../money-transfer-frontend/src/app/interceptors/auth.interceptor.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../money-transfer-frontend/src/app/services/account.service.ts" beforeDir="false" afterPath="$PROJECT_DIR$/../../money-transfer-frontend/src/app/services/account.service.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../money-transfer-frontend/src/app/services/auth.service.ts" beforeDir="false" afterPath="$PROJECT_DIR$/../../money-transfer-frontend/src/app/services/auth.service.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../money-transfer-frontend/src/app/services/transfer.service.ts" beforeDir="false" afterPath="$PROJECT_DIR$/../../money-transfer-frontend/src/app/services/transfer.service.ts" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -43,13 +47,26 @@
     "RunOnceActivity.OpenProjectViewOnStart": "true",
     "RunOnceActivity.ShowReadmeOnStart": "true",
     "git-widget-placeholder": "develop",
-    "last_opened_file_path": "C:/Users/labuser/Capstone/money_transfer_system/backend/BackendProj"
+    "last_opened_file_path": "C:/Users/labuser/mts/money_transfer_system/backend/BackendProj"
   }
 }]]></component>
   <component name="RunManager">
     <configuration name="MTS" type="Application" factoryName="Application">
       <option name="MAIN_CLASS_NAME" value="com.fidelity.moneytransfer.MoneyTransferApplication" />
       <module name="money-transfer-system" />
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
+    <configuration default="true" type="JetRunConfigurationType">
+      <module name="BackendProj" />
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
+    <configuration default="true" type="KotlinStandaloneScriptRunConfigurationType">
+      <module name="BackendProj" />
+      <option name="filePath" />
       <method v="2">
         <option name="Make" enabled="true" />
       </method>
