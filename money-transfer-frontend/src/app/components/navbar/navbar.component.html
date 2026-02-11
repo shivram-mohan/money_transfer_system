@@ -1,0 +1,45 @@
+<!-- src/app/components/navbar/navbar.component.html -->
+
+<mat-toolbar color="primary" class="navbar">
+  <div class="toolbar-content">
+    <div class="brand">
+      <mat-icon class="brand-icon">account_balance</mat-icon>
+      <span class="brand-text">Money Transfer System</span>
+    </div>
+    
+    <div class="nav-links">
+      <button mat-button routerLink="/dashboard" routerLinkActive="active-link">
+        <mat-icon>dashboard</mat-icon>
+        Dashboard
+      </button>
+      <button mat-button routerLink="/transfer" routerLinkActive="active-link">
+        <mat-icon>swap_horiz</mat-icon>
+        Transfer
+      </button>
+      <button mat-button routerLink="/history" routerLinkActive="active-link">
+        <mat-icon>history</mat-icon>
+        History
+      </button>
+    </div>
+
+    <div class="user-menu">
+      <button mat-button [matMenuTriggerFor]="menu" class="user-button">
+        <mat-icon>account_circle</mat-icon>
+        <span>{{ holderName }}</span>
+        <mat-icon>arrow_drop_down</mat-icon>
+      </button>
+      <mat-menu #menu="matMenu">
+        <button mat-menu-item disabled>
+          <mat-icon>person</mat-icon>
+          <span>{{ holderName }}</span>
+        </button>
+        
+        <br>
+        <button mat-menu-item (click)="logout()">
+          <mat-icon>logout</mat-icon>
+          <span>Logout</span>
+        </button>
+      </mat-menu>
+    </div>
+  </div>
+</mat-toolbar>

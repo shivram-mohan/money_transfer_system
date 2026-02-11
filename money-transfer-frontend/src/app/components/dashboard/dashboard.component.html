@@ -1,0 +1,84 @@
+<!-- src/app/components/dashboard/dashboard.component.html -->
+
+<app-navbar></app-navbar>
+
+<div class="dashboard-container">
+  <div class="welcome-section">
+    <h1>Welcome, {{ holderName }}!</h1>
+    <p class="subtitle">Manage your account and transfer funds securely</p>
+  </div>
+
+  <div class="dashboard-content">
+    <!-- Balance Card -->
+    <mat-card class="balance-card">
+      <mat-card-header>
+        <div class="card-header-content">
+          <div class="header-title">
+            <mat-icon class="header-icon">account_balance_wallet</mat-icon>
+            <mat-card-title>Current Balance</mat-card-title>
+          </div>
+          <button 
+            mat-icon-button 
+            (click)="refreshBalance()" 
+            matTooltip="Refresh balance"
+            [disabled]="isLoading"
+          >
+            <mat-icon [class.spinning]="isLoading">refresh</mat-icon>
+          </button>
+        </div>
+      </mat-card-header>
+      <mat-card-content>
+        <div class="balance-display" *ngIf="!isLoading">
+          <span class="currency">₹</span>
+          <span class="amount">{{ balance | number:'1.2-2' }}</span>
+        </div>
+        <div class="loading-spinner" *ngIf="isLoading">
+          <mat-spinner diameter="50"></mat-spinner>
+        </div>
+        <div class="account-info">
+          <mat-icon>credit_card</mat-icon>
+          <span>Account ID: {{ accountId }}</span>
+        </div>
+      </mat-card-content>
+    </mat-card>
+
+    <!-- Quick Actions -->
+    <div class="action-cards">
+      <mat-card class="action-card transfer-card" (click)="navigateToTransfer()">
+        <mat-card-content>
+          <div class="action-icon-wrapper transfer-icon">
+            <mat-icon>swap_horiz</mat-icon>
+          </div>
+          <h3>Transfer Money</h3>
+          <p>Send money to another account</p>
+        </mat-card-content>
+      </mat-card>
+
+      <mat-card class="action-card history-card" (click)="navigateToHistory()">
+        <mat-card-content>
+          <div class="action-icon-wrapper history-icon">
+            <mat-icon>history</mat-icon>
+          </div>
+          <h3>Transaction History</h3>
+          <p>View your past transactions</p>
+        </mat-card-content>
+      </mat-card>
+    </div>
+
+    <!-- Info Card -->
+    <mat-card class="info-card">
+      <mat-card-header>
+        <mat-icon class="info-icon">info</mat-icon>
+        <mat-card-title>Quick Tips</mat-card-title>
+      </mat-card-header>
+      <mat-card-content>
+        <ul>
+          <li>Ensure you have sufficient balance before initiating a transfer</li>
+          <li>Double-check the destination account ID before confirming</li>
+          <li>All transactions are logged and can be viewed in History</li>
+          <li>Your account is secured with industry-standard encryption</li>
+        </ul>
+      </mat-card-content>
+    </mat-card>
+  </div>
+</div>
