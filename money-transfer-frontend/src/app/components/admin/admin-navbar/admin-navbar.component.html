@@ -1,0 +1,52 @@
+<!-- src/app/components/admin/admin-navbar/admin-navbar.component.html -->
+
+<mat-toolbar color="primary" class="admin-navbar">
+  <div class="toolbar-content">
+    <div class="brand" routerLink="/admin/dashboard">
+      <mat-icon class="brand-icon">admin_panel_settings</mat-icon>
+      <span class="brand-text">Admin Portal</span>
+    </div>
+    
+    <div class="nav-links">
+      <button mat-button routerLink="/admin/dashboard" routerLinkActive="active-link">
+        <mat-icon>dashboard</mat-icon>
+        <span class="link-text">Dashboard</span>
+      </button>
+      
+      <button mat-button routerLink="/admin/create-user" routerLinkActive="active-link">
+        <mat-icon>person_add</mat-icon>
+        <span class="link-text">Create User</span>
+      </button>
+      
+    
+      <button mat-button routerLink="/admin/users" routerLinkActive="active-link">
+        <mat-icon>group</mat-icon>
+        <span class="link-text">All Users</span>
+      </button>
+    </div>
+
+    <div class="user-menu">
+      <button mat-button [matMenuTriggerFor]="menu" class="user-button">
+        <mat-icon>account_circle</mat-icon>
+        <span class="admin-name">{{ adminName }}</span>
+        <mat-icon class="dropdown-icon">arrow_drop_down</mat-icon>
+      </button>
+      <mat-menu #menu="matMenu">
+        <button mat-menu-item disabled>
+          <mat-icon>admin_panel_settings</mat-icon>
+          <span>{{ adminName }}</span>
+        </button>
+        <mat-divider></mat-divider>
+        <button mat-menu-item routerLink="/admin/dashboard">
+          <mat-icon>dashboard</mat-icon>
+          <span>Dashboard</span>
+        </button>
+        <mat-divider></mat-divider>
+        <button mat-menu-item (click)="logout()">
+          <mat-icon>logout</mat-icon>
+          <span>Logout</span>
+        </button>
+      </mat-menu>
+    </div>
+  </div>
+</mat-toolbar>

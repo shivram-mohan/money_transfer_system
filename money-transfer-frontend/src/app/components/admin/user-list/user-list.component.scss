@@ -1,0 +1,231 @@
+// src/app/components/admin/user-list/user-list.component.scss
+
+.user-list-container {
+  padding: 24px;
+  max-width: 1400px;
+  margin: 0 auto;
+  background-color: #f5f5f5;
+  min-height: calc(100vh - 64px);
+}
+
+.header-section {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 24px;
+  
+  h1 {
+    font-size: 28px;
+    font-weight: 600;
+    color: #333;
+    margin: 0;
+  }
+  
+  button {
+    mat-icon {
+      margin-right: 8px;
+    }
+  }
+}
+
+.spinning {
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+.user-list-card {
+  min-height: 400px;
+}
+
+// Loading State
+.loading-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 60px 20px;
+  
+  p {
+    margin-top: 20px;
+    color: #666;
+    font-size: 16px;
+  }
+}
+
+// No Users State
+.no-users {
+  text-align: center;
+  padding: 60px 20px;
+  
+  mat-icon {
+    font-size: 80px;
+    height: 80px;
+    width: 80px;
+    color: #ccc;
+    margin-bottom: 16px;
+  }
+  
+  h3 {
+    font-size: 20px;
+    font-weight: 500;
+    color: #666;
+    margin-bottom: 8px;
+  }
+  
+  p {
+    color: #999;
+  }
+}
+
+// Table
+.table-container {
+  overflow-x: auto;
+}
+
+.users-table {
+  width: 100%;
+  
+  th {
+    background-color: #f5f5f5;
+    font-weight: 600;
+    color: #333;
+    padding: 16px;
+    font-size: 14px;
+  }
+  
+  td {
+    padding: 16px;
+    font-size: 14px;
+  }
+  
+  tr:hover {
+    background-color: #fafafa;
+  }
+}
+
+.username-cell {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  
+  .user-icon {
+    font-size: 20px;
+    height: 20px;
+    width: 20px;
+    color: #667eea;
+  }
+}
+
+.email-text {
+  color: #666;
+  font-size: 13px;
+}
+
+.account-chip {
+  background-color: #e3f2fd !important;
+  color: #1976d2 !important;
+  font-weight: 500;
+  font-size: 12px;
+}
+
+// Status Chips
+mat-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 12px;
+  font-weight: 500;
+  padding: 4px 12px;
+  
+  mat-icon {
+    font-size: 16px;
+    height: 16px;
+    width: 16px;
+  }
+}
+
+.status-active {
+  background-color: #e8f5e9 !important;
+  color: #2e7d32 !important;
+}
+
+.status-inactive {
+  background-color: #ffebee !important;
+  color: #c62828 !important;
+}
+
+.status-pending {
+  background-color: #fff3e0 !important;
+  color: #f57c00 !important;
+}
+
+.status-locked {
+  background-color: #f5f5f5 !important;
+  color: #757575 !important;
+}
+
+// Actions
+.action-buttons {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  
+  .pending-text {
+    font-size: 12px;
+    color: #f57c00;
+    font-style: italic;
+  }
+}
+
+// Summary
+.summary-section {
+  margin-top: 24px;
+  padding: 16px;
+  background-color: #f9f9f9;
+  border-radius: 8px;
+  border-left: 4px solid #667eea;
+  
+  p {
+    margin: 0;
+    font-size: 14px;
+    color: #555;
+    
+    strong {
+      color: #333;
+      margin-right: 4px;
+    }
+  }
+}
+
+// Responsive
+@media (max-width: 768px) {
+  .user-list-container {
+    padding: 16px;
+  }
+  
+  .header-section {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 16px;
+    
+    h1 {
+      font-size: 22px;
+    }
+    
+    button {
+      width: 100%;
+    }
+  }
+  
+  .table-container {
+    overflow-x: scroll;
+  }
+  
+  .users-table {
+    min-width: 900px;
+  }
+}

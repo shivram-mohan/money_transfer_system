@@ -7,12 +7,15 @@ import { environment } from '../../environments/environment';
 export interface LoginRequest {
   username: string;
   password: string;
+  isAdmin?: boolean;
 }
  
 export interface LoginResponse {
   token: string;
   accountId: number;
   holderName: string;
+  userId: number;
+  role: UserRole;
 }
  
 @Injectable({
@@ -60,6 +63,9 @@ export class AuthService {
   }
  
   getToken(): string | null {
+    if (!this.isBrowser) {
+      return null;
+    }
     return localStorage.getItem(this.TOKEN_KEY);
   }
  
@@ -72,11 +78,17 @@ export class AuthService {
   }
  
   getCurrentAccountId(): number | null {
+    if (!this.isBrowser) {
+      return null;
+    }
     const accountId = localStorage.getItem(this.ACCOUNT_ID_KEY);
     return accountId ? parseInt(accountId, 10) : null;
   }
  
   getHolderName(): string | null {
+    if (!this.isBrowser) {
+      return null;
+    }
     return localStorage.getItem(this.HOLDER_NAME_KEY);
   }
  
@@ -85,6 +97,9 @@ export class AuthService {
   }
  
   private hasToken(): boolean {
+    if (!this.isBrowser) {
+      return false;
+    }
     return !!this.getToken();
   }
  
