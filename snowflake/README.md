@@ -1,0 +1,1 @@
+-- Snowflake scripts will be added in Module 5

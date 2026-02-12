@@ -50,11 +50,11 @@ export class DashboardComponent implements OnInit {
     if (this.accountId) {
       this.isLoading = true;
       this.accountService.getBalance(this.accountId).subscribe({
-        next: (response) => {
-          this.balance = response.balance;
+        next: (response: number) => {
+          this.balance = response;
           this.isLoading = false;
         },
-        error: (error) => {
+        error: (error: any) => {
           console.error('Error loading balance:', error);
           this.isLoading = false;
         }
