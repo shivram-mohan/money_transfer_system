@@ -1,5 +1,3 @@
-// src/app/services/auth.service.ts
-
 import { Injectable, PLATFORM_ID, inject } from '@angular/core';
 import { isPlatformBrowser } from '@angular/common';
 import { BehaviorSubject, Observable } from 'rxjs';
@@ -22,7 +20,7 @@ export interface LoginResponse {
 @Injectable({
   providedIn: 'root'
 })
-export class AuthService {
+export class adminGuard {
   private readonly TOKEN_KEY = 'auth_token';
   private readonly ACCOUNT_ID_KEY = 'account_id';
   private readonly HOLDER_NAME_KEY = 'holder_name';

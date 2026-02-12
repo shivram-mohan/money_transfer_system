@@ -11,7 +11,9 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
 import { MatIconModule } from '@angular/material/icon';
+import { MatTabsModule } from '@angular/material/tabs';
 import { AuthService } from '../../services/auth.service';
+import { UserRole } from '../../models/user.model';
 
 @Component({
   selector: 'app-login',
@@ -25,15 +27,20 @@ import { AuthService } from '../../services/auth.service';
     MatButtonModule,
     MatProgressSpinnerModule,
     MatSnackBarModule,
-    MatIconModule
+    MatIconModule,
+    MatTabsModule
   ],
   templateUrl: './login.component.html',
   styleUrls: ['./login.component.scss']
 })
 export class LoginComponent {
-  loginForm: FormGroup;
-  isLoading = false;
-  hidePassword = true;
+  userLoginForm: FormGroup;
+  adminLoginForm: FormGroup;
+  isUserLoading = false;
+  isAdminLoading = false;
+  hideUserPassword = true;
+  hideAdminPassword = true;
+  selectedTabIndex = 0;
 
   constructor(
     private fb: FormBuilder,
@@ -41,27 +48,44 @@ export class LoginComponent {
     private router: Router,
     private snackBar: MatSnackBar
   ) {
-    this.loginForm = this.fb.group({
+    this.userLoginForm = this.fb.group({
+      username: ['', [Validators.required]],
+      password: ['', [Validators.required]]
+    });
+
+    this.adminLoginForm = this.fb.group({
       username: ['', [Validators.required]],
       password: ['', [Validators.required]]
     });
   }
 
-  onSubmit(): void {
-    if (this.loginForm.valid) {
-      this.isLoading = true;
-      this.authService.login(this.loginForm.value).subscribe({
+  onUserLogin(): void {
+    if (this.userLoginForm.valid) {
+      this.isUserLoading = true;
+      
+      const loginRequest = {
+        ...this.userLoginForm.value,
+        isAdmin: false
+      };
+      
+      console.log('User login request:', loginRequest); // Debug log
+      
+      this.authService.login(loginRequest).subscribe({
         next: (response) => {
-          this.isLoading = false;
+          console.log('User login response:', response); // Debug log
+          this.isUserLoading = false;
           this.snackBar.open(`Welcome, ${response.holderName}!`, 'Close', {
             duration: 3000,
             horizontalPosition: 'end',
             verticalPosition: 'top'
           });
+          
+          console.log('Navigating to user dashboard'); // Debug log
           this.router.navigate(['/dashboard']);
         },
         error: (error) => {
-          this.isLoading = false;
+          console.error('User login error:', error); // Debug log
+          this.isUserLoading = false;
           this.snackBar.open(error.message || 'Login failed. Please try again.', 'Close', {
             duration: 5000,
             horizontalPosition: 'end',
@@ -73,7 +97,62 @@ export class LoginComponent {
     }
   }
 
-  togglePasswordVisibility(): void {
-    this.hidePassword = !this.hidePassword;
+  onAdminLogin(): void {
+    if (this.adminLoginForm.valid) {
+      this.isAdminLoading = true;
+      
+      const loginRequest = {
+        ...this.adminLoginForm.value,
+        isAdmin: true
+      };
+      
+      console.log('Admin login request:', loginRequest); // Debug log
+      
+      this.authService.login(loginRequest).subscribe({
+        next: (response) => {
+          console.log('Admin login response:', response); // Debug log
+          console.log('Admin role:', response.role); // Debug log
+          
+          this.isAdminLoading = false;
+          this.snackBar.open(`Welcome, ${response.holderName}!`, 'Close', {
+            duration: 3000,
+            horizontalPosition: 'end',
+            verticalPosition: 'top'
+          });
+          
+          // Verify admin role before navigation
+          if (response.role === UserRole.ADMIN) {
+            console.log('Role is ADMIN, navigating to admin dashboard'); // Debug log
+            setTimeout(() => {
+              this.router.navigate(['/admin/dashboard']);
+            }, 100); // Small delay to ensure localStorage is set
+          } else {
+            console.error('Role is not ADMIN:', response.role); // Debug log
+            this.snackBar.open('Admin access denied', 'Close', {
+              duration: 3000,
+              panelClass: ['error-snackbar']
+            });
+          }
+        },
+        error: (error) => {
+          console.error('Admin login error:', error); // Debug log
+          this.isAdminLoading = false;
+          this.snackBar.open(error.message || 'Login failed. Please try again.', 'Close', {
+            duration: 5000,
+            horizontalPosition: 'end',
+            verticalPosition: 'top',
+            panelClass: ['error-snackbar']
+          });
+        }
+      });
+    }
+  }
+
+  toggleUserPasswordVisibility(): void {
+    this.hideUserPassword = !this.hideUserPassword;
+  }
+
+  toggleAdminPasswordVisibility(): void {
+    this.hideAdminPassword = !this.hideAdminPassword;
   }
 }
