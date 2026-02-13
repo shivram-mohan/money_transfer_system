@@ -4,14 +4,7 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="9abde197-823a-4056-bf58-1fba2e1bff4f" name="Changes" comment="">
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/fidelity/moneytransfer/config/SecurityConfig.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/fidelity/moneytransfer/config/SecurityConfig.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/fidelity/moneytransfer/controller/AccountController.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/fidelity/moneytransfer/controller/AccountController.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/fidelity/moneytransfer/service/AccountService.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/fidelity/moneytransfer/service/AccountService.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../../money-transfer-frontend/src/app/interceptors/auth.interceptor.ts" beforeDir="false" afterPath="$PROJECT_DIR$/../../money-transfer-frontend/src/app/interceptors/auth.interceptor.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../../money-transfer-frontend/src/app/services/auth.service.ts" beforeDir="false" afterPath="$PROJECT_DIR$/../../money-transfer-frontend/src/app/services/auth.service.ts" afterDir="false" />
-    </list>
+    <list default="true" id="9abde197-823a-4056-bf58-1fba2e1bff4f" name="Changes" comment="" />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -41,14 +34,17 @@
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
-  <component name="PropertiesComponent">{
-  &quot;keyToString&quot;: {
-    &quot;RunOnceActivity.OpenProjectViewOnStart&quot;: &quot;true&quot;,
-    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
-    &quot;git-widget-placeholder&quot;: &quot;develop&quot;,
-    &quot;last_opened_file_path&quot;: &quot;C:/Users/labuser/mts/money_transfer_system/backend/BackendProj&quot;
+  <component name="PropertiesComponent"><![CDATA[{
+  "keyToString": {
+    "Application.MTS.executor": "Run",
+    "RunOnceActivity.OpenProjectViewOnStart": "true",
+    "RunOnceActivity.ShowReadmeOnStart": "true",
+    "RunOnceActivity.git.unshallow": "true",
+    "git-widget-placeholder": "dummy",
+    "kotlin-language-version-configured": "true",
+    "last_opened_file_path": "/home/zeta/Work/CapstoneProject/money_transfer_system/backend/BackendProj"
   }
-}</component>
+}]]></component>
   <component name="RunManager">
     <configuration name="MTS" type="Application" factoryName="Application">
       <option name="MAIN_CLASS_NAME" value="com.fidelity.moneytransfer.MoneyTransferApplication" />
@@ -70,6 +66,13 @@
         <option name="Make" enabled="true" />
       </method>
     </configuration>
+  </component>
+  <component name="SharedIndexes">
+    <attachedChunks>
+      <set>
+        <option value="bundled-jdk-30f59d01ecdd-cffe25b9f5b3-intellij.indexing.shared.core-IU-253.28294.334" />
+      </set>
+    </attachedChunks>
   </component>
   <component name="SpellCheckerSettings" RuntimeDictionaries="0" Folders="0" CustomDictionaries="0" DefaultDictionary="application-level" UseSingleDictionary="true" transferred="true" />
   <component name="TaskManager">

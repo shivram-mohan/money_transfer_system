@@ -40,14 +40,16 @@ export class DashboardComponent implements OnInit {
   ngOnInit(): void {
     this.holderName = this.authService.getHolderName();
     this.accountId = this.authService.getCurrentAccountId();
-    
-    if (this.accountId) {
+
+    if (this.accountId != null && this.accountId > 0) {
       this.loadBalance();
+    } else {
+      this.isLoading = false;
     }
   }
 
   loadBalance(): void {
-    if (this.accountId) {
+    if (this.accountId != null && this.accountId > 0) {
       this.isLoading = true;
       this.accountService.getBalance(this.accountId).subscribe({
         next: (response: number) => {
