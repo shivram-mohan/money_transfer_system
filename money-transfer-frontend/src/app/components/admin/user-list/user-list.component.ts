@@ -34,7 +34,7 @@ import { AdminNavbarComponent } from '../admin-navbar/admin-navbar.component';
 })
 export class UserListComponent implements OnInit {
   users: UserResponse[] = [];
-  displayedColumns: string[] = ['id', 'username', 'name', 'email', 'accountId', 'status', 'createdDate', 'actions'];
+  displayedColumns: string[] = ['id', 'username', 'name', 'accountId', 'status', 'actions'];
   isLoading = true;
 
   constructor(

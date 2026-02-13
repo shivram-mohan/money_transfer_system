@@ -49,9 +49,11 @@ export class HistoryComponent implements OnInit {
 
   ngOnInit(): void {
     this.currentAccountId = this.authService.getCurrentAccountId();
-    
-    if (this.currentAccountId) {
+
+    if (this.currentAccountId != null && this.currentAccountId > 0) {
       this.loadTransactions();
+    } else {
+      this.isLoading = false;
     }
   }
 

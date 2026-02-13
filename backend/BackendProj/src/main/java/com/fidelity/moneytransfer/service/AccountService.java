@@ -10,10 +10,7 @@ import com.fidelity.moneytransfer.repository.AccountRepository;
 import com.fidelity.moneytransfer.repository.TransactionLogRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.security.core.userdetails.User;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.security.provisioning.InMemoryUserDetailsManager;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -29,7 +26,6 @@ public class AccountService {
 
     private final AccountRepository accountRepository;
     private final TransactionLogRepository transactionLogRepository;
-    private final InMemoryUserDetailsManager userDetailsManager;
     private final PasswordEncoder passwordEncoder;
 
     // ─── EXISTING METHODS ─────────────────────────────────────────────
@@ -75,21 +71,14 @@ public class AccountService {
         Account account = Account.builder()
                 .holderName(request.getHolderName())
                 .username(request.getUsername())
+                .password(passwordEncoder.encode(request.getPassword()))
                 .balance(request.getInitialBalance())
                 .status(AccountStatus.ACTIVE)
                 .version(0)
                 .build();
 
         Account savedAccount = accountRepository.save(account);
-        log.info("Account created with id: {}", savedAccount.getId());
-
-        UserDetails newUser = User.builder()
-                .username(request.getUsername())
-                .password(passwordEncoder.encode(request.getPassword()))
-                .roles("USER")
-                .build();
-        userDetailsManager.createUser(newUser);
-        log.info("Login credentials created for username: {}", request.getUsername());
+        log.info("Account created with id: {}, username: {}", savedAccount.getId(), savedAccount.getUsername());
 
         return mapToAccountResponse(savedAccount);
     }

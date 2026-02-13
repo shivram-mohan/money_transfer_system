@@ -63,8 +63,8 @@ export class TransferComponent implements OnInit {
   ngOnInit(): void {
     this.currentAccountId = this.authService.getCurrentAccountId();
     this.holderName = this.authService.getHolderName();
-    
-    if (this.currentAccountId) {
+
+    if (this.currentAccountId != null && this.currentAccountId > 0) {
       this.loadBalance();
     }
   }
