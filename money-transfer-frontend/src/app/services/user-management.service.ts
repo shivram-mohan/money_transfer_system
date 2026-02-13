@@ -30,6 +30,8 @@ export class UserManagementService {
   createUser(request: CreateUserRequest, createdBy: string): Observable<UserResponse> {
     const accountRequest: CreateAccountRequest = {
       holderName: request.name,
+      username: request.username,
+      password: request.password,
       initialBalance: request.initialBalance
     };
     return this.http.post<AccountResponse>(`${this.apiUrl}/accounts`, accountRequest).pipe(
