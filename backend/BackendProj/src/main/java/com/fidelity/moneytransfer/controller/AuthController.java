@@ -1,5 +1,7 @@
 package com.fidelity.moneytransfer.controller;
 
+import com.fidelity.moneytransfer.entity.Account;
+import com.fidelity.moneytransfer.repository.AccountRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
@@ -12,6 +14,7 @@ import org.springframework.web.bind.annotation.RestController;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @RestController
@@ -19,6 +22,8 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 @Slf4j
 public class AuthController {
+
+    private final AccountRepository accountRepository;
 
     @GetMapping("/me")
     public ResponseEntity<Map<String, Object>> getCurrentUser(Authentication authentication) {
@@ -32,6 +37,12 @@ public class AuthController {
         userInfo.put("username", authentication.getName());
         userInfo.put("roles", roles);
         userInfo.put("isAdmin", roles.contains("ROLE_ADMIN"));
+
+        Optional<Account> account = accountRepository.findByUsername(authentication.getName());
+        if (account.isPresent()) {
+            userInfo.put("accountId", account.get().getId());
+            userInfo.put("holderName", account.get().getHolderName());
+        }
 
         return ResponseEntity.ok(userInfo);
     }

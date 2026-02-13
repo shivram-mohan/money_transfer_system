@@ -2,7 +2,7 @@ import { Injectable, PLATFORM_ID, inject } from '@angular/core';
 import { isPlatformBrowser } from '@angular/common';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { BehaviorSubject, Observable } from 'rxjs';
-import { tap, switchMap } from 'rxjs/operators';
+import { switchMap } from 'rxjs/operators';
 import { UserRole } from '../models/user.model';
 import { environment } from '../../environments/environment';
 
@@ -16,6 +16,8 @@ export interface AuthMeResponse {
   username: string;
   roles: string[];
   isAdmin: boolean;
+  accountId?: number;
+  holderName?: string;
 }
 
 @Injectable({
@@ -66,53 +68,39 @@ export class AuthService {
         }
 
         if (isAdmin) {
-          // Admin: fetch all accounts to get stats, but admin doesn't have a personal account
-          return this.http.get<any[]>(`${environment.apiUrl}/accounts`, { headers }).pipe(
-            tap((accounts: any[]) => {
-              if (this.isBrowser) {
-                localStorage.setItem(this.HOLDER_NAME_KEY, 'Admin');
-                localStorage.setItem(this.ACCOUNT_ID_KEY, '0');
-              }
-              this.isAuthenticatedSubject.next(true);
-            }),
-            // Return a normalized response
-            switchMap(() => {
-              return new Observable(observer => {
-                observer.next({
-                  holderName: 'Admin',
-                  role: UserRole.ADMIN,
-                  accountId: 0
-                });
-                observer.complete();
-              });
-            })
-          );
+          if (this.isBrowser) {
+            localStorage.setItem(this.HOLDER_NAME_KEY, 'Admin');
+            localStorage.setItem(this.ACCOUNT_ID_KEY, '0');
+          }
+          this.isAuthenticatedSubject.next(true);
+
+          return new Observable(observer => {
+            observer.next({
+              holderName: 'Admin',
+              role: UserRole.ADMIN,
+              accountId: 0
+            });
+            observer.complete();
+          });
         } else {
-          // Regular user: need to find their account
-          // Try fetching accounts list with user creds (will fail since user doesn't have ADMIN role)
-          // Instead, we need to find the user's account by trying known account IDs
-          // The backend currently has no user-to-account mapping endpoint
-          // So we try to get account details - the user should know their account ID
-          // For now, fetch account 1 as default and let user use their real account
-          return this.http.get<any>(`${environment.apiUrl}/accounts/1`, { headers }).pipe(
-            tap((account: any) => {
-              if (this.isBrowser) {
-                localStorage.setItem(this.HOLDER_NAME_KEY, account.holderName);
-                localStorage.setItem(this.ACCOUNT_ID_KEY, account.id.toString());
-              }
-              this.isAuthenticatedSubject.next(true);
-            }),
-            switchMap((account: any) => {
-              return new Observable(observer => {
-                observer.next({
-                  holderName: account.holderName,
-                  role: UserRole.USER,
-                  accountId: account.id
-                });
-                observer.complete();
-              });
-            })
-          );
+          // Use accountId and holderName returned from /auth/me
+          const accountId = authResponse.accountId;
+          const holderName = authResponse.holderName || credentials.username;
+
+          if (this.isBrowser) {
+            localStorage.setItem(this.HOLDER_NAME_KEY, holderName);
+            localStorage.setItem(this.ACCOUNT_ID_KEY, accountId ? accountId.toString() : '0');
+          }
+          this.isAuthenticatedSubject.next(true);
+
+          return new Observable(observer => {
+            observer.next({
+              holderName: holderName,
+              role: UserRole.USER,
+              accountId: accountId
+            });
+            observer.complete();
+          });
         }
       })
     );
