@@ -20,6 +20,7 @@ export interface AccountResponse {
   holderName: string;
   balance: number;
   status: string;
+  lastUpdated?: string;
 }
 
 export interface BalanceResponse {

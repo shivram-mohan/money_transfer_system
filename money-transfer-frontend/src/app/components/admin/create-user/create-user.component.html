@@ -5,13 +5,13 @@
     <button mat-icon-button (click)="cancel()" class="back-button">
       <mat-icon>arrow_back</mat-icon>
     </button>
-    <h1>Create New User</h1>
+    <h1>Create New Account</h1>
   </div>
 
   <mat-card class="create-user-card">
     <mat-card-header>
       <mat-icon class="card-icon">person_add</mat-icon>
-      <mat-card-title>User Information</mat-card-title>
+      <mat-card-title>Account Information</mat-card-title>
       <mat-card-subtitle>Create a new user account</mat-card-subtitle>
     </mat-card-header>
 
@@ -19,49 +19,7 @@
       <form [formGroup]="createUserForm" (ngSubmit)="onSubmit()">
         <div class="form-row">
           <mat-form-field appearance="outline" class="full-width">
-            <mat-label>Username</mat-label>
-            <input matInput formControlName="username" placeholder="john.doe" />
-            <mat-icon matPrefix>account_circle</mat-icon>
-            <mat-error *ngIf="createUserForm.get('username')?.hasError('required')">
-              Username is required
-            </mat-error>
-            <mat-error *ngIf="createUserForm.get('username')?.hasError('minlength')">
-              Username must be at least 3 characters
-            </mat-error>
-            <mat-hint>Minimum 3 characters</mat-hint>
-          </mat-form-field>
-        </div>
-
-        <div class="form-row">
-          <mat-form-field appearance="outline" class="full-width">
-            <mat-label>Password</mat-label>
-            <input 
-              matInput 
-              [type]="hidePassword ? 'password' : 'text'" 
-              formControlName="password"
-            />
-            <mat-icon matPrefix>lock</mat-icon>
-            <button 
-              mat-icon-button 
-              matSuffix 
-              type="button"
-              (click)="hidePassword = !hidePassword"
-            >
-              <mat-icon>{{hidePassword ? 'visibility_off' : 'visibility'}}</mat-icon>
-            </button>
-            <mat-error *ngIf="createUserForm.get('password')?.hasError('required')">
-              Password is required
-            </mat-error>
-            <mat-error *ngIf="createUserForm.get('password')?.hasError('minlength')">
-              Password must be at least 6 characters
-            </mat-error>
-            <mat-hint>Minimum 6 characters</mat-hint>
-          </mat-form-field>
-        </div>
-
-        <div class="form-row">
-          <mat-form-field appearance="outline" class="full-width">
-            <mat-label>Full Name</mat-label>
+            <mat-label>Account Holder Name</mat-label>
             <input matInput formControlName="name" placeholder="John Doe" />
             <mat-icon matPrefix>badge</mat-icon>
             <mat-error *ngIf="createUserForm.get('name')?.hasError('required')">
@@ -72,20 +30,9 @@
 
         <div class="form-row">
           <mat-form-field appearance="outline" class="full-width">
-            <mat-label>Email (Optional)</mat-label>
-            <input matInput formControlName="email" type="email" placeholder="john.doe@example.com" />
-            <mat-icon matPrefix>email</mat-icon>
-            <mat-error *ngIf="createUserForm.get('email')?.hasError('email')">
-              Please enter a valid email
-            </mat-error>
-          </mat-form-field>
-        </div>
-
-        <div class="form-row">
-          <mat-form-field appearance="outline" class="full-width">
             <mat-label>Initial Balance</mat-label>
             <input matInput type="number" formControlName="initialBalance" step="100" />
-            <span matPrefix>₹&nbsp;</span>
+            <span matPrefix>&#8377;&nbsp;</span>
             <mat-icon matSuffix>account_balance_wallet</mat-icon>
             <mat-error *ngIf="createUserForm.get('initialBalance')?.hasError('required')">
               Initial balance is required
@@ -105,7 +52,7 @@
           <button mat-raised-button color="primary" type="submit" [disabled]="!createUserForm.valid || isLoading">
             <mat-spinner *ngIf="isLoading" diameter="20" class="button-spinner"></mat-spinner>
             <mat-icon *ngIf="!isLoading">person_add</mat-icon>
-            <span *ngIf="!isLoading">Create User</span>
+            <span *ngIf="!isLoading">Create Account</span>
           </button>
         </div>
       </form>
@@ -119,11 +66,10 @@
     </mat-card-header>
     <mat-card-content>
       <ul>
-        <li>New users will be created with PENDING status</li>
-        <li>Users must be approved before they can log in</li>
+        <li>New accounts will be created with ACTIVE status</li>
         <li>A unique account ID will be automatically assigned</li>
         <li>Initial balance can be set at creation</li>
-        <li>Username must be unique across the system</li>
+        <li>Accounts can be deactivated later from the user management page</li>
       </ul>
     </mat-card-content>
   </mat-card>

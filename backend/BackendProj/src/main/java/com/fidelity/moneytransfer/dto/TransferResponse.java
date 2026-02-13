@@ -14,7 +14,7 @@ import java.math.BigDecimal;
 @Builder
 public class TransferResponse {
 
-    private String TransactionId;
+    private String transactionId;
     private String status;
     private String message;
     private Long debitedFrom;

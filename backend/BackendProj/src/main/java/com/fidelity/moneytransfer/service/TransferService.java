@@ -76,7 +76,7 @@ public class TransferService {
             transactionLog = this.createTransactionLog(request, TransactionStatus.SUCCESS, (String)null);
             this.transactionLogRepository.save(transactionLog);
             log.info("Transfer successful. Transaction ID: {}", transactionLog.getId());
-            return TransferResponse.builder().TransactionId(transactionLog.getId()).status("SUCCESS").message("Transfer completed successfully").debitedFrom(request.getFromAccountId()).creditedTo(request.getToAccountId()).amount(request.getAmount()).build();
+            return TransferResponse.builder().transactionId(transactionLog.getId()).status("SUCCESS").message("Transfer completed successfully").debitedFrom(request.getFromAccountId()).creditedTo(request.getToAccountId()).amount(request.getAmount()).build();
         } catch (Exception var5) {
             log.error("Transfer failed: {}", var5.getMessage(), var5);
             transactionLog = this.createTransactionLog(request, TransactionStatus.FAILED, var5.getMessage());

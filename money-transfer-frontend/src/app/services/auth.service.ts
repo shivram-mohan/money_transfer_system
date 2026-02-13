@@ -1,10 +1,8 @@
-// src/app/services/auth.service.ts
-
 import { Injectable, PLATFORM_ID, inject } from '@angular/core';
 import { isPlatformBrowser } from '@angular/common';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { BehaviorSubject, Observable } from 'rxjs';
-import { tap } from 'rxjs/operators';
+import { tap, switchMap } from 'rxjs/operators';
 import { UserRole } from '../models/user.model';
 import { environment } from '../../environments/environment';
 
@@ -14,12 +12,10 @@ export interface LoginRequest {
   isAdmin?: boolean;
 }
 
-export interface LoginResponse {
-  token: string;
-  accountId: number;
-  holderName: string;
-  userId: number;
-  role: UserRole;
+export interface AuthMeResponse {
+  username: string;
+  roles: string[];
+  isAdmin: boolean;
 }
 
 @Injectable({
@@ -29,14 +25,13 @@ export class AuthService {
   private readonly TOKEN_KEY = 'auth_token';
   private readonly ACCOUNT_ID_KEY = 'account_id';
   private readonly HOLDER_NAME_KEY = 'holder_name';
-  private readonly USER_ID_KEY = 'user_id';
   private readonly USER_ROLE_KEY = 'user_role';
   private readonly USERNAME_KEY = 'username';
   private readonly PASSWORD_KEY = 'password';
-  
+
   private platformId = inject(PLATFORM_ID);
   private isBrowser: boolean;
-  
+
   private isAuthenticatedSubject: BehaviorSubject<boolean>;
   public isAuthenticated$: Observable<boolean>;
 
@@ -53,40 +48,72 @@ export class AuthService {
       )
     });
 
-    // Test auth by calling accounts endpoint
-    // Admin calls GET /accounts (all accounts)
-    // User calls GET /accounts/1 (specific account)
-    const testEndpoint = credentials.isAdmin
-      ? `${environment.apiUrl}/accounts`
-      : `${environment.apiUrl}/accounts/1`;
+    // First validate credentials by calling /auth/me
+    return this.http.get<AuthMeResponse>(`${environment.apiUrl}/auth/me`, { headers }).pipe(
+      switchMap((authResponse: AuthMeResponse) => {
+        const isAdmin = authResponse.isAdmin;
+        const role = isAdmin ? UserRole.ADMIN : UserRole.USER;
 
-    return this.http.get(testEndpoint, { headers }).pipe(
-      tap((response: any) => {
-        const role = credentials.isAdmin ? UserRole.ADMIN : UserRole.USER;
-        
-        // For regular users, get their account details
-        const accountId = credentials.isAdmin 
-          ? 999  // Admin doesn't have a real account
-          : 1;   // Default account for user
-        
-        const holderName = credentials.isAdmin
-          ? 'Admin'
-          : (Array.isArray(response) ? 'User' : response.holderName);
-
+        // Store credentials for Basic Auth
         if (this.isBrowser) {
           localStorage.setItem(this.USERNAME_KEY, credentials.username);
           localStorage.setItem(this.PASSWORD_KEY, credentials.password);
           localStorage.setItem(
-            this.TOKEN_KEY, 
+            this.TOKEN_KEY,
             btoa(credentials.username + ':' + credentials.password)
           );
-          localStorage.setItem(this.ACCOUNT_ID_KEY, accountId.toString());
-          localStorage.setItem(this.HOLDER_NAME_KEY, holderName);
-          localStorage.setItem(this.USER_ID_KEY, '1');
           localStorage.setItem(this.USER_ROLE_KEY, role);
         }
-        
-        this.isAuthenticatedSubject.next(true);
+
+        if (isAdmin) {
+          // Admin: fetch all accounts to get stats, but admin doesn't have a personal account
+          return this.http.get<any[]>(`${environment.apiUrl}/accounts`, { headers }).pipe(
+            tap((accounts: any[]) => {
+              if (this.isBrowser) {
+                localStorage.setItem(this.HOLDER_NAME_KEY, 'Admin');
+                localStorage.setItem(this.ACCOUNT_ID_KEY, '0');
+              }
+              this.isAuthenticatedSubject.next(true);
+            }),
+            // Return a normalized response
+            switchMap(() => {
+              return new Observable(observer => {
+                observer.next({
+                  holderName: 'Admin',
+                  role: UserRole.ADMIN,
+                  accountId: 0
+                });
+                observer.complete();
+              });
+            })
+          );
+        } else {
+          // Regular user: need to find their account
+          // Try fetching accounts list with user creds (will fail since user doesn't have ADMIN role)
+          // Instead, we need to find the user's account by trying known account IDs
+          // The backend currently has no user-to-account mapping endpoint
+          // So we try to get account details - the user should know their account ID
+          // For now, fetch account 1 as default and let user use their real account
+          return this.http.get<any>(`${environment.apiUrl}/accounts/1`, { headers }).pipe(
+            tap((account: any) => {
+              if (this.isBrowser) {
+                localStorage.setItem(this.HOLDER_NAME_KEY, account.holderName);
+                localStorage.setItem(this.ACCOUNT_ID_KEY, account.id.toString());
+              }
+              this.isAuthenticatedSubject.next(true);
+            }),
+            switchMap((account: any) => {
+              return new Observable(observer => {
+                observer.next({
+                  holderName: account.holderName,
+                  role: UserRole.USER,
+                  accountId: account.id
+                });
+                observer.complete();
+              });
+            })
+          );
+        }
       })
     );
   }
@@ -96,7 +123,6 @@ export class AuthService {
       localStorage.removeItem(this.TOKEN_KEY);
       localStorage.removeItem(this.ACCOUNT_ID_KEY);
       localStorage.removeItem(this.HOLDER_NAME_KEY);
-      localStorage.removeItem(this.USER_ID_KEY);
       localStorage.removeItem(this.USER_ROLE_KEY);
       localStorage.removeItem(this.USERNAME_KEY);
       localStorage.removeItem(this.PASSWORD_KEY);
@@ -125,12 +151,6 @@ export class AuthService {
     return accountId ? parseInt(accountId, 10) : null;
   }
 
-  getCurrentUserId(): number | null {
-    if (!this.isBrowser) return null;
-    const userId = localStorage.getItem(this.USER_ID_KEY);
-    return userId ? parseInt(userId, 10) : null;
-  }
-
   getHolderName(): string | null {
     if (!this.isBrowser) return null;
     return localStorage.getItem(this.HOLDER_NAME_KEY);
@@ -150,7 +170,6 @@ export class AuthService {
     return this.hasToken();
   }
 
-  // Get Basic Auth header for interceptor
   getBasicAuthHeader(): string {
     const username = this.getUsername();
     const password = this.getPassword();

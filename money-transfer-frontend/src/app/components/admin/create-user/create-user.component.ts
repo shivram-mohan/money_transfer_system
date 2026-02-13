@@ -9,8 +9,7 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
-import { AuthService } from '../../../services/auth.service';
-import { UserManagementService } from '../../../services/user-management.service';
+import { AccountService, CreateAccountRequest } from '../../../services/account.service';
 import { AdminNavbarComponent } from '../admin-navbar/admin-navbar.component';
 
 @Component({
@@ -34,20 +33,15 @@ import { AdminNavbarComponent } from '../admin-navbar/admin-navbar.component';
 export class CreateUserComponent {
   createUserForm: FormGroup;
   isLoading = false;
-  hidePassword = true;
 
   constructor(
     private fb: FormBuilder,
-    private authService: AuthService,
-    private userManagementService: UserManagementService,
+    private accountService: AccountService,
     private router: Router,
     private snackBar: MatSnackBar
   ) {
     this.createUserForm = this.fb.group({
-      username: ['', [Validators.required, Validators.minLength(3)]],
-      password: ['', [Validators.required, Validators.minLength(6)]],
       name: ['', [Validators.required]],
-      email: ['', [Validators.email]],
       initialBalance: [1000, [Validators.required, Validators.min(0)]]
     });
   }
@@ -55,24 +49,36 @@ export class CreateUserComponent {
   onSubmit(): void {
     if (this.createUserForm.valid) {
       this.isLoading = true;
-      const adminName = this.authService.getHolderName() || 'admin';
-      
-      this.userManagementService.createUser(this.createUserForm.value, adminName).subscribe({
+
+      const request: CreateAccountRequest = {
+        holderName: this.createUserForm.value.name,
+        initialBalance: this.createUserForm.value.initialBalance
+      };
+
+      this.accountService.createAccount(request).subscribe({
         next: (response) => {
           this.isLoading = false;
-          this.snackBar.open('User created successfully!', 'Close', {
-            duration: 5000,
-            panelClass: ['success-snackbar']
-          });
+          this.snackBar.open(
+            `Account created successfully! Account ID: ${response.id}`,
+            'Close',
+            {
+              duration: 5000,
+              panelClass: ['success-snackbar']
+            }
+          );
           this.createUserForm.reset({ initialBalance: 1000 });
           this.router.navigate(['/admin/dashboard']);
         },
         error: (error) => {
           this.isLoading = false;
-          this.snackBar.open(error.message || 'Failed to create user', 'Close', {
-            duration: 5000,
-            panelClass: ['error-snackbar']
-          });
+          this.snackBar.open(
+            error?.error?.message || 'Failed to create account',
+            'Close',
+            {
+              duration: 5000,
+              panelClass: ['error-snackbar']
+            }
+          );
         }
       });
     }
@@ -82,4 +88,3 @@ export class CreateUserComponent {
     this.router.navigate(['/admin/dashboard']);
   }
 }
-

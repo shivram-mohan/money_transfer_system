@@ -103,10 +103,10 @@
                 >
                   <mat-icon>block</mat-icon>
                 </button>
-                <button 
-                  mat-icon-button 
+                <button
+                  mat-icon-button
                   color="primary"
-                  *ngIf="user.status === 'INACTIVE'"
+                  *ngIf="user.status === 'INACTIVE' || user.status === 'LOCKED'"
                   (click)="activateUser(user.id, user.username)"
                   matTooltip="Activate User"
                 >

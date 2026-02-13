@@ -47,11 +47,12 @@ export class AdminDashboardComponent implements OnInit {
       next: (users) => {
         this.totalUsers = users.length;
         this.activeUsers = users.filter(u => u.status === 'ACTIVE').length;
-        this.inactiveUsers = users.filter(u => u.status === 'INACTIVE').length;
+        this.inactiveUsers = users.filter(u => u.status === 'INACTIVE' || u.status === 'LOCKED').length;
+      },
+      error: (error) => {
+        console.error('Error loading statistics:', error);
       }
     });
-
-
   }
 
   navigateToUserList(): void {

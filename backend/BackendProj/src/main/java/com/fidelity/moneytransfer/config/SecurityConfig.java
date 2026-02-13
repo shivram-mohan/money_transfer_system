@@ -41,6 +41,8 @@ public class SecurityConfig {
                                 org.springframework.http.HttpMethod.GET,
                                 "/api/v1/accounts"
                         ).hasRole("ADMIN")
+                        // Auth endpoint for all authenticated users
+                        .requestMatchers("/api/v1/auth/**").authenticated()
                         // All other API endpoints require authentication
                         .requestMatchers("/api/v1/**").authenticated()
                         .anyRequest().permitAll()
