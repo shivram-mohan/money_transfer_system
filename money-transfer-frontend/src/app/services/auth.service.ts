@@ -2,7 +2,7 @@
 
 import { Injectable, PLATFORM_ID, inject } from '@angular/core';
 import { isPlatformBrowser } from '@angular/common';
-import { HttpClient, HttpHeaders } from '@angular/common/http';
+import { HttpClient } from '@angular/common/http';
 import { BehaviorSubject, Observable } from 'rxjs';
 import { tap } from 'rxjs/operators';
 import { UserRole } from '../models/user.model';
@@ -20,6 +20,8 @@ export interface LoginResponse {
   holderName: string;
   userId: number;
   role: UserRole;
+  username: string;
+  expiresIn: number;
 }
 
 @Injectable({
@@ -32,60 +34,49 @@ export class AuthService {
   private readonly USER_ID_KEY = 'user_id';
   private readonly USER_ROLE_KEY = 'user_role';
   private readonly USERNAME_KEY = 'username';
-  private readonly PASSWORD_KEY = 'password';
-  
+
   private platformId = inject(PLATFORM_ID);
   private isBrowser: boolean;
-  
+
   private isAuthenticatedSubject: BehaviorSubject<boolean>;
   public isAuthenticated$: Observable<boolean>;
 
   constructor(private http: HttpClient) {
     this.isBrowser = isPlatformBrowser(this.platformId);
-    this.isAuthenticatedSubject = new BehaviorSubject<boolean>(this.hasToken());
+    this.isAuthenticatedSubject = new BehaviorSubject<boolean>(
+      this.hasToken()
+    );
     this.isAuthenticated$ = this.isAuthenticatedSubject.asObservable();
   }
 
-  login(credentials: LoginRequest): Observable<any> {
-    const headers = new HttpHeaders({
-      'Authorization': 'Basic ' + btoa(
-        credentials.username + ':' + credentials.password
-      )
-    });
-
-    // Test auth by calling accounts endpoint
-    // Admin calls GET /accounts (all accounts)
-    // User calls GET /accounts/1 (specific account)
-    const testEndpoint = credentials.isAdmin
-      ? `${environment.apiUrl}/accounts`
-      : `${environment.apiUrl}/accounts/1`;
-
-    return this.http.get(testEndpoint, { headers }).pipe(
-      tap((response: any) => {
-        const role = credentials.isAdmin ? UserRole.ADMIN : UserRole.USER;
-        
-        // For regular users, get their account details
-        const accountId = credentials.isAdmin 
-          ? 999  // Admin doesn't have a real account
-          : 1;   // Default account for user
-        
-        const holderName = credentials.isAdmin
-          ? 'Admin'
-          : (Array.isArray(response) ? 'User' : response.holderName);
-
+  login(credentials: LoginRequest): Observable<LoginResponse> {
+    // Call the new JWT login endpoint
+    return this.http.post<LoginResponse>(
+      `${environment.apiUrl}/auth/login`,
+      {
+        username: credentials.username,
+        password: credentials.password
+      }
+    ).pipe(
+      tap((response: LoginResponse) => {
         if (this.isBrowser) {
-          localStorage.setItem(this.USERNAME_KEY, credentials.username);
-          localStorage.setItem(this.PASSWORD_KEY, credentials.password);
+          // Store JWT token and user info
+          localStorage.setItem(this.TOKEN_KEY, response.token);
           localStorage.setItem(
-            this.TOKEN_KEY, 
-            btoa(credentials.username + ':' + credentials.password)
+            this.ACCOUNT_ID_KEY, 
+            response.accountId?.toString() || '0'
           );
-          localStorage.setItem(this.ACCOUNT_ID_KEY, accountId.toString());
-          localStorage.setItem(this.HOLDER_NAME_KEY, holderName);
+          localStorage.setItem(
+            this.HOLDER_NAME_KEY, 
+            response.holderName
+          );
           localStorage.setItem(this.USER_ID_KEY, '1');
-          localStorage.setItem(this.USER_ROLE_KEY, role);
+          localStorage.setItem(this.USERNAME_KEY, response.username);
+          localStorage.setItem(
+            this.USER_ROLE_KEY, 
+            response.role
+          );
         }
-        
         this.isAuthenticatedSubject.next(true);
       })
     );
@@ -99,7 +90,6 @@ export class AuthService {
       localStorage.removeItem(this.USER_ID_KEY);
       localStorage.removeItem(this.USER_ROLE_KEY);
       localStorage.removeItem(this.USERNAME_KEY);
-      localStorage.removeItem(this.PASSWORD_KEY);
     }
     this.isAuthenticatedSubject.next(false);
   }
@@ -112,11 +102,6 @@ export class AuthService {
   getUsername(): string | null {
     if (!this.isBrowser) return null;
     return localStorage.getItem(this.USERNAME_KEY);
-  }
-
-  getPassword(): string | null {
-    if (!this.isBrowser) return null;
-    return localStorage.getItem(this.PASSWORD_KEY);
   }
 
   getCurrentAccountId(): number | null {
@@ -138,8 +123,7 @@ export class AuthService {
 
   getUserRole(): UserRole | null {
     if (!this.isBrowser) return null;
-    const role = localStorage.getItem(this.USER_ROLE_KEY);
-    return role as UserRole;
+    return localStorage.getItem(this.USER_ROLE_KEY) as UserRole;
   }
 
   isAdmin(): boolean {
@@ -148,16 +132,6 @@ export class AuthService {
 
   isAuthenticated(): boolean {
     return this.hasToken();
-  }
-
-  // Get Basic Auth header for interceptor
-  getBasicAuthHeader(): string {
-    const username = this.getUsername();
-    const password = this.getPassword();
-    if (username && password) {
-      return 'Basic ' + btoa(username + ':' + password);
-    }
-    return '';
   }
 
   private hasToken(): boolean {

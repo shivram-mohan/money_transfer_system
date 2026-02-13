@@ -6,13 +6,15 @@ import { AuthService } from '../services/auth.service';
 
 export const authInterceptor: HttpInterceptorFn = (req, next) => {
   const authService = inject(AuthService);
-  
-  // Use Basic Auth instead of Bearer token
-  const authHeader = authService.getBasicAuthHeader();
+  const token = authService.getToken();
 
-  if (authHeader) {
+  // Add Bearer token to all requests
+  if (token) {
     const clonedRequest = req.clone({
-      headers: req.headers.set('Authorization', authHeader)
+      headers: req.headers.set(
+        'Authorization', 
+        `Bearer ${token}`  // ← JWT Bearer token
+      )
     });
     return next(clonedRequest);
   }
