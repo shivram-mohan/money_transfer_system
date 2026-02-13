@@ -23,6 +23,9 @@ public class Account {
     @Column(name = "holder_name", nullable = false)
     private String holderName;
 
+    @Column(unique = true)
+    private String username;
+
     @Column(nullable = false, precision = 18, scale = 2)
     private BigDecimal balance;
 

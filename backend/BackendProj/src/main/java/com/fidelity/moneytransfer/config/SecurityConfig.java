@@ -53,7 +53,7 @@ public class SecurityConfig {
     }
 
     @Bean
-    public UserDetailsService userDetailsService() {
+    public InMemoryUserDetailsManager userDetailsService() {
         // Regular user
         UserDetails user = User.builder()
                 .username("user")

@@ -9,6 +9,8 @@ import { TransactionLog } from '../models/transaction.model';
 
 export interface CreateAccountRequest {
   holderName: string;
+  username: string;
+  password: string;
   initialBalance: number;
 }
 

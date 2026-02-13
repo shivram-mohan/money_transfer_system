@@ -42,6 +42,8 @@ export class CreateUserComponent {
   ) {
     this.createUserForm = this.fb.group({
       name: ['', [Validators.required]],
+      username: ['', [Validators.required]],
+      password: ['', [Validators.required, Validators.minLength(6)]],
       initialBalance: [1000, [Validators.required, Validators.min(0)]]
     });
   }
@@ -52,6 +54,8 @@ export class CreateUserComponent {
 
       const request: CreateAccountRequest = {
         holderName: this.createUserForm.value.name,
+        username: this.createUserForm.value.username,
+        password: this.createUserForm.value.password,
         initialBalance: this.createUserForm.value.initialBalance
       };
 
@@ -59,7 +63,7 @@ export class CreateUserComponent {
         next: (response) => {
           this.isLoading = false;
           this.snackBar.open(
-            `Account created successfully! Account ID: ${response.id}`,
+            `Account created! ID: ${response.id}, Username: ${response.username}`,
             'Close',
             {
               duration: 5000,

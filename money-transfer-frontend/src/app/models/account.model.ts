@@ -18,6 +18,7 @@ export interface Account {
 export interface AccountResponse {
   id: number;
   holderName: string;
+  username?: string;
   balance: number;
   status: string;
   lastUpdated?: string;
