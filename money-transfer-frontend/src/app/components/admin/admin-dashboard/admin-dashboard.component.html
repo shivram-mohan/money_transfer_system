@@ -11,6 +11,20 @@
   <div class="dashboard-content">
     <!-- Statistics Cards -->
     <div class="stats-grid">
+      <!-- Add this widget alongside other stats -->
+      <mat-card class="stat-card pending">
+        <mat-card-content>
+          <div class="stat-icon">
+            <mat-icon [matBadge]="pendingUsers" matBadgeColor="warn">
+              hourglass_empty
+            </mat-icon>
+          </div>
+          <div class="stat-info">
+            <h3>{{ pendingUsers }}</h3>
+            <p>Pending Approval</p>
+          </div>
+        </mat-card-content>
+      </mat-card>
       <mat-card class="stat-card total-users">
         <mat-card-content>
           <div class="stat-icon">

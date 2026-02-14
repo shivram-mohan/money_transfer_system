@@ -41,6 +41,7 @@ export class AdminDashboardComponent implements OnInit {
     this.adminName = this.authService.getHolderName();
     this.loadStatistics();
   }
+  pendingUsers = 0;
 
   loadStatistics(): void {
     this.userManagementService.getAllUsers().subscribe({
@@ -48,6 +49,8 @@ export class AdminDashboardComponent implements OnInit {
         this.totalUsers = users.length;
         this.activeUsers = users.filter(u => u.status === 'ACTIVE').length;
         this.inactiveUsers = users.filter(u => u.status === 'INACTIVE').length;
+        this.pendingUsers = users.filter(u => u.status === 'PENDING').length; // ← ADD THIS
+
       }
     });
 

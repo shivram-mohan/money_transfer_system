@@ -1,13 +1,16 @@
 package com.fidelity.moneytransfer.controller;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 
 import com.fidelity.moneytransfer.config.JwtUtil;
 import com.fidelity.moneytransfer.dto.AuthRequest;
 import com.fidelity.moneytransfer.dto.AuthResponse;
+import com.fidelity.moneytransfer.dto.SignupRequest;
+import com.fidelity.moneytransfer.dto.UserResponseDto;
 import com.fidelity.moneytransfer.repository.UserRepository;
+import com.fidelity.moneytransfer.service.UserService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
@@ -25,6 +28,7 @@ public class AuthController {
     private final AuthenticationManager authenticationManager;
     private final JwtUtil jwtUtil;
     private final UserRepository userRepository;
+    private final UserService userService;
 
     @PostMapping("/login")
     public ResponseEntity<AuthResponse> login(
@@ -53,12 +57,10 @@ public class AuthController {
             log.info("Role determined: {}", role);
 
             // Step 3: Get account ID and holder name
-            // For admin - no account needed
             Long accountId = null;
             String holderName = request.getUsername();
 
             if (!role.equals("ADMIN")) {
-                // Only look up account for regular users
                 var userOptional = userRepository
                         .findByUsername(request.getUsername());
 
@@ -69,7 +71,6 @@ public class AuthController {
                 } else {
                     log.warn("No user record found for: {}",
                             request.getUsername());
-                    // Use default account ID 1 for testing
                     accountId = 1L;
                 }
             }
@@ -100,10 +101,25 @@ public class AuthController {
             throw e;
         }
     }
-    // TEMPORARY - for generating password hash
-    @GetMapping("/hash/{password}")
-    public String hashPassword(@PathVariable String password) {
-        BCryptPasswordEncoder encoder = new BCryptPasswordEncoder();
-        return encoder.encode(password);
+
+    @PostMapping("/signup")
+    public ResponseEntity<UserResponseDto> signup(
+            @Valid @RequestBody SignupRequest request) {
+
+        log.info("Signup request for username: {}", request.getUsername());
+
+        try {
+            UserResponseDto user = userService.signupUser(request);
+            log.info("Signup successful - awaiting approval: {}",
+                    request.getUsername());
+
+            return ResponseEntity
+                    .status(HttpStatus.CREATED)
+                    .body(user);
+
+        } catch (IllegalArgumentException e) {
+            log.error("Signup failed: {}", e.getMessage());
+            throw e;
+        }
     }
 }

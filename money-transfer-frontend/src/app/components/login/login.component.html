@@ -58,7 +58,7 @@
               <div class="demo-credentials user-demo">
                 <p><strong>Demo Credentials:</strong></p>
                 <p>Username: <code>demo</code> | Password: <code>demo</code></p>
-                <p>Username: <code>john.doe</code> | Password: <code>password123</code></p>
+                <p>Username: <code>johndoe</code> | Password: <code>password123</code></p>
               </div>
 
               <button 
@@ -125,7 +125,7 @@
               <div class="demo-credentials admin-demo">
                 <p><strong>Admin Credentials:</strong></p>
                 <p>Username: <code>admin</code> | Password: <code>admin123</code></p>
-                </div>
+              </div>
 
               <button 
                 mat-raised-button 
@@ -145,5 +145,16 @@
         </mat-tab>
       </mat-tab-group>
     </mat-card-content>
+
+    <!-- ✅ MOVED OUTSIDE mat-card-content -->
+    <mat-card-actions class="card-actions">
+      <mat-divider></mat-divider>
+      <div class="signup-link">
+        <p>New user? 
+          <a routerLink="/signup" class="link">Create an account</a>
+        </p>
+      </div>
+    </mat-card-actions>
+
   </mat-card>
 </div>

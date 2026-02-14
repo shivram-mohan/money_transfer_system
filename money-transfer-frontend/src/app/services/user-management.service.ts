@@ -56,4 +56,19 @@ export class UserManagementService {
       `${this.apiUrl}/deactivate`, request
     );
   }
+
+  // Approve pending user
+approveUser(userId: number): Observable<UserResponse> {
+  return this.http.put<UserResponse>(
+    `${this.apiUrl}/${userId}/approve`, {}
+  );
+}
+
+// Reject pending user  
+rejectUser(userId: number, reason?: string): Observable<void> {
+  const params = reason ? `?reason=${encodeURIComponent(reason)}` : '';
+  return this.http.delete<void>(
+    `${this.apiUrl}/${userId}/reject${params}`
+  );
+}
 }

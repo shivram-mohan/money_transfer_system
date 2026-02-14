@@ -8,10 +8,12 @@ import { UserListComponent } from './components/admin/user-list/user-list.compon
 import { CreateUserComponent } from './components/admin/create-user/create-user.component';
 import { authGuard } from './guards/auth.guard';
 import { adminGuard } from './guards/admin.guard'; // ← Make sure this is correct
+import { SignupComponent } from './components/signup/signup.component';
 
 export const routes: Routes = [
   { path: '', redirectTo: '/login', pathMatch: 'full' },
   { path: 'login', component: LoginComponent },
+  { path: 'signup', component: SignupComponent }, // ← ADD THIS
 
   // User routes
   { 

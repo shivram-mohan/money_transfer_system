@@ -14,11 +14,14 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatTabsModule } from '@angular/material/tabs';
 import { AuthService } from '../../services/auth.service';
 import { UserRole } from '../../models/user.model';
+import { MatDivider } from "@angular/material/divider";
+import { RouterModule } from '@angular/router';
 
 @Component({
   selector: 'app-login',
   standalone: true,
   imports: [
+    RouterModule,
     CommonModule,
     ReactiveFormsModule,
     MatCardModule,
@@ -28,8 +31,9 @@ import { UserRole } from '../../models/user.model';
     MatProgressSpinnerModule,
     MatSnackBarModule,
     MatIconModule,
-    MatTabsModule
-  ],
+    MatTabsModule,
+    MatDivider
+],
   templateUrl: './login.component.html',
   styleUrls: ['./login.component.scss']
 })

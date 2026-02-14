@@ -89,32 +89,52 @@
             <td mat-cell *matCellDef="let user">{{ formatDate(user.createdDate) }}</td>
           </ng-container>
 
-          <!-- Actions Column -->
-          <ng-container matColumnDef="actions">
-            <th mat-header-cell *matHeaderCellDef>Actions</th>
-            <td mat-cell *matCellDef="let user">
-              <div class="action-buttons">
-                <button 
-                  mat-icon-button 
-                  color="warn"
-                  *ngIf="user.status === 'ACTIVE'"
-                  (click)="deactivateUser(user.id, user.username)"
-                  matTooltip="Deactivate User"
-                >
-                  <mat-icon>block</mat-icon>
-                </button>
-                <button 
-                  mat-icon-button 
-                  color="primary"
-                  *ngIf="user.status === 'INACTIVE'"
-                  (click)="activateUser(user.id, user.username)"
-                  matTooltip="Activate User"
-                >
-                  <mat-icon>check_circle</mat-icon>
-                </button>
-              </div>
-            </td>
-          </ng-container>
+        <!-- Actions Column -->
+<ng-container matColumnDef="actions">
+  <th mat-header-cell *matHeaderCellDef>Actions</th>
+  <td mat-cell *matCellDef="let user">
+    
+    <!-- For PENDING users - show Approve/Reject -->
+    <div *ngIf="user.status === 'PENDING'" class="action-buttons">
+      <button mat-raised-button 
+              color="primary"
+              (click)="approveUser(user.id, user.username)"
+              class="action-btn">
+        <mat-icon>check_circle</mat-icon>
+        Approve
+      </button>
+      
+      <button mat-raised-button 
+              color="warn"
+              (click)="rejectUser(user.id, user.username)"
+              class="action-btn">
+        <mat-icon>cancel</mat-icon>
+        Reject
+      </button>
+    </div>
+
+    <!-- For ACTIVE users - show Deactivate -->
+    <button mat-stroked-button 
+            color="warn"
+            *ngIf="user.status === 'ACTIVE'"
+            (click)="deactivateUser(user.id, user.username)"
+            class="action-btn">
+      <mat-icon>block</mat-icon>
+      Deactivate
+    </button>
+
+    <!-- For INACTIVE users - show Activate -->
+    <button mat-stroked-button 
+            color="primary"
+            *ngIf="user.status === 'INACTIVE'"
+            (click)="activateUser(user.id, user.username)"
+            class="action-btn">
+      <mat-icon>check_circle</mat-icon>
+      Activate
+    </button>
+
+  </td>
+</ng-container>
 
           <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
           <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>

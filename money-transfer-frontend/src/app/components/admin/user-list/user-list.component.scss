@@ -7,7 +7,24 @@
   background-color: #f5f5f5;
   min-height: calc(100vh - 64px);
 }
+.action-buttons {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
 
+.action-btn {
+  margin: 4px;
+  
+  mat-icon {
+    margin-right: 4px;
+  }
+}
+
+.status-pending {
+  background-color: #fff3e0;
+  color: #e65100;
+}
 .header-section {
   display: flex;
   justify-content: space-between;

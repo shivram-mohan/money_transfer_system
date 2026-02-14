@@ -7,6 +7,7 @@ import { BehaviorSubject, Observable } from 'rxjs';
 import { tap } from 'rxjs/operators';
 import { UserRole } from '../models/user.model';
 import { environment } from '../../environments/environment';
+import { SignupRequest, UserResponse } from '../models/user.model';
 
 export interface LoginRequest {
   username: string;
@@ -48,6 +49,14 @@ export class AuthService {
     );
     this.isAuthenticated$ = this.isAuthenticatedSubject.asObservable();
   }
+
+  // Add this method after login()
+signup(request: SignupRequest): Observable<UserResponse> {
+  return this.http.post<UserResponse>(
+    `${environment.apiUrl}/auth/signup`,
+    request
+  );
+}
 
   login(credentials: LoginRequest): Observable<LoginResponse> {
     // Call the new JWT login endpoint

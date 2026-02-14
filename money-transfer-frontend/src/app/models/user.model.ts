@@ -59,3 +59,10 @@ export interface DeactivateUserRequest {
   userId: number;
   reason: string;
 }
+export interface SignupRequest {
+  username: string;
+  password: string;
+  name: string;
+  email?: string;
+  initialBalance: number;
+}

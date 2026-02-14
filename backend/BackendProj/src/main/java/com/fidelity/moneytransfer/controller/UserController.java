@@ -20,16 +20,9 @@ import java.util.List;
 @Slf4j
 public class UserController {
 
-
-    // Get all users (Admin only)
-    @GetMapping("/by-username/{username}")
-    public ResponseEntity<UserResponseDto> getUserByUsername(
-            @PathVariable String username) {
-        log.info("Fetching user with username: {}", username);
-        return ResponseEntity.ok(userService.getUserByUsername(username));
-    }
-
     private final UserService userService;
+
+    // ─── EXISTING ENDPOINTS ───────────────────────────────────────────
 
     @GetMapping
     public ResponseEntity<List<UserResponseDto>> getAllUsers() {
@@ -37,21 +30,18 @@ public class UserController {
         return ResponseEntity.ok(userService.getAllUsers());
     }
 
-    // Get pending users (Admin only)
     @GetMapping("/pending")
     public ResponseEntity<List<UserResponseDto>> getPendingUsers() {
         log.info("Admin: Fetching pending users");
         return ResponseEntity.ok(userService.getPendingUsers());
     }
 
-    // Get user by ID
     @GetMapping("/{id}")
     public ResponseEntity<UserResponseDto> getUserById(@PathVariable Long id) {
         log.info("Fetching user with id: {}", id);
         return ResponseEntity.ok(userService.getUserById(id));
     }
 
-    // Create new user (Admin only)
     @PostMapping
     public ResponseEntity<UserResponseDto> createUser(
             @Valid @RequestBody CreateUserRequest request,
@@ -63,14 +53,12 @@ public class UserController {
                 .body(userService.createUser(request, createdBy));
     }
 
-    // Activate user (Admin only)
     @PutMapping("/{id}/activate")
     public ResponseEntity<UserResponseDto> activateUser(@PathVariable Long id) {
         log.info("Admin: Activating user id: {}", id);
         return ResponseEntity.ok(userService.activateUser(id));
     }
 
-    // Deactivate user (Admin only)
     @PutMapping("/deactivate")
     public ResponseEntity<UserResponseDto> deactivateUser(
             @RequestBody DeactivateUserRequest request) {
@@ -78,5 +66,23 @@ public class UserController {
         return ResponseEntity.ok(userService.deactivateUser(request));
     }
 
-    // Get user by username (for login)
+    // ─── NEW ENDPOINTS FOR SIGNUP APPROVAL ────────────────────────────
+
+    @PutMapping("/{id}/approve")
+    public ResponseEntity<UserResponseDto> approveUser(
+            @PathVariable Long id,
+            Authentication authentication) {
+        log.info("Admin: Approving pending user id: {}", id);
+        String approvedBy = authentication.getName();
+        return ResponseEntity.ok(userService.approveUser(id, approvedBy));
+    }
+
+    @DeleteMapping("/{id}/reject")
+    public ResponseEntity<Void> rejectUser(
+            @PathVariable Long id,
+            @RequestParam(required = false) String reason) {
+        log.info("Admin: Rejecting pending user id: {}", id);
+        userService.rejectUser(id, reason != null ? reason : "Rejected by admin");
+        return ResponseEntity.noContent().build();
+    }
 }
