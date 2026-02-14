@@ -47,9 +47,34 @@ public class AccountService {
 
     public List<TransactionLog> getTransactionHistory(Long accountId) {
         log.debug("Fetching transaction history for account: {}", accountId);
+
+        // Verify account exists
         getAccountById(accountId);
-        return transactionLogRepository
+
+        // Get transactions
+        List<TransactionLog> transactions = transactionLogRepository
                 .findByFromAccountIdOrToAccountId(accountId, accountId);
+
+        // ✅ NEW - Populate account holder names
+        transactions.forEach(txn -> {
+            // Get "from" account holder name
+            if (txn.getFromAccountId() != null) {
+                accountRepository.findById(txn.getFromAccountId())
+                        .ifPresent(account ->
+                                txn.setFromAccountHolderName(account.getHolderName())
+                        );
+            }
+
+            // Get "to" account holder name
+            if (txn.getToAccountId() != null) {
+                accountRepository.findById(txn.getToAccountId())
+                        .ifPresent(account ->
+                                txn.setToAccountHolderName(account.getHolderName())
+                        );
+            }
+        });
+
+        return transactions;
     }
 
     // ─── ADMIN METHODS ────────────────────────────────────────────────

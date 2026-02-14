@@ -281,3 +281,54 @@ mat-chip {
     font-size: 22px;
   }
 }
+
+// ✅ NEW - Account Details Styles
+.account-details {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.account-info {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  
+  .small-icon {
+    font-size: 18px;
+    width: 18px;
+    height: 18px;
+    color: #666;
+    flex-shrink: 0;
+  }
+  
+  .account-text {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+  }
+  
+  .account-name {
+    font-weight: 600;
+    color: #333;
+    font-size: 14px;
+  }
+  
+  .account-id {
+    font-size: 11px;
+    color: #999;
+  }
+}
+
+// Mobile account name styles
+.account-name-mobile {
+  font-weight: 600;
+  color: #333;
+  display: block;
+}
+
+.account-id-mobile {
+  font-size: 11px;
+  color: #999;
+  display: block;
+}

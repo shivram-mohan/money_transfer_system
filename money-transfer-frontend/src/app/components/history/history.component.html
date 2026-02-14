@@ -60,19 +60,35 @@
           </ng-container>
 
           <!-- Account Column -->
-          <ng-container matColumnDef="accountId">
-            <th mat-header-cell *matHeaderCellDef>Account</th>
-            <td mat-cell *matCellDef="let transaction">
-              <div class="account-cell">
-                <span class="account-label">
-                  {{ transaction.type === 'DEBIT' ? 'To:' : 'From:' }}
-                </span>
-                <span class="account-id">
-                  {{ transaction.type === 'DEBIT' ? transaction.toAccountId : transaction.fromAccountId }}
-                </span>
+<!-- ✅ NEW - Account Details Column with Names -->
+        <ng-container matColumnDef="accountDetails">
+          <th mat-header-cell *matHeaderCellDef>From / To</th>
+          <td mat-cell *matCellDef="let transaction">
+            <div class="account-details">
+              <!-- For DEBIT transactions (money going out) -->
+              <div *ngIf="transaction.type === 'DEBIT'" class="account-info">
+                <mat-icon class="small-icon">arrow_forward</mat-icon>
+                <div class="account-text">
+                  <span class="account-name">
+                    {{ transaction.toAccountHolderName || 'Unknown' }}
+                  </span>
+                  <span class="account-id">(#{{ transaction.toAccountId }})</span>
+                </div>
               </div>
-            </td>
-          </ng-container>
+              
+              <!-- For CREDIT transactions (money coming in) -->
+              <div *ngIf="transaction.type === 'CREDIT'" class="account-info">
+                <mat-icon class="small-icon">arrow_back</mat-icon>
+                <div class="account-text">
+                  <span class="account-name">
+                    {{ transaction.fromAccountHolderName || 'Unknown' }}
+                  </span>
+                  <span class="account-id">(#{{ transaction.fromAccountId }})</span>
+                </div>
+              </div>
+            </div>
+          </td>
+        </ng-container>
 
           <!-- Amount Column -->
           <ng-container matColumnDef="amount">
@@ -122,9 +138,17 @@
               <span class="label">Date:</span>
               <span class="value">{{ formatDate(transaction.createdOn) }}</span>
             </div>
+            <!-- ✅ NEW - Mobile view with names -->
             <div class="transaction-row">
-              <span class="label">{{ transaction.type === 'DEBIT' ? 'To Account:' : 'From Account:' }}</span>
-              <span class="value">{{ transaction.type === 'DEBIT' ? transaction.toAccountId : transaction.fromAccountId }}</span>
+              <span class="label">{{ transaction.type === 'DEBIT' ? 'To:' : 'From:' }}</span>
+              <span class="value">
+                <span class="account-name-mobile">
+                  {{ transaction.type === 'DEBIT' ? (transaction.toAccountHolderName || 'Unknown') : (transaction.fromAccountHolderName || 'Unknown') }}
+                </span>
+                <span class="account-id-mobile">
+                  (#{{ transaction.type === 'DEBIT' ? transaction.toAccountId : transaction.fromAccountId }})
+                </span>
+              </span>
             </div>
             <div class="transaction-row">
               <span class="label">Amount:</span>

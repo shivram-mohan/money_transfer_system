@@ -5,18 +5,8 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="9abde197-823a-4056-bf58-1fba2e1bff4f" name="Changes" comment="">
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/fidelity/moneytransfer/controller/AuthController.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/fidelity/moneytransfer/controller/AuthController.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/fidelity/moneytransfer/controller/UserController.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/fidelity/moneytransfer/controller/UserController.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/fidelity/moneytransfer/service/UserService.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/fidelity/moneytransfer/service/UserService.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../../money-transfer-frontend/src/app/app.routes.ts" beforeDir="false" afterPath="$PROJECT_DIR$/../../money-transfer-frontend/src/app/app.routes.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../../money-transfer-frontend/src/app/components/admin/admin-dashboard/admin-dashboard.component.html" beforeDir="false" afterPath="$PROJECT_DIR$/../../money-transfer-frontend/src/app/components/admin/admin-dashboard/admin-dashboard.component.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../../money-transfer-frontend/src/app/components/admin/admin-dashboard/admin-dashboard.component.ts" beforeDir="false" afterPath="$PROJECT_DIR$/../../money-transfer-frontend/src/app/components/admin/admin-dashboard/admin-dashboard.component.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../../money-transfer-frontend/src/app/components/admin/user-list/user-list.component.scss" beforeDir="false" afterPath="$PROJECT_DIR$/../../money-transfer-frontend/src/app/components/admin/user-list/user-list.component.scss" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../../money-transfer-frontend/src/app/components/admin/user-list/user-list.component.ts" beforeDir="false" afterPath="$PROJECT_DIR$/../../money-transfer-frontend/src/app/components/admin/user-list/user-list.component.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../../money-transfer-frontend/src/app/components/login/login.component.scss" beforeDir="false" afterPath="$PROJECT_DIR$/../../money-transfer-frontend/src/app/components/login/login.component.scss" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../../money-transfer-frontend/src/app/models/user.model.ts" beforeDir="false" afterPath="$PROJECT_DIR$/../../money-transfer-frontend/src/app/models/user.model.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../../money-transfer-frontend/src/app/services/auth.service.ts" beforeDir="false" afterPath="$PROJECT_DIR$/../../money-transfer-frontend/src/app/services/auth.service.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/fidelity/moneytransfer/entity/TransactionLog.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/fidelity/moneytransfer/entity/TransactionLog.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/fidelity/moneytransfer/service/AccountService.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/fidelity/moneytransfer/service/AccountService.java" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />

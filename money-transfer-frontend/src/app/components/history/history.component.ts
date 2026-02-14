@@ -9,6 +9,7 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { MatChipsModule } from '@angular/material/chips';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
+import { MatTooltipModule } from '@angular/material/tooltip';
 import { AuthService } from '../../services/auth.service';
 import { AccountService } from '../../services/account.service';
 import { TransactionLog, TransactionStatus } from '../../models/transaction.model';
@@ -30,6 +31,7 @@ interface TransactionDisplay extends TransactionLog {
     MatIconModule,
     MatChipsModule,
     MatProgressSpinnerModule,
+    MatTooltipModule,
     NavbarComponent
   ],
   templateUrl: './history.component.html',
@@ -37,7 +39,7 @@ interface TransactionDisplay extends TransactionLog {
 })
 export class HistoryComponent implements OnInit {
   transactions: TransactionDisplay[] = [];
-  displayedColumns: string[] = ['date', 'type', 'accountId', 'amount', 'status'];
+  displayedColumns: string[] = ['date', 'type', 'accountDetails', 'amount', 'status']; // ✅ Changed
   isLoading = true;
   currentAccountId: number | null = null;
 

@@ -40,6 +40,12 @@ public class TransactionLog {
 
     @Column(name = "created_on")
     private LocalDateTime createdOn;
+    @Transient
+    private String fromAccountHolderName;
+
+    @Transient
+    private String toAccountHolderName;
+
 
     @PrePersist
     public void prePersist() {

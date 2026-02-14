@@ -117,30 +117,41 @@ export class TransferComponent implements OnInit {
       };
 
       this.transferService.transfer(transferRequest).subscribe({
-        next: (response: any) => {
-          this.isLoading = false;
-          this.transferSuccess = true;
-          this.transferResult = response;
-          this.snackBar.open('Transfer completed successfully!', 'Close', {
+  next: (response) => {
+    this.isLoading = false;
+    this.transferSuccess = true;
+    this.transferResult = response;
+    
+    // ✅ Show recipient name if available
+    this.accountService.getAccount(response.creditedTo).subscribe({
+      next: (account) => {
+        this.snackBar.open(
+          `₹${response.amount} sent successfully to ${account.holderName}!`, 
+          'Close', 
+          {
             duration: 5000,
             panelClass: ['success-snackbar']
-          });
-          
-          // Reload balance
-          this.loadBalance();
-          
-          // Reset form
-          this.transferForm.reset();
-        },
-        error: (error: { message: string; }) => {
-          this.isLoading = false;
-          const errorMessage = error.message || 'Transfer failed. Please try again.';
-          this.snackBar.open(errorMessage, 'Close', {
+          }
+        );
+      },
+      error: () => {
+        // Fallback if account fetch fails
+        this.snackBar.open(
+          'Transfer completed successfully!', 
+          'Close', 
+          {
             duration: 5000,
-            panelClass: ['error-snackbar']
-          });
-        }
-      });
+            panelClass: ['success-snackbar']
+          }
+        );
+      }
+    });
+    
+    this.loadBalance();
+    this.transferForm.reset();
+  },
+  // ... error handler
+});
     }
   }
 

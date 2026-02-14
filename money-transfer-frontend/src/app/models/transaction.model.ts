@@ -14,6 +14,8 @@ export interface TransactionLog {
   failureReason?: string;
   idempotencyKey: string;
   createdOn: Date;
+   fromAccountHolderName?: string;
+  toAccountHolderName?: string
 }
 
 export interface TransferRequest {
