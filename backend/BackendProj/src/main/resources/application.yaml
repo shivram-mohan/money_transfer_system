@@ -32,3 +32,4 @@ app:
   jwt:
     secret: "3f8b2c9d4e5a6f7g8h9i0j1k2l3m4n5o6p7q8r9s0t1u2v3w4x5y6z7a8b9c0d"
     expiration: 86400000 # 24 hours in milliseconds
+
