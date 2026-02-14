@@ -10,6 +10,8 @@ import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { AuthService } from '../../services/auth.service';
 import { AccountService } from '../../services/account.service';
 import { NavbarComponent } from '../navbar/navbar.component';
+import { AccountLimits } from '../account-limits/account-limits';
+import { AccountType } from '../../models/account.model';
 
 @Component({
   selector: 'app-dashboard',
@@ -20,7 +22,8 @@ import { NavbarComponent } from '../navbar/navbar.component';
     MatButtonModule,
     MatIconModule,
     MatProgressSpinnerModule,
-    NavbarComponent
+    NavbarComponent,
+    AccountLimits
   ],
   templateUrl: './dashboard.component.html',
   styleUrls: ['./dashboard.component.scss']
@@ -30,6 +33,9 @@ export class DashboardComponent implements OnInit {
   accountId: number | null = null;
   balance: number = 0;
   isLoading = true;
+  accountType: AccountType = AccountType.SAVINGS;
+  monthlyTransactionCount: number = 0;
+  dailyWithdrawalAmount: number = 0;
 
   constructor(
     private authService: AuthService,
@@ -42,10 +48,28 @@ export class DashboardComponent implements OnInit {
     this.accountId = this.authService.getCurrentAccountId();
     
     if (this.accountId) {
-      this.loadBalance();
+      this.loadAccount();
     }
   }
-
+loadAccount(): void {
+  if (this.accountId) {
+    this.isLoading = true;
+    this.accountService.getAccount(this.accountId).subscribe({
+      next: (account) => {
+        this.holderName = account.holderName;
+        this.balance = account.balance;
+        this.accountType = account.accountType as AccountType; // ✅ NEW
+        this.monthlyTransactionCount = account.monthlyTransactionCount || 0; // ✅ NEW
+        this.dailyWithdrawalAmount = account.dailyWithdrawalAmount || 0; // ✅ NEW
+        this.isLoading = false;
+      },
+      error: (error) => {
+        console.error('Error loading account:', error);
+        this.isLoading = false;
+      }
+    });
+  }
+}
   loadBalance(): void {
     if (this.accountId) {
       this.isLoading = true;
@@ -71,6 +95,6 @@ export class DashboardComponent implements OnInit {
   }
 
   refreshBalance(): void {
-    this.loadBalance();
+    this.loadAccount();
   }
 }

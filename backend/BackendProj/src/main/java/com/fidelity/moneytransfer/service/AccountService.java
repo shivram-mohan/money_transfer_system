@@ -26,7 +26,7 @@ import java.util.stream.Collectors;
 @Slf4j
 @Transactional(readOnly = true)
 public class AccountService {
-
+    private final AccountTypeValidationService accountTypeValidationService;
     private final AccountRepository accountRepository;
     private final TransactionLogRepository transactionLogRepository;
 
@@ -94,11 +94,16 @@ public class AccountService {
     @Transactional
     public AccountResponse createAccount(CreateAccountRequest request) {
         log.info("Creating new account for: {}", request.getHolderName());
-
+        // ✅ NEW - Validate minimum balance for account type
+        accountTypeValidationService.validateMinimumBalance(
+                request.getAccountType(),
+                request.getInitialBalance()
+        );
         Account account = Account.builder()
                 .holderName(request.getHolderName())
                 .balance(request.getInitialBalance())
                 .status(AccountStatus.ACTIVE)
+                .accountType(request.getAccountType())
                 .version(0)
                 .build();
 
@@ -138,6 +143,7 @@ public class AccountService {
                 .holderName(account.getHolderName())
                 .balance(account.getBalance())
                 .status(account.getStatus().name())
+                .accountType(account.getAccountType().name())
                 .lastUpdated(account.getLastUpdated())
                 .build();
     }

@@ -20,5 +20,5 @@ public class AccountResponse {
     private BigDecimal balance;
     private String status;
     private LocalDateTime lastUpdated;
-
+    private String accountType;
 }

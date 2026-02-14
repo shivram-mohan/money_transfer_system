@@ -116,43 +116,42 @@ export class TransferComponent implements OnInit {
         idempotencyKey: this.transferService.generateIdempotencyKey()
       };
 
-      this.transferService.transfer(transferRequest).subscribe({
-  next: (response) => {
-    this.isLoading = false;
-    this.transferSuccess = true;
-    this.transferResult = response;
-    
-    // ✅ Show recipient name if available
-    this.accountService.getAccount(response.creditedTo).subscribe({
-      next: (account) => {
-        this.snackBar.open(
-          `₹${response.amount} sent successfully to ${account.holderName}!`, 
-          'Close', 
-          {
-            duration: 5000,
-            panelClass: ['success-snackbar']
-          }
-        );
-      },
-      error: () => {
-        // Fallback if account fetch fails
-        this.snackBar.open(
-          'Transfer completed successfully!', 
-          'Close', 
-          {
-            duration: 5000,
-            panelClass: ['success-snackbar']
-          }
-        );
-      }
+        this.transferService.transfer(transferRequest).subscribe({
+    next: (response) => {
+      this.isLoading = false;
+      this.transferSuccess = true;
+      this.transferResult = response;
+      
+      // ✅ Show recipient name if available
+      this.accountService.getAccount(response.creditedTo).subscribe({
+        next: (account) => {
+          this.snackBar.open(
+            `₹${response.amount} sent successfully to ${account.holderName}!`, 
+            'Close', 
+            {
+              duration: 5000,
+              panelClass: ['success-snackbar']
+            }
+          );
+        },
+        error: () => {
+          // Fallback if account fetch fails
+          this.snackBar.open(
+            'Transfer completed successfully!', 
+            'Close', 
+            {
+              duration: 5000,
+              panelClass: ['success-snackbar']
+            }
+          );
+        }
+      });
+      
+      this.loadBalance();
+      this.transferForm.reset();
+    },
     });
-    
-    this.loadBalance();
-    this.transferForm.reset();
-  },
-  // ... error handler
-});
-    }
+  }
   }
 
   resetForm(): void {

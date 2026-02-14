@@ -24,6 +24,8 @@ import org.springframework.transaction.annotation.Transactional;
 
 @Service
 public class TransferService {
+    private final AccountTypeValidationService accountTypeValidationService;
+
     private static final Logger log = LoggerFactory.getLogger(TransferService.class);
     private final AccountService accountService;
     private final AccountRepository accountRepository;
@@ -86,8 +88,16 @@ public class TransferService {
         try {
             Account fromAccount = this.accountService.getAccountById(request.getFromAccountId());
             Account toAccount = this.accountService.getAccountById(request.getToAccountId());
+            accountTypeValidationService.validateDebitTransaction(
+                    fromAccount, request.getAmount()
+            );
+            accountTypeValidationService.validateCreditTransaction(
+                    toAccount, request.getAmount()
+            );
             fromAccount.debit(request.getAmount());
             toAccount.credit(request.getAmount());
+            fromAccount.incrementTransactionCount();
+            fromAccount.addToDailyWithdrawal(request.getAmount());
             this.accountRepository.save(fromAccount);
             this.accountRepository.save(toAccount);
             transactionLog = this.createTransactionLog(request, TransactionStatus.SUCCESS, (String)null);
@@ -119,9 +129,14 @@ public class TransferService {
                 .build();
     }
 
-    public TransferService(final AccountService accountService, final AccountRepository accountRepository, final TransactionLogRepository transactionLogRepository) {
+    public TransferService(
+            AccountService accountService,
+            AccountRepository accountRepository,
+            TransactionLogRepository transactionLogRepository,
+            AccountTypeValidationService accountTypeValidationService) {
         this.accountService = accountService;
         this.accountRepository = accountRepository;
         this.transactionLogRepository = transactionLogRepository;
+        this.accountTypeValidationService = accountTypeValidationService;
     }
 }

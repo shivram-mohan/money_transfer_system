@@ -12,6 +12,7 @@ import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
 import { AuthService } from '../../../services/auth.service';
 import { UserManagementService } from '../../../services/user-management.service';
 import { AdminNavbarComponent } from '../admin-navbar/admin-navbar.component';
+import { MatOption } from "@angular/material/select";
 
 @Component({
   selector: 'app-create-user',
@@ -26,8 +27,9 @@ import { AdminNavbarComponent } from '../admin-navbar/admin-navbar.component';
     MatIconModule,
     MatProgressSpinnerModule,
     MatSnackBarModule,
-    AdminNavbarComponent
-  ],
+    AdminNavbarComponent,
+    MatOption
+],
   templateUrl: './create-user.component.html',
   styleUrls: ['./create-user.component.scss']
 })
@@ -35,6 +37,10 @@ export class CreateUserComponent {
   createUserForm: FormGroup;
   isLoading = false;
   hidePassword = true;
+  accountTypes = [
+  { value: 'SAVINGS', label: 'Savings Account' },
+  { value: 'CURRENT', label: 'Current Account' }
+];
 
   constructor(
     private fb: FormBuilder,
@@ -48,9 +54,24 @@ export class CreateUserComponent {
       password: ['', [Validators.required, Validators.minLength(6)]],
       name: ['', [Validators.required]],
       email: ['', [Validators.email]],
-      initialBalance: [1000, [Validators.required, Validators.min(0)]]
+      initialBalance: [1000, [Validators.required, Validators.min(0)]],
+      accountType: ['SAVINGS', Validators.required]
     });
   }
+
+  ngOnInit(): void {
+  this.createUserForm.get('accountType')?.valueChanges.subscribe(accountType => {
+    const balanceControl = this.createUserForm.get('initialBalance');
+    
+    if (accountType === 'SAVINGS') {
+      balanceControl?.setValidators([Validators.required, Validators.min(1000)]);
+    } else {
+      balanceControl?.setValidators([Validators.required, Validators.min(5000)]);
+    }
+    
+    balanceControl?.updateValueAndValidity();
+  });
+}
 
   onSubmit(): void {
     if (this.createUserForm.valid) {

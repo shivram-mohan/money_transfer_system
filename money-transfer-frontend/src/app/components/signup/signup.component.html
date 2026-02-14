@@ -81,25 +81,50 @@
           </mat-error>
         </mat-form-field>
 
-        <!-- Initial Balance -->
         <mat-form-field appearance="outline">
-          <mat-label>Initial Deposit (₹)</mat-label>
-          <input matInput 
-                 type="number"
-                 formControlName="initialBalance" 
-                 placeholder="Minimum ₹100"/>
-          <mat-icon matPrefix>currency_rupee</mat-icon>
-          <mat-hint>Minimum: ₹100, Maximum: ₹10,00,000</mat-hint>
-          <mat-error *ngIf="signupForm.get('initialBalance')?.hasError('required')">
-            Initial balance is required
-          </mat-error>
-          <mat-error *ngIf="signupForm.get('initialBalance')?.hasError('min')">
-            Minimum deposit is ₹100
-          </mat-error>
-          <mat-error *ngIf="signupForm.get('initialBalance')?.hasError('max')">
-            Maximum deposit is ₹10,00,000
+          <mat-label>Account Type</mat-label>
+          <mat-select formControlName="accountType">
+            <mat-option *ngFor="let type of accountTypes" [value]="type.value">
+              <div class="account-type-option">
+                <span class="account-type-label">{{ type.label }}</span>
+                <span class="account-type-desc">{{ type.description }}</span>
+              </div>
+            </mat-option>
+          </mat-select>
+          <mat-icon matPrefix>account_balance</mat-icon>
+          <mat-hint>Choose account type based on your needs</mat-hint>
+          <mat-error *ngIf="signupForm.get('accountType')?.hasError('required')">
+            Account type is required
           </mat-error>
         </mat-form-field>
+
+        <!-- Initial Balance -->
+        <mat-form-field appearance="outline">
+  <mat-label>Initial Deposit (₹)</mat-label>
+  <input matInput 
+         type="number"
+         formControlName="initialBalance" 
+         [placeholder]="signupForm.get('accountType')?.value === 'CURRENT' ? 'Minimum ₹5,000' : 'Minimum ₹1,000'"/>
+  <mat-icon matPrefix>currency_rupee</mat-icon>
+  <mat-hint *ngIf="signupForm.get('accountType')?.value === 'SAVINGS'">
+    Savings: Minimum ₹1,000, Maximum ₹10,00,000
+  </mat-hint>
+  <mat-hint *ngIf="signupForm.get('accountType')?.value === 'CURRENT'">
+    Current: Minimum ₹5,000, Maximum ₹10,00,000
+  </mat-hint>
+  <mat-error *ngIf="signupForm.get('initialBalance')?.hasError('required')">
+    Initial balance is required
+  </mat-error>
+  <mat-error *ngIf="signupForm.get('initialBalance')?.hasError('min') && signupForm.get('accountType')?.value === 'SAVINGS'">
+    Minimum deposit for Savings is ₹1,000
+  </mat-error>
+  <mat-error *ngIf="signupForm.get('initialBalance')?.hasError('min') && signupForm.get('accountType')?.value === 'CURRENT'">
+    Minimum deposit for Current is ₹5,000
+  </mat-error>
+  <mat-error *ngIf="signupForm.get('initialBalance')?.hasError('max')">
+    Maximum deposit is ₹10,00,000
+  </mat-error>
+</mat-form-field>
 
         <!-- Submit Button -->
         <button mat-raised-button 

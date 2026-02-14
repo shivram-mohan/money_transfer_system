@@ -1,0 +1,95 @@
+<!-- src/app/components/account-limits/account-limits.component.html -->
+
+<mat-card class="limits-card">
+  <mat-card-header>
+    <mat-icon class="limits-icon">account_balance_wallet</mat-icon>
+    <mat-card-title>Account Limits</mat-card-title>
+  </mat-card-header>
+  
+  <mat-card-content>
+    
+    <!-- Account Type Badge -->
+    <div class="account-type-badge" [class.savings]="accountType === AccountType.SAVINGS" 
+                                    [class.current]="accountType === AccountType.CURRENT">
+      <mat-icon>{{ accountType === AccountType.SAVINGS ? 'savings' : 'business' }}</mat-icon>
+      <span>{{ accountType }} Account</span>
+    </div>
+
+    <!-- Savings Account Limits -->
+    <div *ngIf="accountType === AccountType.SAVINGS" class="limits-container">
+      
+      <!-- Monthly Transfers -->
+      <div class="limit-item">
+        <div class="limit-header">
+          <span class="limit-label">Monthly Transfers</span>
+          <span class="limit-value">{{ monthlyTransactionCount }}/{{ monthlyLimit }}</span>
+        </div>
+        <mat-progress-bar 
+          mode="determinate" 
+          [value]="monthlyProgress"
+          [color]="monthlyProgressColor">
+        </mat-progress-bar>
+        <span class="limit-hint" *ngIf="monthlyTransactionCount >= monthlyLimit">
+          ⚠️ Monthly limit reached. Resets next month.
+        </span>
+        <span class="limit-hint" *ngIf="monthlyTransactionCount >= 8 && monthlyTransactionCount < monthlyLimit">
+          ⚠️ Almost at limit ({{ monthlyLimit - monthlyTransactionCount }} left)
+        </span>
+      </div>
+
+      <!-- Daily Withdrawals -->
+      <div class="limit-item">
+        <div class="limit-header">
+          <span class="limit-label">Daily Withdrawals</span>
+          <span class="limit-value">₹{{ dailyWithdrawalAmount | number:'1.0-0' }}/₹{{ dailyLimit | number:'1.0-0' }}</span>
+        </div>
+        <mat-progress-bar 
+          mode="determinate" 
+          [value]="dailyProgress"
+          [color]="dailyProgressColor">
+        </mat-progress-bar>
+        <span class="limit-hint" *ngIf="dailyProgress >= 90">
+          ⚠️ Almost at daily limit. Resets tomorrow.
+        </span>
+      </div>
+
+      <!-- Minimum Balance -->
+      <div class="limit-item">
+        <div class="info-row">
+          <mat-icon class="info-icon">info</mat-icon>
+          <span>Minimum balance: ₹1,000</span>
+        </div>
+        <div class="info-row">
+          <mat-icon class="info-icon">block</mat-icon>
+          <span>No overdraft allowed</span>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- Current Account Features -->
+    <div *ngIf="accountType === AccountType.CURRENT" class="limits-container">
+      
+      <div class="unlimited-features">
+        <div class="feature-item">
+          <mat-icon class="feature-icon success">check_circle</mat-icon>
+          <span>Unlimited monthly transfers</span>
+        </div>
+        <div class="feature-item">
+          <mat-icon class="feature-icon success">check_circle</mat-icon>
+          <span>Unlimited daily withdrawals</span>
+        </div>
+        <div class="feature-item">
+          <mat-icon class="feature-icon success">check_circle</mat-icon>
+          <span>₹10,000 overdraft available</span>
+        </div>
+        <div class="feature-item">
+          <mat-icon class="feature-icon info">info</mat-icon>
+          <span>Minimum balance: ₹5,000</span>
+        </div>
+      </div>
+
+    </div>
+
+  </mat-card-content>
+</mat-card>

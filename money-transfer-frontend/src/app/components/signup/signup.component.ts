@@ -13,6 +13,9 @@ import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
 import { MatIconModule } from '@angular/material/icon';
 import { AuthService } from '../../services/auth.service';
 import { SignupRequest } from '../../models/user.model';
+import { AccountType } from '../../models/account.model';
+import { MatOption } from "@angular/material/select";
+
 
 @Component({
   selector: 'app-signup',
@@ -27,8 +30,9 @@ import { SignupRequest } from '../../models/user.model';
     MatButtonModule,
     MatProgressSpinnerModule,
     MatSnackBarModule,
-    MatIconModule
-  ],
+    MatIconModule,
+    MatOption
+],
   templateUrl: './signup.component.html',
   styleUrls: ['./signup.component.scss']
 })
@@ -36,7 +40,10 @@ export class SignupComponent {
   signupForm: FormGroup;
   isLoading = false;
   hidePassword = true;
-
+accountTypes = [
+  { value: 'SAVINGS', label: 'Savings Account', description: '10 transfers/month, ₹50k daily limit' },
+  { value: 'CURRENT', label: 'Current Account', description: 'Unlimited transfers, ₹10k overdraft' }
+];
   constructor(
     private fb: FormBuilder,
     private authService: AuthService,
@@ -62,10 +69,37 @@ export class SignupComponent {
         Validators.required, 
         Validators.min(100),
         Validators.max(1000000)
-      ]]
+      ]],
+      accountType: ['SAVINGS', Validators.required]
     });
   }
-
+ngOnInit(): void {
+  this.signupForm.get('accountType')?.valueChanges.subscribe(accountType => {
+    const balanceControl = this.signupForm.get('initialBalance');
+    
+    if (accountType === 'SAVINGS') {
+      balanceControl?.setValidators([
+        Validators.required,
+        Validators.min(1000),
+        Validators.max(1000000)
+      ]);
+      if (balanceControl?.value < 1000) {
+        balanceControl?.setValue(1000);
+      }
+    } else if (accountType === 'CURRENT') {
+      balanceControl?.setValidators([
+        Validators.required,
+        Validators.min(5000),
+        Validators.max(1000000)
+      ]);
+      if (balanceControl?.value < 5000) {
+        balanceControl?.setValue(5000);
+      }
+    }
+    
+    balanceControl?.updateValueAndValidity();
+  });
+}
   onSubmit(): void {
     if (this.signupForm.valid) {
       this.isLoading = true;

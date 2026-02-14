@@ -42,6 +42,12 @@
       </mat-card-content>
     </mat-card>
 
+    <app-account-limits
+      [accountType]="accountType"
+      [monthlyTransactionCount]="monthlyTransactionCount"
+      [dailyWithdrawalAmount]="dailyWithdrawalAmount">
+    </app-account-limits>
+
     <!-- Quick Actions -->
     <div class="action-cards">
       <mat-card class="action-card transfer-card" (click)="navigateToTransfer()">

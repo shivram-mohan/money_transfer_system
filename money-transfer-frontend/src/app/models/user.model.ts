@@ -34,6 +34,7 @@ export interface CreateUserRequest {
   name: string;
   email?: string;
   initialBalance: number;
+  accountType?: string;
 }
 
 export interface UserResponse {
@@ -65,4 +66,5 @@ export interface SignupRequest {
   name: string;
   email?: string;
   initialBalance: number;
+  accountType?: string;
 }

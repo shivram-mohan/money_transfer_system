@@ -92,3 +92,21 @@ mat-form-field {
 mat-spinner {
   display: inline-block;
 }
+
+.account-type-option {
+  display: flex;
+  flex-direction: column;
+  padding: 8px 0;
+  
+  .account-type-label {
+    font-size: 14px;
+    font-weight: 600;
+    color: #333;
+  }
+  
+  .account-type-desc {
+    font-size: 11px;
+    color: #666;
+    margin-top: 2px;
+  }
+}
