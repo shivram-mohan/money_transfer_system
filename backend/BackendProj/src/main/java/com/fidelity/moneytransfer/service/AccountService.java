@@ -12,8 +12,12 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
+// Add these imports at the top
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -136,5 +140,71 @@ public class AccountService {
                 .status(account.getStatus().name())
                 .lastUpdated(account.getLastUpdated())
                 .build();
+    }
+
+    public List<TransactionLog> getFilteredTransactionHistory(
+            Long accountId,
+            LocalDate startDate,
+            LocalDate endDate) {
+
+        log.debug("Fetching filtered transactions for account: {} from {} to {}",
+                accountId, startDate, endDate);
+
+        // Verify account exists
+        getAccountById(accountId);
+
+        // Convert LocalDate to LocalDateTime (start of day and end of day)
+        LocalDateTime startDateTime = startDate.atStartOfDay();
+        LocalDateTime endDateTime = endDate.atTime(LocalTime.MAX);
+
+        // Get filtered transactions
+        List<TransactionLog> transactions = transactionLogRepository
+                .findByAccountIdAndDateRange(accountId, startDateTime, endDateTime);
+
+        // Populate account holder names
+        transactions.forEach(txn -> {
+            if (txn.getFromAccountId() != null) {
+                accountRepository.findById(txn.getFromAccountId())
+                        .ifPresent(account ->
+                                txn.setFromAccountHolderName(account.getHolderName())
+                        );
+            }
+
+            if (txn.getToAccountId() != null) {
+                accountRepository.findById(txn.getToAccountId())
+                        .ifPresent(account ->
+                                txn.setToAccountHolderName(account.getHolderName())
+                        );
+            }
+        });
+
+        return transactions;
+    }
+
+    /**
+     * Get transactions for last week
+     */
+    public List<TransactionLog> getLastWeekTransactions(Long accountId) {
+        LocalDate endDate = LocalDate.now();
+        LocalDate startDate = endDate.minusWeeks(1);
+        return getFilteredTransactionHistory(accountId, startDate, endDate);
+    }
+
+    /**
+     * Get transactions for last month
+     */
+    public List<TransactionLog> getLastMonthTransactions(Long accountId) {
+        LocalDate endDate = LocalDate.now();
+        LocalDate startDate = endDate.minusMonths(1);
+        return getFilteredTransactionHistory(accountId, startDate, endDate);
+    }
+
+    /**
+     * Get transactions for last year
+     */
+    public List<TransactionLog> getLastYearTransactions(Long accountId) {
+        LocalDate endDate = LocalDate.now();
+        LocalDate startDate = endDate.minusYears(1);
+        return getFilteredTransactionHistory(accountId, startDate, endDate);
     }
 }

@@ -9,6 +9,19 @@
     </button>
     <h1>Transaction History</h1>
     <div class="spacer"></div>
+    
+    <!-- PDF Download Button -->
+    <button 
+      mat-raised-button 
+      color="accent"
+      (click)="downloadPdf()"
+      [disabled]="isLoading || transactions.length === 0"
+      class="pdf-button"
+    >
+      <mat-icon>picture_as_pdf</mat-icon>
+      Download PDF
+    </button>
+    
     <button 
       mat-icon-button 
       (click)="refreshHistory()" 
@@ -18,6 +31,56 @@
       <mat-icon [class.spinning]="isLoading">refresh</mat-icon>
     </button>
   </div>
+
+  <!-- Filter Section -->
+  <mat-card class="filter-card">
+    <mat-card-content>
+      <div class="filter-section">
+        <mat-form-field appearance="outline" class="filter-dropdown">
+          <mat-label>Filter Transactions</mat-label>
+          <mat-select [formControl]="filterControl">
+            <mat-option value="ALL">All Transactions</mat-option>
+            <mat-option value="LAST_WEEK">Last Week</mat-option>
+            <mat-option value="LAST_MONTH">Last Month</mat-option>
+            <mat-option value="LAST_YEAR">Last Year</mat-option>
+            <mat-option value="CUSTOM">Custom Date Range</mat-option>
+          </mat-select>
+        </mat-form-field>
+
+        <!-- Custom Date Picker -->
+        <div class="custom-date-picker" *ngIf="showCustomDatePicker">
+          <mat-form-field appearance="outline">
+            <mat-label>Start Date</mat-label>
+            <input matInput 
+                   [matDatepicker]="startPicker" 
+                   [formControl]="startDateControl"
+                   placeholder="Start date">
+            <mat-datepicker-toggle matSuffix [for]="startPicker"></mat-datepicker-toggle>
+            <mat-datepicker #startPicker></mat-datepicker>
+          </mat-form-field>
+
+          <mat-form-field appearance="outline">
+            <mat-label>End Date</mat-label>
+            <input matInput 
+                   [matDatepicker]="endPicker" 
+                   [formControl]="endDateControl"
+                   placeholder="End date">
+            <mat-datepicker-toggle matSuffix [for]="endPicker"></mat-datepicker-toggle>
+            <mat-datepicker #endPicker></mat-datepicker>
+          </mat-form-field>
+
+          <button 
+            mat-raised-button 
+            color="primary"
+            (click)="applyCustomDateFilter()"
+            [disabled]="!startDateControl.value || !endDateControl.value"
+          >
+            Apply Filter
+          </button>
+        </div>
+      </div>
+    </mat-card-content>
+  </mat-card>
 
   <mat-card class="history-card">
     <mat-card-content>
@@ -31,19 +94,20 @@
       <div class="no-transactions" *ngIf="!isLoading && transactions.length === 0">
         <mat-icon>inbox</mat-icon>
         <h3>No Transactions Found</h3>
-        <p>You haven't made any transactions yet.</p>
+        <p>No transactions match the selected filter.</p>
       </div>
 
       <!-- Transactions Table (Desktop) -->
       <div class="table-container desktop-table" *ngIf="!isLoading && transactions.length > 0">
         <table mat-table [dataSource]="transactions" class="transactions-table">
+          
           <!-- Date Column -->
           <ng-container matColumnDef="date">
             <th mat-header-cell *matHeaderCellDef>Date & Time</th>
             <td mat-cell *matCellDef="let transaction">
               <div class="date-cell">
                 <mat-icon class="cell-icon">schedule</mat-icon>
-                {{ formatDate(transaction.createdOn) }}
+                {{ formatDate2(transaction.createdOn) }}
               </div>
             </td>
           </ng-container>
@@ -59,42 +123,40 @@
             </td>
           </ng-container>
 
-          <!-- Account Column -->
-<!-- ✅ NEW - Account Details Column with Names -->
-        <ng-container matColumnDef="accountDetails">
-          <th mat-header-cell *matHeaderCellDef>From / To</th>
-          <td mat-cell *matCellDef="let transaction">
-            <div class="account-details">
-              <!-- For DEBIT transactions (money going out) -->
-              <div *ngIf="transaction.type === 'DEBIT'" class="account-info">
-                <mat-icon class="small-icon">arrow_forward</mat-icon>
-                <div class="account-text">
-                  <span class="account-name">
-                    {{ transaction.toAccountHolderName || 'Unknown' }}
-                  </span>
-                  <span class="account-id">(#{{ transaction.toAccountId }})</span>
+          <!-- Account Details Column -->
+          <ng-container matColumnDef="accountDetails">
+            <th mat-header-cell *matHeaderCellDef>From / To</th>
+            <td mat-cell *matCellDef="let transaction">
+              <div class="account-details">
+                <div *ngIf="transaction.type === 'DEBIT'" class="account-info">
+                  <mat-icon class="small-icon">arrow_forward</mat-icon>
+                  <div class="account-text">
+                    <span class="account-name">
+                      {{ transaction.toAccountHolderName || 'Unknown' }}
+                    </span>
+                    <span class="account-id">(#{{ transaction.toAccountId }})</span>
+                  </div>
+                </div>
+                
+                <div *ngIf="transaction.type === 'CREDIT'" class="account-info">
+                  <mat-icon class="small-icon">arrow_back</mat-icon>
+                  <div class="account-text">
+                    <span class="account-name">
+                      {{ transaction.fromAccountHolderName || 'Unknown' }}
+                    </span>
+                    <span class="account-id">(#{{ transaction.fromAccountId }})</span>
+                  </div>
                 </div>
               </div>
-              
-              <!-- For CREDIT transactions (money coming in) -->
-              <div *ngIf="transaction.type === 'CREDIT'" class="account-info">
-                <mat-icon class="small-icon">arrow_back</mat-icon>
-                <div class="account-text">
-                  <span class="account-name">
-                    {{ transaction.fromAccountHolderName || 'Unknown' }}
-                  </span>
-                  <span class="account-id">(#{{ transaction.fromAccountId }})</span>
-                </div>
-              </div>
-            </div>
-          </td>
-        </ng-container>
+            </td>
+          </ng-container>
 
           <!-- Amount Column -->
           <ng-container matColumnDef="amount">
             <th mat-header-cell *matHeaderCellDef>Amount</th>
             <td mat-cell *matCellDef="let transaction">
-              <div class="amount-cell" [class.amount-debit]="transaction.type === 'DEBIT'" 
+              <div class="amount-cell" 
+                   [class.amount-debit]="transaction.type === 'DEBIT'" 
                    [class.amount-credit]="transaction.type === 'CREDIT'">
                 {{ transaction.type === 'DEBIT' ? '-' : '+' }}₹{{ transaction.displayAmount | number:'1.2-2' }}
               </div>
@@ -120,7 +182,7 @@
         </table>
       </div>
 
-      <!-- Transactions List (Mobile) -->
+      <!-- Transactions List (Mobile) - Same as before -->
       <div class="mobile-list" *ngIf="!isLoading && transactions.length > 0">
         <div class="transaction-card" *ngFor="let transaction of transactions">
           <div class="transaction-header">
@@ -136,9 +198,9 @@
           <div class="transaction-body">
             <div class="transaction-row">
               <span class="label">Date:</span>
-              <span class="value">{{ formatDate(transaction.createdOn) }}</span>
+              <span class="value">{{ formatDate2(transaction.createdOn) }}</span>
             </div>
-            <!-- ✅ NEW - Mobile view with names -->
+            
             <div class="transaction-row">
               <span class="label">{{ transaction.type === 'DEBIT' ? 'To:' : 'From:' }}</span>
               <span class="value">
@@ -150,6 +212,7 @@
                 </span>
               </span>
             </div>
+            
             <div class="transaction-row">
               <span class="label">Amount:</span>
               <span class="value amount" 
@@ -158,6 +221,7 @@
                 {{ transaction.type === 'DEBIT' ? '-' : '+' }}₹{{ transaction.displayAmount | number:'1.2-2' }}
               </span>
             </div>
+            
             <div class="transaction-row" *ngIf="transaction.failureReason">
               <span class="label">Reason:</span>
               <span class="value error">{{ transaction.failureReason }}</span>

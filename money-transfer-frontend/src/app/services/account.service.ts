@@ -6,6 +6,8 @@ import { Observable } from 'rxjs';
 import { environment } from '../../environments/environment';
 import { AccountResponse } from '../models/account.model';
 import { TransactionLog } from '../models/transaction.model';
+import { HttpParams } from '@angular/common/http';
+
 
 export interface CreateAccountRequest {
   holderName: string;
@@ -61,4 +63,59 @@ export class AccountService {
       `${this.apiUrl}/accounts/${accountId}/deactivate`, {}
     );
   }
+
+  getFilteredTransactions(
+  accountId: number,
+  startDate: string,
+  endDate: string
+): Observable<TransactionLog[]> {
+  const params = new HttpParams()
+    .set('startDate', startDate)
+    .set('endDate', endDate);
+    
+  return this.http.get<TransactionLog[]>(
+    `${this.apiUrl}/accounts/${accountId}/transactions/filter`,
+    { params }
+  );
+}
+
+getLastWeekTransactions(accountId: number): Observable<TransactionLog[]> {
+  return this.http.get<TransactionLog[]>(
+    `${this.apiUrl}/accounts/${accountId}/transactions/last-week`
+  );
+}
+
+getLastMonthTransactions(accountId: number): Observable<TransactionLog[]> {
+  return this.http.get<TransactionLog[]>(
+    `${this.apiUrl}/accounts/${accountId}/transactions/last-month`
+  );
+}
+
+getLastYearTransactions(accountId: number): Observable<TransactionLog[]> {
+  return this.http.get<TransactionLog[]>(
+    `${this.apiUrl}/accounts/${accountId}/transactions/last-year`
+  );
+}
+
+downloadPdfStatement(
+  accountId: number,
+  startDate?: string,
+  endDate?: string
+): Observable<Blob> {
+  let params = new HttpParams();
+  if (startDate) {
+    params = params.set('startDate', startDate);
+  }
+  if (endDate) {
+    params = params.set('endDate', endDate);
+  }
+  
+  return this.http.get(
+    `${this.apiUrl}/accounts/${accountId}/statement/pdf`,
+    {
+      params,
+      responseType: 'blob' // Important for PDF download
+    }
+  );
+}
 }

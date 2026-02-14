@@ -332,3 +332,71 @@ mat-chip {
   color: #999;
   display: block;
 }
+
+.pdf-button {
+  margin-right: 8px;
+  
+  mat-icon {
+    margin-right: 8px;
+  }
+}
+
+.filter-card {
+  margin-bottom: 24px;
+}
+
+.filter-section {
+  display: flex;
+  align-items: flex-start;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+
+.filter-dropdown {
+  min-width: 250px;
+}
+
+.custom-date-picker {
+  display: flex;
+  gap: 16px;
+  align-items: flex-start;
+  flex-wrap: wrap;
+  
+  mat-form-field {
+    min-width: 200px;
+  }
+  
+  button {
+    margin-top: 8px;
+    height: 48px;
+  }
+}
+
+// Mobile responsive
+@media (max-width: 768px) {
+  .filter-section {
+    flex-direction: column;
+  }
+  
+  .filter-dropdown {
+    width: 100%;
+  }
+  
+  .custom-date-picker {
+    width: 100%;
+    flex-direction: column;
+    
+    mat-form-field {
+      width: 100%;
+    }
+    
+    button {
+      width: 100%;
+    }
+  }
+  
+  .pdf-button {
+    width: 100%;
+    margin-bottom: 8px;
+  }
+}
