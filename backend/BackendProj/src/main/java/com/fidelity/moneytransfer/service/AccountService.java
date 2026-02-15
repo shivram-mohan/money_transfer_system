@@ -19,6 +19,7 @@ import java.time.LocalTime;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.List;
+import java.util.concurrent.ThreadLocalRandom;
 import java.util.stream.Collectors;
 
 @Service
@@ -29,6 +30,16 @@ public class AccountService {
 
     private final AccountRepository accountRepository;
     private final TransactionLogRepository transactionLogRepository;
+
+    // ─── ACCOUNT ID GENERATION ──────────────────────────────────────────
+
+    public Long generateUniqueAccountId() {
+        Long id;
+        do {
+            id = ThreadLocalRandom.current().nextLong(1_000_000_000L, 10_000_000_000L);
+        } while (accountRepository.existsById(id));
+        return id;
+    }
 
     // ─── EXISTING METHODS ─────────────────────────────────────────────
 
@@ -96,6 +107,7 @@ public class AccountService {
         log.info("Creating new account for: {}", request.getHolderName());
 
         Account account = Account.builder()
+                .id(generateUniqueAccountId())
                 .holderName(request.getHolderName())
                 .balance(request.getInitialBalance())
                 .status(AccountStatus.ACTIVE)

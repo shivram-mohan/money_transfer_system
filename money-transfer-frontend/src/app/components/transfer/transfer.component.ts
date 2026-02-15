@@ -150,7 +150,14 @@ export class TransferComponent implements OnInit {
     this.loadBalance();
     this.transferForm.reset();
   },
-  // ... error handler
+  error: (error) => {
+    this.isLoading = false;
+    const errorMsg = error.error?.message || 'Transfer failed. Please try again.';
+    this.snackBar.open(errorMsg, 'Close', {
+      duration: 5000,
+      panelClass: ['error-snackbar']
+    });
+  }
 });
     }
   }

@@ -28,6 +28,7 @@ public class UserService {
 
     private final UserRepository userRepository;
     private final AccountRepository accountRepository;
+    private final AccountService accountService;
     private final PasswordEncoder passwordEncoder;
 
     // ─── EXISTING METHODS ─────────────────────────────────────────────
@@ -74,6 +75,7 @@ public class UserService {
         }
 
         Account account = Account.builder()
+                .id(accountService.generateUniqueAccountId())
                 .holderName(request.getName())
                 .balance(request.getInitialBalance())
                 .status(AccountStatus.ACTIVE)
@@ -168,6 +170,7 @@ public class UserService {
 
         // Create account with LOCKED status
         Account account = Account.builder()
+                .id(accountService.generateUniqueAccountId())
                 .holderName(request.getName())
                 .balance(request.getInitialBalance())
                 .status(AccountStatus.LOCKED) // Locked until approved

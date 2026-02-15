@@ -10,9 +10,11 @@ import { MatChipsModule } from '@angular/material/chips';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
 import { MatTooltipModule } from '@angular/material/tooltip';
+import { MatDialog, MatDialogModule } from '@angular/material/dialog';
 import { UserManagementService } from '../../../services/user-management.service';
 import { UserResponse, UserStatus } from '../../../models/user.model';
 import { AdminNavbarComponent } from '../admin-navbar/admin-navbar.component';
+import { ConfirmDialogComponent } from '../confirm-dialog/confirm-dialog.component';
 
 @Component({
   selector: 'app-user-list',
@@ -27,6 +29,7 @@ import { AdminNavbarComponent } from '../admin-navbar/admin-navbar.component';
     MatProgressSpinnerModule,
     MatSnackBarModule,
     MatTooltipModule,
+    MatDialogModule,
     AdminNavbarComponent
   ],
   templateUrl: './user-list.component.html',
@@ -39,7 +42,8 @@ export class UserListComponent implements OnInit {
 
   constructor(
     private userManagementService: UserManagementService,
-    private snackBar: MatSnackBar
+    private snackBar: MatSnackBar,
+    private dialog: MatDialog
   ) {}
 
   ngOnInit(): void {
@@ -149,26 +153,40 @@ rejectUser(userId: number, username: string): void {
   }
 }
   deactivateUser(userId: number, username: string): void {
-    if (confirm(`Are you sure you want to deactivate user "${username}"?`)) {
-      this.userManagementService.deactivateUser({
-        userId,
-        reason: 'Deactivated by admin'
-      }).subscribe({
-        next: () => {
-          this.snackBar.open('User deactivated successfully', 'Close', {
-            duration: 3000,
-            panelClass: ['success-snackbar']
-          });
-          this.loadUsers();
-        },
-        error: (error) => {
-          this.snackBar.open(error.message || 'Failed to deactivate user', 'Close', {
-            duration: 3000,
-            panelClass: ['error-snackbar']
-          });
-        }
-      });
-    }
+    const dialogRef = this.dialog.open(ConfirmDialogComponent, {
+      width: '400px',
+      data: {
+        title: 'Deactivate User',
+        message: `Are you sure you want to deactivate "${username}"? This will lock their account and prevent any transactions.`,
+        confirmText: 'Deactivate',
+        cancelText: 'Cancel',
+        icon: 'block',
+        color: 'warn'
+      }
+    });
+
+    dialogRef.afterClosed().subscribe(result => {
+      if (result) {
+        this.userManagementService.deactivateUser({
+          userId,
+          reason: 'Deactivated by admin'
+        }).subscribe({
+          next: () => {
+            this.snackBar.open('User deactivated successfully', 'Close', {
+              duration: 3000,
+              panelClass: ['success-snackbar']
+            });
+            this.loadUsers();
+          },
+          error: (error) => {
+            this.snackBar.open(error.error?.message || 'Failed to deactivate user', 'Close', {
+              duration: 3000,
+              panelClass: ['error-snackbar']
+            });
+          }
+        });
+      }
+    });
   }
 
   activateUser(userId: number, username: string): void {
