@@ -57,7 +57,7 @@ public class AccountService {
 
         // Get transactions
         List<TransactionLog> transactions = transactionLogRepository
-                .findByFromAccountIdOrToAccountId(accountId, accountId);
+                .findByFromAccountIdOrToAccountIdOrderByCreatedOnDesc(accountId, accountId);
 
         // ✅ NEW - Populate account holder names
         transactions.forEach(txn -> {

@@ -5,6 +5,7 @@ import com.fidelity.moneytransfer.dto.AuthRequest;
 import com.fidelity.moneytransfer.dto.AuthResponse;
 import com.fidelity.moneytransfer.dto.SignupRequest;
 import com.fidelity.moneytransfer.dto.UserResponseDto;
+import com.fidelity.moneytransfer.exception.AccountNotFoundException;
 import com.fidelity.moneytransfer.repository.UserRepository;
 import com.fidelity.moneytransfer.service.UserService;
 import jakarta.validation.Valid;
@@ -69,9 +70,8 @@ public class AuthController {
                     holderName = userOptional.get().getName();
                     log.info("Found user account: {}", accountId);
                 } else {
-                    log.warn("No user record found for: {}",
-                            request.getUsername());
-                    accountId = 1L;
+                    log.warn("No user record found for: {}", request.getUsername());
+                            throw new AccountNotFoundException(holderName);
                 }
             }
 
@@ -87,7 +87,7 @@ public class AuthController {
                     .role(role)
                     .accountId(accountId)
                     .holderName(holderName)
-                    .expiresIn(86400000L)
+                    .expiresIn(900000L)
                     .build());
 
         } catch (BadCredentialsException e) {

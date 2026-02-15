@@ -197,7 +197,7 @@ class AccountServiceTest {
 
         when(accountRepository.findById(1L))
                 .thenReturn(Optional.of(testAccount));
-        when(transactionLogRepository.findByFromAccountIdOrToAccountId(1L, 1L))
+        when(transactionLogRepository.findByFromAccountIdOrToAccountIdOrderByCreatedOnDesc(1L, 1L))
                 .thenReturn(Arrays.asList(txn1, txn2));
 
         // Act
@@ -206,6 +206,6 @@ class AccountServiceTest {
         // Assert
         assertEquals(2, transactions.size());
         verify(transactionLogRepository, times(1))
-                .findByFromAccountIdOrToAccountId(1L, 1L);
+                .findByFromAccountIdOrToAccountIdOrderByCreatedOnDesc(1L, 1L);
     }
 }

@@ -79,7 +79,7 @@ export class CreateUserComponent {
   }
 
   cancel(): void {
-    this.router.navigate(['/admin/dashboard']);
+    this.router.navigate(['/admin']);
   }
 }
 
