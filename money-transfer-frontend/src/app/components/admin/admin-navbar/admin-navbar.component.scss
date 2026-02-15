@@ -4,8 +4,8 @@
   position: sticky;
   top: 0;
   z-index: 1000;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%) !important;
+  box-shadow: 0 2px 20px rgba(139, 92, 246, 0.2);
+  background: var(--aurora-gradient-admin) !important;
 }
 
 .toolbar-content {
@@ -24,7 +24,7 @@
   font-weight: 500;
   cursor: pointer;
   transition: opacity 0.2s;
-  
+
   &:hover {
     opacity: 0.9;
   }
@@ -38,7 +38,7 @@
 
 .brand-text {
   display: none;
-  
+
   @media (min-width: 768px) {
     display: inline;
   }
@@ -49,22 +49,22 @@
   gap: 4px;
   flex: 1;
   justify-content: center;
-  
+
   button {
     display: flex;
     align-items: center;
     gap: 6px;
     padding: 0 12px;
-    
+
     mat-icon {
       font-size: 20px;
       height: 20px;
       width: 20px;
     }
-    
+
     .link-text {
       display: none;
-      
+
       @media (min-width: 960px) {
         display: inline;
       }
@@ -75,7 +75,8 @@
 .active-link {
   background-color: rgba(255, 255, 255, 0.2) !important;
   border-radius: 4px;
-  
+  box-shadow: 0 0 10px rgba(139, 92, 246, 0.3);
+
   &::before {
     content: '';
     position: absolute;
@@ -93,16 +94,16 @@
     display: flex;
     align-items: center;
     gap: 4px;
-    
+
     mat-icon:first-child {
       font-size: 24px;
       height: 24px;
       width: 24px;
     }
-    
+
     .admin-name {
       display: none;
-      
+
       @media (min-width: 768px) {
         display: inline;
         max-width: 150px;
@@ -111,7 +112,7 @@
         white-space: nowrap;
       }
     }
-    
+
     .dropdown-icon {
       font-size: 20px;
       height: 20px;
@@ -123,7 +124,7 @@
 // Badge styling
 ::ng-deep {
   .mat-badge-content {
-    background-color: #f44336;
+    background-color: var(--aurora-pink);
     color: white;
     font-size: 10px;
     font-weight: 600;
@@ -135,10 +136,10 @@
   .toolbar-content {
     padding: 0 4px;
   }
-  
+
   .nav-links {
     gap: 2px;
-    
+
     button {
       padding: 0 8px;
       min-width: auto;
@@ -151,22 +152,22 @@
   .mat-mdc-menu-panel {
     min-width: 200px;
   }
-  
+
   .mat-mdc-menu-item {
     .mat-icon {
       margin-right: 12px;
-      color: #666;
+      color: var(--aurora-text-secondary);
     }
   }
-  
+
   .mat-mdc-menu-item:disabled {
     .mat-icon {
-      color: #667eea;
+      color: var(--aurora-purple);
     }
-    
+
     span {
       font-weight: 500;
-      color: #333;
+      color: var(--aurora-text-primary);
     }
   }
 }

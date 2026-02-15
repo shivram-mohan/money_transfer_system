@@ -1,59 +1,361 @@
-/* src/styles.scss */
+/* src/styles.scss - Aurora Theme */
 
-/* You can add global styles to this file, and also import other style files */
-@import '@angular/material/prebuilt-themes/indigo-pink.css';
+@use '@angular/material' as mat;
 
+/* ===== Custom Angular Material Dark Theme (M3 API) ===== */
+$aurora-theme: mat.define-theme((
+  color: (
+    theme-type: dark,
+    primary: mat.$cyan-palette,
+    tertiary: mat.$violet-palette,
+  ),
+  typography: (
+    plain-family: 'Inter, sans-serif',
+    brand-family: 'Inter, sans-serif',
+  ),
+  density: (
+    scale: 0,
+  ),
+));
+
+html {
+  @include mat.all-component-themes($aurora-theme);
+  @include mat.typography-hierarchy($aurora-theme);
+}
+
+/* ===== Aurora CSS Custom Properties ===== */
+:root {
+  /* Backgrounds */
+  --aurora-bg-primary: #0a0e1a;
+  --aurora-bg-secondary: #111827;
+  --aurora-bg-card: rgba(255, 255, 255, 0.05);
+  --aurora-bg-card-hover: rgba(255, 255, 255, 0.08);
+  --aurora-bg-elevated: rgba(255, 255, 255, 0.03);
+
+  /* Text */
+  --aurora-text-primary: #e2e8f0;
+  --aurora-text-secondary: #94a3b8;
+  --aurora-text-muted: #cbd5e1;
+  --aurora-text-accent: #06b6d4;
+
+  /* Aurora accent colors */
+  --aurora-teal: #06b6d4;
+  --aurora-purple: #8b5cf6;
+  --aurora-emerald: #10b981;
+  --aurora-blue: #3b82f6;
+  --aurora-pink: #ec4899;
+
+  /* Gradients */
+  --aurora-gradient-primary: linear-gradient(135deg, #06b6d4 0%, #8b5cf6 100%);
+  --aurora-gradient-success: linear-gradient(135deg, #10b981 0%, #06b6d4 100%);
+  --aurora-gradient-danger: linear-gradient(135deg, #ec4899 0%, #8b5cf6 100%);
+  --aurora-gradient-admin: linear-gradient(135deg, #8b5cf6 0%, #3b82f6 100%);
+  --aurora-gradient-accent: linear-gradient(135deg, #3b82f6 0%, #10b981 100%);
+
+  /* Glassmorphism */
+  --aurora-glass-bg: rgba(255, 255, 255, 0.05);
+  --aurora-glass-border: rgba(255, 255, 255, 0.1);
+  --aurora-glass-blur: blur(10px);
+
+  /* Borders */
+  --aurora-border: rgba(255, 255, 255, 0.1);
+  --aurora-border-hover: rgba(255, 255, 255, 0.2);
+
+  /* Shadows / Glow */
+  --aurora-glow-teal: 0 0 20px rgba(6, 182, 212, 0.3);
+  --aurora-glow-purple: 0 0 20px rgba(139, 92, 246, 0.3);
+  --aurora-glow-emerald: 0 0 20px rgba(16, 185, 129, 0.3);
+  --aurora-glow-pink: 0 0 20px rgba(236, 72, 153, 0.3);
+}
+
+/* ===== Global Base Styles ===== */
 html, body {
   height: 100%;
 }
 
 body {
   margin: 0;
-  font-family: Roboto, "Helvetica Neue", sans-serif;
-  background-color: #f5f5f5;
+  font-family: 'Inter', sans-serif;
+  background-color: var(--aurora-bg-primary);
+  color: var(--aurora-text-primary);
 }
 
-/* Custom Snackbar Styles */
-.success-snackbar {
-  background-color: #4caf50 !important;
-  color: white !important;
-}
-
-.error-snackbar {
-  background-color: #f44336 !important;
-  color: white !important;
-}
-
-/* Material Override Styles */
-.mat-mdc-snack-bar-container {
-  &.success-snackbar {
-    --mdc-snackbar-container-color: #4caf50;
-    --mat-mdc-snack-bar-button-color: #fff;
-    --mdc-snackbar-supporting-text-color: #fff;
-  }
-
-  &.error-snackbar {
-    --mdc-snackbar-container-color: #f44336;
-    --mat-mdc-snack-bar-button-color: #fff;
-    --mdc-snackbar-supporting-text-color: #fff;
-  }
-}
-
-/* Scrollbar Styling */
+/* ===== Scrollbar (Dark) ===== */
 ::-webkit-scrollbar {
   width: 8px;
   height: 8px;
 }
 
 ::-webkit-scrollbar-track {
-  background: #f1f1f1;
+  background: var(--aurora-bg-secondary);
 }
 
 ::-webkit-scrollbar-thumb {
-  background: #888;
+  background: rgba(255, 255, 255, 0.2);
   border-radius: 4px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: #555;
+  background: rgba(255, 255, 255, 0.3);
+}
+
+/* ===== Snackbar Overrides ===== */
+.success-snackbar {
+  background-color: var(--aurora-emerald) !important;
+  color: white !important;
+}
+
+.error-snackbar {
+  background-color: var(--aurora-pink) !important;
+  color: white !important;
+}
+
+.mat-mdc-snack-bar-container {
+  &.success-snackbar {
+    --mdc-snackbar-container-color: #10b981;
+    --mat-mdc-snack-bar-button-color: #fff;
+    --mdc-snackbar-supporting-text-color: #fff;
+  }
+
+  &.error-snackbar {
+    --mdc-snackbar-container-color: #ec4899;
+    --mat-mdc-snack-bar-button-color: #fff;
+    --mdc-snackbar-supporting-text-color: #fff;
+  }
+}
+
+/* ===== Global Material Component Overrides ===== */
+
+/* -- mat-card: glassmorphism -- */
+.mat-mdc-card {
+  background: var(--aurora-glass-bg) !important;
+  backdrop-filter: var(--aurora-glass-blur);
+  -webkit-backdrop-filter: var(--aurora-glass-blur);
+  border: 1px solid var(--aurora-glass-border) !important;
+  border-radius: 12px !important;
+  color: var(--aurora-text-primary);
+  box-shadow: 0 4px 24px rgba(0, 0, 0, 0.2) !important;
+}
+
+/* -- mat-toolbar -- */
+.mat-toolbar {
+  background: var(--aurora-bg-secondary) !important;
+  color: var(--aurora-text-primary) !important;
+  border-bottom: 1px solid var(--aurora-border);
+}
+
+/* -- mat-form-field -- */
+.mat-mdc-form-field {
+  --mdc-filled-text-field-container-color: rgba(255, 255, 255, 0.05);
+  --mdc-filled-text-field-label-text-color: var(--aurora-text-secondary);
+  --mdc-filled-text-field-input-text-color: var(--aurora-text-primary);
+  --mdc-filled-text-field-focus-active-indicator-color: var(--aurora-teal);
+  --mdc-filled-text-field-focus-label-text-color: var(--aurora-teal);
+  --mdc-filled-text-field-hover-active-indicator-color: var(--aurora-text-muted);
+  --mdc-outlined-text-field-outline-color: var(--aurora-border);
+  --mdc-outlined-text-field-focus-outline-color: var(--aurora-teal);
+  --mdc-outlined-text-field-hover-outline-color: var(--aurora-text-muted);
+  --mdc-outlined-text-field-label-text-color: var(--aurora-text-secondary);
+  --mdc-outlined-text-field-input-text-color: var(--aurora-text-primary);
+  --mdc-outlined-text-field-focus-label-text-color: var(--aurora-teal);
+}
+
+.mat-mdc-form-field .mat-mdc-form-field-hint {
+  color: var(--aurora-text-muted);
+}
+
+/* -- mat-table -- */
+.mat-mdc-table {
+  background: transparent !important;
+}
+
+.mat-mdc-header-row {
+  background: rgba(255, 255, 255, 0.05);
+}
+
+.mat-mdc-header-cell {
+  color: var(--aurora-text-secondary) !important;
+  border-bottom-color: var(--aurora-border) !important;
+}
+
+.mat-mdc-cell {
+  color: var(--aurora-text-primary) !important;
+  border-bottom-color: var(--aurora-border) !important;
+}
+
+.mat-mdc-row:hover {
+  background: rgba(255, 255, 255, 0.03) !important;
+}
+
+/* -- mat-button (primary) -- */
+.mat-mdc-raised-button.mat-primary,
+.mat-mdc-unelevated-button.mat-primary {
+  background: var(--aurora-gradient-primary) !important;
+  color: white !important;
+  border: none;
+  transition: box-shadow 0.3s ease, transform 0.2s ease;
+
+  &:hover:not(:disabled) {
+    box-shadow: var(--aurora-glow-teal);
+    transform: translateY(-1px);
+  }
+}
+
+.mat-mdc-raised-button.mat-warn,
+.mat-mdc-unelevated-button.mat-warn {
+  background: var(--aurora-gradient-danger) !important;
+  color: white !important;
+  transition: box-shadow 0.3s ease, transform 0.2s ease;
+
+  &:hover:not(:disabled) {
+    box-shadow: var(--aurora-glow-pink);
+    transform: translateY(-1px);
+  }
+}
+
+.mat-mdc-outlined-button,
+.mat-mdc-stroked-button {
+  border-color: var(--aurora-border) !important;
+  color: var(--aurora-text-primary) !important;
+
+  &:hover {
+    border-color: var(--aurora-border-hover) !important;
+    background: rgba(255, 255, 255, 0.05) !important;
+  }
+
+  &.mat-primary {
+    border-color: rgba(6, 182, 212, 0.4) !important;
+    color: var(--aurora-teal) !important;
+
+    &:hover {
+      background: rgba(6, 182, 212, 0.1) !important;
+    }
+  }
+
+  &.mat-warn {
+    border-color: rgba(236, 72, 153, 0.4) !important;
+    color: var(--aurora-pink) !important;
+
+    &:hover {
+      background: rgba(236, 72, 153, 0.1) !important;
+    }
+  }
+}
+
+.mat-mdc-icon-button {
+  color: var(--aurora-text-secondary) !important;
+
+  &:hover {
+    color: var(--aurora-text-primary) !important;
+    background: rgba(255, 255, 255, 0.05) !important;
+  }
+}
+
+.mat-mdc-button {
+  color: var(--aurora-text-primary) !important;
+
+  &:hover {
+    background: rgba(255, 255, 255, 0.05) !important;
+  }
+}
+
+/* -- mat-menu -- */
+.mat-mdc-menu-panel {
+  background: var(--aurora-bg-secondary) !important;
+  border: 1px solid var(--aurora-border) !important;
+  backdrop-filter: var(--aurora-glass-blur);
+  -webkit-backdrop-filter: var(--aurora-glass-blur);
+}
+
+.mat-mdc-menu-item {
+  color: var(--aurora-text-primary) !important;
+
+  .mat-icon {
+    color: var(--aurora-text-secondary) !important;
+  }
+
+  &:hover {
+    background: rgba(255, 255, 255, 0.05) !important;
+  }
+}
+
+/* -- mat-select -- */
+.mat-mdc-select {
+  --mat-select-trigger-text-color: var(--aurora-text-primary);
+  --mat-select-enabled-arrow-color: var(--aurora-text-secondary);
+}
+
+.mat-mdc-select-panel {
+  background: var(--aurora-bg-secondary) !important;
+  border: 1px solid var(--aurora-border);
+}
+
+.mat-mdc-option {
+  color: var(--aurora-text-primary) !important;
+
+  &:hover {
+    background: rgba(255, 255, 255, 0.05) !important;
+  }
+
+  &.mdc-list-item--selected,
+  &.mat-mdc-option-active {
+    background: rgba(6, 182, 212, 0.1) !important;
+  }
+}
+
+/* -- mat-datepicker -- */
+.mat-datepicker-content {
+  background: var(--aurora-bg-secondary) !important;
+  color: var(--aurora-text-primary) !important;
+  border: 1px solid var(--aurora-border);
+}
+
+/* -- mat-dialog -- */
+.mat-mdc-dialog-container {
+  --mdc-dialog-container-color: var(--aurora-bg-secondary);
+}
+
+.mat-mdc-dialog-surface {
+  background: var(--aurora-bg-secondary) !important;
+  border: 1px solid var(--aurora-border) !important;
+}
+
+/* -- mat-tab-group -- */
+.mat-mdc-tab-group {
+  --mat-tab-header-active-label-text-color: var(--aurora-teal);
+  --mat-tab-header-active-focus-label-text-color: var(--aurora-teal);
+  --mat-tab-header-active-hover-label-text-color: var(--aurora-teal);
+  --mat-tab-header-inactive-label-text-color: var(--aurora-text-secondary);
+  --mat-tab-header-active-focus-indicator-color: var(--aurora-teal);
+  --mat-tab-header-active-hover-indicator-color: var(--aurora-teal);
+}
+
+/* -- mat-chip -- */
+.mat-mdc-chip {
+  border: 1px solid var(--aurora-border) !important;
+}
+
+/* -- mat-progress-spinner -- */
+.mat-mdc-progress-spinner {
+  --mdc-circular-progress-active-indicator-color: var(--aurora-teal);
+}
+
+/* -- mat-paginator -- */
+.mat-mdc-paginator {
+  background: transparent !important;
+  color: var(--aurora-text-secondary) !important;
+}
+
+/* -- mat-divider -- */
+.mat-divider {
+  border-top-color: var(--aurora-border) !important;
+}
+
+/* -- mat-card subtitle/title helpers -- */
+.mat-mdc-card-title {
+  color: var(--aurora-text-primary) !important;
+}
+
+.mat-mdc-card-subtitle {
+  color: var(--aurora-text-secondary) !important;
 }

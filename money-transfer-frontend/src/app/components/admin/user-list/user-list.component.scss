@@ -4,9 +4,10 @@
   padding: 24px;
   max-width: 1400px;
   margin: 0 auto;
-  background-color: #f5f5f5;
+  background-color: var(--aurora-bg-primary);
   min-height: calc(100vh - 64px);
 }
+
 .action-buttons {
   display: flex;
   gap: 8px;
@@ -15,29 +16,25 @@
 
 .action-btn {
   margin: 4px;
-  
+
   mat-icon {
     margin-right: 4px;
   }
 }
 
-.status-pending {
-  background-color: #fff3e0;
-  color: #e65100;
-}
 .header-section {
   display: flex;
   justify-content: space-between;
   align-items: center;
   margin-bottom: 24px;
-  
+
   h1 {
     font-size: 28px;
     font-weight: 600;
-    color: #333;
+    color: var(--aurora-text-primary);
     margin: 0;
   }
-  
+
   button {
     mat-icon {
       margin-right: 8px;
@@ -65,10 +62,10 @@
   align-items: center;
   justify-content: center;
   padding: 60px 20px;
-  
+
   p {
     margin-top: 20px;
-    color: #666;
+    color: var(--aurora-text-secondary);
     font-size: 16px;
   }
 }
@@ -77,24 +74,24 @@
 .no-users {
   text-align: center;
   padding: 60px 20px;
-  
+
   mat-icon {
     font-size: 80px;
     height: 80px;
     width: 80px;
-    color: #ccc;
+    color: rgba(255, 255, 255, 0.2);
     margin-bottom: 16px;
   }
-  
+
   h3 {
     font-size: 20px;
     font-weight: 500;
-    color: #666;
+    color: var(--aurora-text-secondary);
     margin-bottom: 8px;
   }
-  
+
   p {
-    color: #999;
+    color: var(--aurora-text-muted);
   }
 }
 
@@ -105,22 +102,22 @@
 
 .users-table {
   width: 100%;
-  
+
   th {
-    background-color: #f5f5f5;
+    background-color: rgba(255, 255, 255, 0.05);
     font-weight: 600;
-    color: #333;
+    color: var(--aurora-text-secondary);
     padding: 16px;
     font-size: 14px;
   }
-  
+
   td {
     padding: 16px;
     font-size: 14px;
   }
-  
+
   tr:hover {
-    background-color: #fafafa;
+    background-color: rgba(255, 255, 255, 0.03);
   }
 }
 
@@ -128,25 +125,26 @@
   display: flex;
   align-items: center;
   gap: 8px;
-  
+
   .user-icon {
     font-size: 20px;
     height: 20px;
     width: 20px;
-    color: #667eea;
+    color: var(--aurora-teal);
   }
 }
 
 .email-text {
-  color: #666;
+  color: var(--aurora-text-secondary);
   font-size: 13px;
 }
 
 .account-chip {
-  background-color: #e3f2fd !important;
-  color: #1976d2 !important;
+  background: rgba(59, 130, 246, 0.15) !important;
+  color: var(--aurora-blue) !important;
   font-weight: 500;
   font-size: 12px;
+  border-color: rgba(59, 130, 246, 0.3) !important;
 }
 
 // Status Chips
@@ -157,7 +155,7 @@ mat-chip {
   font-size: 12px;
   font-weight: 500;
   padding: 4px 12px;
-  
+
   mat-icon {
     font-size: 16px;
     height: 16px;
@@ -166,23 +164,27 @@ mat-chip {
 }
 
 .status-active {
-  background-color: #e8f5e9 !important;
-  color: #2e7d32 !important;
+  background: rgba(16, 185, 129, 0.15) !important;
+  color: var(--aurora-emerald) !important;
+  border-color: rgba(16, 185, 129, 0.3) !important;
 }
 
 .status-inactive {
-  background-color: #ffebee !important;
-  color: #c62828 !important;
+  background: rgba(248, 113, 113, 0.15) !important;
+  color: #f87171 !important;
+  border-color: rgba(248, 113, 113, 0.3) !important;
 }
 
 .status-pending {
-  background-color: #fff3e0 !important;
-  color: #f57c00 !important;
+  background: rgba(245, 158, 11, 0.15) !important;
+  color: #f59e0b !important;
+  border-color: rgba(245, 158, 11, 0.3) !important;
 }
 
 .status-locked {
-  background-color: #f5f5f5 !important;
-  color: #757575 !important;
+  background: rgba(255, 255, 255, 0.08) !important;
+  color: var(--aurora-text-muted) !important;
+  border-color: rgba(255, 255, 255, 0.15) !important;
 }
 
 // Actions
@@ -190,10 +192,10 @@ mat-chip {
   display: flex;
   gap: 8px;
   align-items: center;
-  
+
   .pending-text {
     font-size: 12px;
-    color: #f57c00;
+    color: #f59e0b;
     font-style: italic;
   }
 }
@@ -202,17 +204,17 @@ mat-chip {
 .summary-section {
   margin-top: 24px;
   padding: 16px;
-  background-color: #f9f9f9;
+  background-color: rgba(255, 255, 255, 0.03);
   border-radius: 8px;
-  border-left: 4px solid #667eea;
-  
+  border-left: 4px solid var(--aurora-teal);
+
   p {
     margin: 0;
     font-size: 14px;
-    color: #555;
-    
+    color: var(--aurora-text-secondary);
+
     strong {
-      color: #333;
+      color: var(--aurora-text-primary);
       margin-right: 4px;
     }
   }
@@ -223,25 +225,25 @@ mat-chip {
   .user-list-container {
     padding: 16px;
   }
-  
+
   .header-section {
     flex-direction: column;
     align-items: flex-start;
     gap: 16px;
-    
+
     h1 {
       font-size: 22px;
     }
-    
+
     button {
       width: 100%;
     }
   }
-  
+
   .table-container {
     overflow-x: scroll;
   }
-  
+
   .users-table {
     min-width: 900px;
   }
