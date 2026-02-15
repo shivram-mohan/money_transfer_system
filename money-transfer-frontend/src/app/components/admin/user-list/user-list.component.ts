@@ -190,23 +190,37 @@ rejectUser(userId: number, username: string): void {
   }
 
   activateUser(userId: number, username: string): void {
-    if (confirm(`Are you sure you want to activate user "${username}"?`)) {
-      this.userManagementService.activateUser(userId).subscribe({
-        next: () => {
-          this.snackBar.open('User activated successfully', 'Close', {
-            duration: 3000,
-            panelClass: ['success-snackbar']
-          });
-          this.loadUsers();
-        },
-        error: (error) => {
-          this.snackBar.open(error.message || 'Failed to activate user', 'Close', {
-            duration: 3000,
-            panelClass: ['error-snackbar']
-          });
-        }
-      });
-    }
+    const dialogRef = this.dialog.open(ConfirmDialogComponent, {
+      width: '400px',
+      data: {
+        title: 'Activate User',
+        message: `Are you sure you want to activate "${username}"? This will unlock their account and allow transactions.`,
+        confirmText: 'Activate',
+        cancelText: 'Cancel',
+        icon: 'check_circle',
+        color: 'accent'
+      }
+    });
+
+    dialogRef.afterClosed().subscribe(result => {
+      if (result) {
+        this.userManagementService.activateUser(userId).subscribe({
+          next: () => {
+            this.snackBar.open('User activated successfully', 'Close', {
+              duration: 3000,
+              panelClass: ['success-snackbar']
+            });
+            this.loadUsers();
+          },
+          error: (error) => {
+            this.snackBar.open(error.error?.message || 'Failed to activate user', 'Close', {
+              duration: 3000,
+              panelClass: ['error-snackbar']
+            });
+          }
+        });
+      }
+    });
   }
 
   formatDate(date: Date): string {
