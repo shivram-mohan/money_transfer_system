@@ -46,10 +46,10 @@ export class AdminDashboardComponent implements OnInit {
   loadStatistics(): void {
     this.userManagementService.getAllUsers().subscribe({
       next: (users) => {
-        this.totalUsers = users.length;
-        this.activeUsers = users.filter(u => u.status === 'ACTIVE').length;
-        this.inactiveUsers = users.filter(u => u.status === 'INACTIVE').length;
-        this.pendingUsers = users.filter(u => u.status === 'PENDING').length; // ← ADD THIS
+        this.totalUsers = users.filter(u => u.role != 'ADMIN').length;;
+        this.activeUsers = users.filter(u => u.status === 'ACTIVE' && u.role != 'ADMIN').length;
+        this.inactiveUsers = users.filter(u => u.status === 'INACTIVE' && u.role != 'ADMIN').length;
+        this.pendingUsers = users.filter(u => u.status === 'PENDING' && u.role != 'ADMIN').length; // ← ADD THIS
 
       }
     });

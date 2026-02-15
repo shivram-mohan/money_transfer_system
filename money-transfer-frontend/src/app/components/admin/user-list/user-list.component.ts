@@ -50,7 +50,7 @@ export class UserListComponent implements OnInit {
     this.isLoading = true;
     this.userManagementService.getAllUsers().subscribe({
       next: (users) => {
-        this.users = users;
+        this.users = users.filter(u => u.role != 'ADMIN');
         this.isLoading = false;
       },
       error: (error) => {

@@ -65,7 +65,7 @@ export class CreateUserComponent {
             panelClass: ['success-snackbar']
           });
           this.createUserForm.reset({ initialBalance: 1000 });
-          this.router.navigate(['/admin/dashboard']);
+          this.router.navigate(['/admin']);
         },
         error: (error) => {
           this.isLoading = false;
