@@ -121,3 +121,13 @@
     }
   }
 }
+
+@media (max-width: 480px) {
+  .create-user-container {
+    padding: 12px;
+  }
+
+  .header-section h1 {
+    font-size: 20px;
+  }
+}

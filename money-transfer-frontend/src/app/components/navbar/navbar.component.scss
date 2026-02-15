@@ -89,3 +89,15 @@
     display: none;
   }
 }
+
+@media (max-width: 480px) {
+  .nav-links {
+    gap: 2px;
+  }
+
+  .brand-icon {
+    font-size: 24px;
+    height: 24px;
+    width: 24px;
+  }
+}

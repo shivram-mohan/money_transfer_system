@@ -221,6 +221,36 @@ mat-form-field {
   }
 }
 
+@media (max-width: 480px) {
+  .login-container {
+    padding: 12px;
+
+    &::before {
+      width: 300px;
+      height: 300px;
+    }
+  }
+
+  .login-card {
+    padding: 12px;
+  }
+
+  .login-title {
+    font-size: 18px;
+  }
+
+  .title-icon {
+    font-size: 24px;
+    height: 24px;
+    width: 24px;
+  }
+
+  .login-button {
+    height: 44px;
+    font-size: 14px;
+  }
+}
+
 .card-actions {
   padding: 0 !important;
   margin: 0 !important;

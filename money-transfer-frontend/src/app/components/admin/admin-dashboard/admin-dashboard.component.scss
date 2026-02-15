@@ -228,3 +228,56 @@
     grid-template-columns: 1fr;
   }
 }
+
+@media (max-width: 480px) {
+  .admin-dashboard-container {
+    padding: 12px;
+  }
+
+  .welcome-section h1 {
+    font-size: 20px;
+  }
+
+  .stat-card {
+    mat-card-content {
+      padding: 16px;
+      gap: 12px;
+    }
+
+    .stat-icon {
+      width: 48px;
+      height: 48px;
+
+      mat-icon {
+        font-size: 24px;
+        height: 24px;
+        width: 24px;
+      }
+    }
+
+    .stat-info h3 {
+      font-size: 24px;
+    }
+  }
+
+  .action-card {
+    .action-icon-wrapper {
+      width: 60px;
+      height: 60px;
+
+      mat-icon {
+        font-size: 30px;
+        height: 30px;
+        width: 30px;
+      }
+    }
+
+    h3 {
+      font-size: 18px;
+    }
+  }
+
+  .action-section h2 {
+    font-size: 20px;
+  }
+}

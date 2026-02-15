@@ -406,3 +406,35 @@ mat-chip {
     margin-bottom: 8px;
   }
 }
+
+@media (max-width: 480px) {
+  .history-container {
+    padding: 12px;
+  }
+
+  .header-section h1 {
+    font-size: 20px;
+  }
+
+  .no-transactions {
+    padding: 40px 16px;
+
+    mat-icon {
+      font-size: 60px;
+      height: 60px;
+      width: 60px;
+    }
+  }
+
+  .loading-container {
+    padding: 40px 16px;
+  }
+
+  .filter-dropdown {
+    min-width: 100%;
+  }
+
+  .transaction-card {
+    padding: 12px;
+  }
+}

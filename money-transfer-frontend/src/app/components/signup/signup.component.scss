@@ -113,3 +113,51 @@ mat-form-field {
 mat-spinner {
   display: inline-block;
 }
+
+@media (max-width: 768px) {
+  .signup-container {
+    padding: 16px;
+  }
+
+  .signup-card {
+    padding: 16px;
+  }
+
+  .header-content {
+    mat-card-title {
+      font-size: 24px;
+    }
+  }
+}
+
+@media (max-width: 480px) {
+  .signup-container {
+    padding: 12px;
+
+    &::before {
+      width: 300px;
+      height: 300px;
+    }
+  }
+
+  .signup-card {
+    padding: 12px;
+  }
+
+  .header-content {
+    .header-icon {
+      font-size: 36px;
+      width: 36px;
+      height: 36px;
+    }
+
+    mat-card-title {
+      font-size: 22px;
+    }
+  }
+
+  .submit-btn {
+    height: 44px;
+    font-size: 14px;
+  }
+}

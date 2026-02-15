@@ -259,3 +259,33 @@
     }
   }
 }
+
+@media (max-width: 480px) {
+  .transfer-container {
+    padding: 12px;
+  }
+
+  .header-section h1 {
+    font-size: 20px;
+  }
+
+  .success-card {
+    mat-card-content {
+      padding: 20px 12px;
+    }
+
+    .success-icon mat-icon {
+      font-size: 60px;
+      height: 60px;
+      width: 60px;
+    }
+
+    h2 {
+      font-size: 20px;
+    }
+
+    .transaction-details {
+      padding: 12px;
+    }
+  }
+}
