@@ -1,0 +1,402 @@
+// src/app/components/history/history.component.scss
+
+.history-container {
+  padding: 24px;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.header-section {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  margin-bottom: 24px;
+  
+  .back-button mat-icon {
+    color: #3f51b5;
+  }
+  
+  h1 {
+    font-size: 28px;
+    font-weight: 600;
+    color: #333;
+    margin: 0;
+  }
+  
+  .spacer {
+    flex: 1;
+  }
+}
+
+.spinning {
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+.history-card {
+  min-height: 400px;
+}
+
+// Loading State
+.loading-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 60px 20px;
+  
+  p {
+    margin-top: 20px;
+    color: #666;
+    font-size: 16px;
+  }
+}
+
+// No Transactions State
+.no-transactions {
+  text-align: center;
+  padding: 60px 20px;
+  
+  mat-icon {
+    font-size: 80px;
+    height: 80px;
+    width: 80px;
+    color: #ccc;
+    margin-bottom: 16px;
+  }
+  
+  h3 {
+    font-size: 20px;
+    font-weight: 500;
+    color: #666;
+    margin-bottom: 8px;
+  }
+  
+  p {
+    color: #999;
+  }
+}
+
+// Desktop Table
+.desktop-table {
+  display: block;
+  
+  @media (max-width: 768px) {
+    display: none;
+  }
+}
+
+.table-container {
+  overflow-x: auto;
+}
+
+.transactions-table {
+  width: 100%;
+  
+  th {
+    background-color: #f5f5f5;
+    font-weight: 600;
+    color: #333;
+    padding: 16px;
+  }
+  
+  td {
+    padding: 16px;
+  }
+  
+  tr:hover {
+    background-color: #f9f9f9;
+  }
+}
+
+.date-cell {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  
+  .cell-icon {
+    font-size: 18px;
+    height: 18px;
+    width: 18px;
+    color: #666;
+  }
+}
+
+.account-cell {
+  .account-label {
+    font-size: 12px;
+    color: #666;
+    display: block;
+    margin-bottom: 4px;
+  }
+  
+  .account-id {
+    font-weight: 500;
+  }
+}
+
+.amount-cell {
+  font-size: 16px;
+  font-weight: 600;
+  
+  &.amount-debit {
+    color: #f44336;
+  }
+  
+  &.amount-credit {
+    color: #4caf50;
+  }
+}
+
+.failure-reason {
+  font-size: 12px;
+  color: #f44336;
+  margin-top: 4px;
+  font-style: italic;
+}
+
+// Chips
+mat-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 12px;
+  font-weight: 500;
+  padding: 4px 12px;
+  border-radius: 16px;
+  
+  mat-icon {
+    font-size: 16px;
+    height: 16px;
+    width: 16px;
+  }
+}
+
+.type-debit {
+  background-color: #ffebee !important;
+  color: #c62828 !important;
+}
+
+.type-credit {
+  background-color: #e8f5e9 !important;
+  color: #2e7d32 !important;
+}
+
+.status-success {
+  background-color: #e8f5e9 !important;
+  color: #2e7d32 !important;
+}
+
+.status-failed {
+  background-color: #ffebee !important;
+  color: #c62828 !important;
+}
+
+// Mobile List
+.mobile-list {
+  display: none;
+  
+  @media (max-width: 768px) {
+    display: block;
+  }
+}
+
+.transaction-card {
+  border: 1px solid #e0e0e0;
+  border-radius: 8px;
+  padding: 16px;
+  margin-bottom: 16px;
+  background-color: white;
+  
+  &:last-child {
+    margin-bottom: 0;
+  }
+}
+
+.transaction-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 16px;
+  padding-bottom: 12px;
+  border-bottom: 1px solid #f0f0f0;
+  
+  .type-chip,
+  .status-chip {
+    margin: 0;
+  }
+}
+
+.transaction-body {
+  .transaction-row {
+    display: flex;
+    justify-content: space-between;
+    padding: 8px 0;
+    
+    .label {
+      font-size: 13px;
+      color: #666;
+      font-weight: 500;
+    }
+    
+    .value {
+      font-size: 13px;
+      color: #333;
+      font-weight: 500;
+      text-align: right;
+      
+      &.amount {
+        font-size: 16px;
+        font-weight: 600;
+        
+        &.amount-debit {
+          color: #f44336;
+        }
+        
+        &.amount-credit {
+          color: #4caf50;
+        }
+      }
+      
+      &.error {
+        color: #f44336;
+        font-size: 12px;
+        font-style: italic;
+      }
+    }
+  }
+}
+
+// Responsive
+@media (max-width: 768px) {
+  .history-container {
+    padding: 16px;
+  }
+  
+  .header-section h1 {
+    font-size: 22px;
+  }
+}
+
+// ✅ NEW - Account Details Styles
+.account-details {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.account-info {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  
+  .small-icon {
+    font-size: 18px;
+    width: 18px;
+    height: 18px;
+    color: #666;
+    flex-shrink: 0;
+  }
+  
+  .account-text {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+  }
+  
+  .account-name {
+    font-weight: 600;
+    color: #333;
+    font-size: 14px;
+  }
+  
+  .account-id {
+    font-size: 11px;
+    color: #999;
+  }
+}
+
+// Mobile account name styles
+.account-name-mobile {
+  font-weight: 600;
+  color: #333;
+  display: block;
+}
+
+.account-id-mobile {
+  font-size: 11px;
+  color: #999;
+  display: block;
+}
+
+.pdf-button {
+  margin-right: 8px;
+  
+  mat-icon {
+    margin-right: 8px;
+  }
+}
+
+.filter-card {
+  margin-bottom: 24px;
+}
+
+.filter-section {
+  display: flex;
+  align-items: flex-start;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+
+.filter-dropdown {
+  min-width: 250px;
+}
+
+.custom-date-picker {
+  display: flex;
+  gap: 16px;
+  align-items: flex-start;
+  flex-wrap: wrap;
+  
+  mat-form-field {
+    min-width: 200px;
+  }
+  
+  button {
+    margin-top: 8px;
+    height: 48px;
+  }
+}
+
+// Mobile responsive
+@media (max-width: 768px) {
+  .filter-section {
+    flex-direction: column;
+  }
+  
+  .filter-dropdown {
+    width: 100%;
+  }
+  
+  .custom-date-picker {
+    width: 100%;
+    flex-direction: column;
+    
+    mat-form-field {
+      width: 100%;
+    }
+    
+    button {
+      width: 100%;
+    }
+  }
+  
+  .pdf-button {
+    width: 100%;
+    margin-bottom: 8px;
+  }
+}

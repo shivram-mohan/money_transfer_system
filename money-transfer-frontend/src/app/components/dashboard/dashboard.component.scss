@@ -1,0 +1,235 @@
+// src/app/components/dashboard/dashboard.component.scss
+
+.dashboard-container {
+  padding: 24px;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.welcome-section {
+  margin-bottom: 32px;
+  
+  h1 {
+    font-size: 32px;
+    font-weight: 600;
+    color: #333;
+    margin-bottom: 8px;
+  }
+  
+  .subtitle {
+    font-size: 16px;
+    color: #666;
+  }
+}
+
+.dashboard-content {
+  display: grid;
+  gap: 24px;
+}
+
+// Balance Card
+.balance-card {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  padding: 8px;
+  
+  mat-card-header {
+    padding-bottom: 16px;
+  }
+  
+  .card-header-content {
+    width: 100%;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  
+  .header-title {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+  
+  .header-icon {
+    font-size: 32px;
+    height: 32px;
+    width: 32px;
+  }
+  
+  mat-card-title {
+    color: white;
+    font-size: 18px;
+    font-weight: 500;
+    margin: 0;
+  }
+  
+  button {
+    color: white;
+  }
+  
+  .balance-display {
+    display: flex;
+    align-items: baseline;
+    justify-content: center;
+    margin: 24px 0;
+    
+    .currency {
+      font-size: 32px;
+      font-weight: 500;
+      margin-right: 8px;
+    }
+    
+    .amount {
+      font-size: 48px;
+      font-weight: 700;
+    }
+  }
+  
+  .loading-spinner {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 120px;
+  }
+  
+  .account-info {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    justify-content: center;
+    opacity: 0.9;
+    font-size: 14px;
+    margin-top: 16px;
+  }
+}
+
+.spinning {
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+// Action Cards
+.action-cards {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 24px;
+}
+
+.action-card {
+  cursor: pointer;
+  transition: all 0.3s ease;
+  
+  &:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
+  }
+  
+  mat-card-content {
+    text-align: center;
+    padding: 32px 16px;
+  }
+  
+  .action-icon-wrapper {
+    width: 80px;
+    height: 80px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 16px;
+    
+    mat-icon {
+      font-size: 40px;
+      height: 40px;
+      width: 40px;
+      color: white;
+    }
+  }
+  
+  .transfer-icon {
+    background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%);
+  }
+  
+  .history-icon {
+    background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+  }
+  
+  h3 {
+    font-size: 20px;
+    font-weight: 600;
+    margin-bottom: 8px;
+    color: #333;
+  }
+  
+  p {
+    font-size: 14px;
+    color: #666;
+    margin: 0;
+  }
+}
+
+// Info Card
+.info-card {
+  mat-card-header {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding-bottom: 16px;
+  }
+  
+  .info-icon {
+    color: #3f51b5;
+    font-size: 28px;
+    height: 28px;
+    width: 28px;
+  }
+  
+  mat-card-title {
+    font-size: 18px;
+    font-weight: 500;
+  }
+  
+  ul {
+    padding-left: 24px;
+    margin: 0;
+    
+    li {
+      margin-bottom: 12px;
+      color: #555;
+      line-height: 1.6;
+      
+      &:last-child {
+        margin-bottom: 0;
+      }
+    }
+  }
+}
+
+// Responsive
+@media (max-width: 768px) {
+  .dashboard-container {
+    padding: 16px;
+  }
+  
+  .welcome-section h1 {
+    font-size: 24px;
+  }
+  
+  .balance-display {
+    .currency {
+      font-size: 24px !important;
+    }
+    
+    .amount {
+      font-size: 36px !important;
+    }
+  }
+  
+  .action-cards {
+    grid-template-columns: 1fr;
+  }
+}

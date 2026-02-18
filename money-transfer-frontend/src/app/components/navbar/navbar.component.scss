@@ -1,0 +1,89 @@
+// src/app/components/navbar/navbar.component.scss
+
+.navbar {
+  position: sticky;
+  top: 0;
+  z-index: 1000;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.toolbar-content {
+  width: 100%;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.brand {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 20px;
+  font-weight: 500;
+  cursor: pointer;
+}
+
+.brand-icon {
+  font-size: 28px;
+  height: 28px;
+  width: 28px;
+}
+
+.brand-text {
+  display: none;
+  
+  @media (min-width: 768px) {
+    display: inline;
+  }
+}
+
+.nav-links {
+  display: flex;
+  gap: 8px;
+  
+  button {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    
+    mat-icon {
+      font-size: 20px;
+      height: 20px;
+      width: 20px;
+    }
+  }
+}
+
+.active-link {
+  background-color: rgba(255, 255, 255, 0.15);
+  border-radius: 4px;
+}
+
+.user-menu {
+  .user-button {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    
+    mat-icon:first-child {
+      font-size: 24px;
+      height: 24px;
+      width: 24px;
+    }
+    
+    span {
+      display: none;
+      
+      @media (min-width: 768px) {
+        display: inline;
+      }
+    }
+  }
+}
+
+// Mobile responsive
+@media (max-width: 768px) {
+  .nav-links button span {
+    display: none;
+  }
+}

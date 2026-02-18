@@ -1,0 +1,108 @@
+<!-- src/app/components/admin/admin-dashboard/admin-dashboard.component.html -->
+
+<app-admin-navbar></app-admin-navbar>
+
+<div class="admin-dashboard-container">
+  <div class="welcome-section">
+    <h1>Welcome, {{ adminName }}!</h1>
+    <p class="subtitle">User Management & Administration Panel</p>
+  </div>
+
+  <div class="dashboard-content">
+    <!-- Statistics Cards -->
+    <div class="stats-grid">
+      <!-- Add this widget alongside other stats -->
+      <mat-card class="stat-card pending">
+        <mat-card-content>
+          <div class="stat-icon">
+            <mat-icon [matBadge]="pendingUsers" matBadgeColor="warn">
+              hourglass_empty
+            </mat-icon>
+          </div>
+          <div class="stat-info">
+            <h3>{{ pendingUsers }}</h3>
+            <p>Pending Approval</p>
+          </div>
+        </mat-card-content>
+      </mat-card>
+      <mat-card class="stat-card total-users">
+        <mat-card-content>
+          <div class="stat-icon">
+            <mat-icon>group</mat-icon>
+          </div>
+          <div class="stat-info">
+            <h3>{{ totalUsers }}</h3>
+            <p>Total Users</p>
+          </div>
+        </mat-card-content>
+      </mat-card>
+
+      <mat-card class="stat-card active-users">
+        <mat-card-content>
+          <div class="stat-icon">
+            <mat-icon>check_circle</mat-icon>
+          </div>
+          <div class="stat-info">
+            <h3>{{ activeUsers }}</h3>
+            <p>Active Users</p>
+          </div>
+        </mat-card-content>
+      </mat-card>
+
+      
+      <mat-card class="stat-card inactive-users">
+        <mat-card-content>
+          <div class="stat-icon">
+            <mat-icon>cancel</mat-icon>
+          </div>
+          <div class="stat-info">
+            <h3>{{ inactiveUsers }}</h3>
+            <p>Inactive Users</p>
+          </div>
+        </mat-card-content>
+      </mat-card>
+    </div>
+
+    <!-- Quick Actions -->
+    <div class="action-section">
+      <h2>Quick Actions</h2>
+      <div class="action-cards">
+        <mat-card class="action-card" (click)="navigateToCreateUser()">
+          <mat-card-content>
+            <div class="action-icon-wrapper create-icon">
+              <mat-icon>person_add</mat-icon>
+            </div>
+            <h3>Create New User</h3>
+            <p>Add a new user to the system</p>
+          </mat-card-content>
+        </mat-card>
+
+        <mat-card class="action-card" (click)="navigateToUserList()">
+          <mat-card-content>
+            <div class="action-icon-wrapper manage-icon">
+              <mat-icon>manage_accounts</mat-icon>
+            </div>
+            <h3>Manage Users</h3>
+            <p>View and manage all users</p>
+          </mat-card-content>
+        </mat-card>
+      </div>
+    </div>
+
+    <!-- Info Card -->
+    <mat-card class="info-card">
+      <mat-card-header>
+        <mat-icon class="info-icon">info</mat-icon>
+        <mat-card-title>Admin Guidelines</mat-card-title>
+      </mat-card-header>
+      <mat-card-content>
+        <ul>
+          <li>You can deactivate users to temporarily suspend their access</li>
+          <li>Deactivated users can be reactivated at any time</li>
+          <li>Each user is automatically assigned a unique account ID upon creation</li>
+          <li>Review pending s regularly to ensure smooth onboarding</li>
+        </ul>
+      </mat-card-content>
+    </mat-card>
+  </div>
+</div>

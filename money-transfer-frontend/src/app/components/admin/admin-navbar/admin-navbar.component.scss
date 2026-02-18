@@ -1,0 +1,172 @@
+// src/app/components/admin/admin-navbar/admin-navbar.component.scss
+
+.admin-navbar {
+  position: sticky;
+  top: 0;
+  z-index: 1000;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%) !important;
+}
+
+.toolbar-content {
+  width: 100%;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0 8px;
+}
+
+.brand {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 20px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: opacity 0.2s;
+  
+  &:hover {
+    opacity: 0.9;
+  }
+}
+
+.brand-icon {
+  font-size: 28px;
+  height: 28px;
+  width: 28px;
+}
+
+.brand-text {
+  display: none;
+  
+  @media (min-width: 768px) {
+    display: inline;
+  }
+}
+
+.nav-links {
+  display: flex;
+  gap: 4px;
+  flex: 1;
+  justify-content: center;
+  
+  button {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 0 12px;
+    
+    mat-icon {
+      font-size: 20px;
+      height: 20px;
+      width: 20px;
+    }
+    
+    .link-text {
+      display: none;
+      
+      @media (min-width: 960px) {
+        display: inline;
+      }
+    }
+  }
+}
+
+.active-link {
+  background-color: rgba(255, 255, 255, 0.2) !important;
+  border-radius: 4px;
+  
+  &::before {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 3px;
+    background-color: white;
+    border-radius: 2px 2px 0 0;
+  }
+}
+
+.user-menu {
+  .user-button {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    
+    mat-icon:first-child {
+      font-size: 24px;
+      height: 24px;
+      width: 24px;
+    }
+    
+    .admin-name {
+      display: none;
+      
+      @media (min-width: 768px) {
+        display: inline;
+        max-width: 150px;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+      }
+    }
+    
+    .dropdown-icon {
+      font-size: 20px;
+      height: 20px;
+      width: 20px;
+    }
+  }
+}
+
+// Badge styling
+::ng-deep {
+  .mat-badge-content {
+    background-color: #f44336;
+    color: white;
+    font-size: 10px;
+    font-weight: 600;
+  }
+}
+
+// Responsive - Mobile
+@media (max-width: 768px) {
+  .toolbar-content {
+    padding: 0 4px;
+  }
+  
+  .nav-links {
+    gap: 2px;
+    
+    button {
+      padding: 0 8px;
+      min-width: auto;
+    }
+  }
+}
+
+// Menu styling
+::ng-deep {
+  .mat-mdc-menu-panel {
+    min-width: 200px;
+  }
+  
+  .mat-mdc-menu-item {
+    .mat-icon {
+      margin-right: 12px;
+      color: #666;
+    }
+  }
+  
+  .mat-mdc-menu-item:disabled {
+    .mat-icon {
+      color: #667eea;
+    }
+    
+    span {
+      font-weight: 500;
+      color: #333;
+    }
+  }
+}
