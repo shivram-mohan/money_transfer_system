@@ -68,13 +68,8 @@ export class UserListComponent implements OnInit {
     });
   }
 
-  // Helper methods for counting
   get activeUsersCount(): number {
     return this.users.filter(u => u.status === UserStatus.ACTIVE).length;
-  }
-
-  get pendingUsersCount(): number {
-    return this.users.filter(u => u.status === UserStatus.PENDING).length;
   }
 
   get inactiveUsersCount(): number {
@@ -87,71 +82,13 @@ export class UserListComponent implements OnInit {
         return 'status-active';
       case UserStatus.INACTIVE:
         return 'status-inactive';
-      case UserStatus.PENDING:
-        return 'status-pending';
       case UserStatus.LOCKED:
         return 'status-locked';
       default:
         return '';
     }
   }
-approveUser(userId: number, username: string): void {
-  if (confirm(`Approve user "${username}"?`)) {
-    this.userManagementService.approveUser(userId).subscribe({
-      next: () => {
-        this.snackBar.open(
-          `User "${username}" approved successfully!`, 
-          'Close', 
-          {
-            duration: 3000,
-            panelClass: ['success-snackbar']
-          }
-        );
-        this.loadUsers(); // Refresh list
-      },
-      error: (error : any) => {
-        this.snackBar.open(
-          error.error?.message || 'Failed to approve user', 
-          'Close', 
-          {
-            duration: 3000,
-            panelClass: ['error-snackbar']
-          }
-        );
-      }
-    });
-  }
-}
 
-rejectUser(userId: number, username: string): void {
-  const reason = prompt(`Reject user "${username}"?\nEnter reason (optional):`);
-  
-  if (reason !== null) { // User clicked OK (even if empty)
-    this.userManagementService.rejectUser(userId, reason).subscribe({
-      next: () => {
-        this.snackBar.open(
-          `User "${username}" rejected and removed`, 
-          'Close', 
-          {
-            duration: 3000,
-            panelClass: ['success-snackbar']
-          }
-        );
-        this.loadUsers(); // Refresh list
-      },
-      error: (error:any) => {
-        this.snackBar.open(
-          error.error?.message || 'Failed to reject user', 
-          'Close', 
-          {
-            duration: 3000,
-            panelClass: ['error-snackbar']
-          }
-        );
-      }
-    });
-  }
-}
   deactivateUser(userId: number, username: string): void {
     const dialogRef = this.dialog.open(ConfirmDialogComponent, {
       width: '400px',

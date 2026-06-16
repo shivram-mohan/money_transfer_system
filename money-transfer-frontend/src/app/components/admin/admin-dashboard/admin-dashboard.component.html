@@ -11,20 +11,6 @@
   <div class="dashboard-content">
     <!-- Statistics Cards -->
     <div class="stats-grid">
-      <!-- Add this widget alongside other stats -->
-      <mat-card class="stat-card pending">
-        <mat-card-content>
-          <div class="stat-icon">
-            <mat-icon [matBadge]="pendingUsers" matBadgeColor="warn">
-              hourglass_empty
-            </mat-icon>
-          </div>
-          <div class="stat-info">
-            <h3>{{ pendingUsers }}</h3>
-            <p>Pending Approval</p>
-          </div>
-        </mat-card-content>
-      </mat-card>
       <mat-card class="stat-card total-users">
         <mat-card-content>
           <div class="stat-icon">
@@ -49,7 +35,6 @@
         </mat-card-content>
       </mat-card>
 
-      
       <mat-card class="stat-card inactive-users">
         <mat-card-content>
           <div class="stat-icon">
@@ -97,10 +82,10 @@
       </mat-card-header>
       <mat-card-content>
         <ul>
+          <li>Users sign up by verifying their bank account via OTP - no approval needed</li>
           <li>You can deactivate users to temporarily suspend their access</li>
           <li>Deactivated users can be reactivated at any time</li>
-          <li>Each user is automatically assigned a unique account ID upon creation</li>
-          <li>Review pending s regularly to ensure smooth onboarding</li>
+          <li>Each user is automatically assigned their bank account ID upon registration</li>
         </ul>
       </mat-card-content>
     </mat-card>

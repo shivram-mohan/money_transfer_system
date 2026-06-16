@@ -4,7 +4,7 @@ spring:
   datasource:
     url: jdbc:mysql://localhost:3306/money_transfer_db?createDatabaseIfNotExist=true
     username: root
-    password: Root123$
+    password: YourRootPassword123!
     driver-class-name: com.mysql.cj.jdbc.Driver
   jpa:
     hibernate:
@@ -14,10 +14,17 @@ spring:
       hibernate:
         format_sql: true
         dialect: org.hibernate.dialect.MySQLDialect
-  security:
-    user:
-      name: admin
-      password: admin123
+  mail:
+    host: smtp.gmail.com
+    port: 587
+    username: gamingsiteforever@gmail.com
+    password: zqlr jkfz tsqj auix
+    properties:
+      mail:
+        smtp:
+          auth: true
+          starttls:
+            enable: true
 
 server:
   port: 8080
@@ -26,10 +33,17 @@ logging:
   level:
     com.fidelity.moneytransfer: DEBUG
     org.springframework.web: INFO
-    org.springframework.security: DEBUG  # ← Add this line
+    org.springframework.security: DEBUG
 
 app:
   jwt:
     secret: "3f8b2c9d4e5a6f7g8h9i0j1k2l3m4n5o6p7q8r9s0t1u2v3w4x5y6z7a8b9c0d"
     expiration: 86400000 # 24 hours in milliseconds
+  otp:
+    expiration: 300 # 5 minutes in seconds
+  admin:
+    username: admin
+    password: admin123
+    name: System Administrator
+    email: admin@moneytransfer.com
 

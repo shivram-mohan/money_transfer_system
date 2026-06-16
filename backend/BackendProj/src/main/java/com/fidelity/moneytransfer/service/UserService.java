@@ -2,13 +2,15 @@ package com.fidelity.moneytransfer.service;
 
 import com.fidelity.moneytransfer.dto.CreateUserRequest;
 import com.fidelity.moneytransfer.dto.DeactivateUserRequest;
-import com.fidelity.moneytransfer.dto.SignupRequest;
+import com.fidelity.moneytransfer.dto.SetPasswordRequest;
 import com.fidelity.moneytransfer.dto.UserResponseDto;
 import com.fidelity.moneytransfer.entity.Account;
 import com.fidelity.moneytransfer.entity.AppUser;
+import com.fidelity.moneytransfer.entity.BankDetails;
 import com.fidelity.moneytransfer.enums.AccountStatus;
 import com.fidelity.moneytransfer.exception.AccountNotFoundException;
 import com.fidelity.moneytransfer.repository.AccountRepository;
+import com.fidelity.moneytransfer.repository.BankDetailsRepository;
 import com.fidelity.moneytransfer.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -30,20 +32,13 @@ public class UserService {
     private final AccountRepository accountRepository;
     private final AccountService accountService;
     private final PasswordEncoder passwordEncoder;
+    private final BankDetailsRepository bankDetailsRepository;
 
-    // ─── EXISTING METHODS ─────────────────────────────────────────────
+    // ─── QUERY METHODS ───────────────────────────────────────────────
 
     public List<UserResponseDto> getAllUsers() {
         log.debug("Fetching all users");
         return userRepository.findAll()
-                .stream()
-                .map(this::mapToUserResponse)
-                .collect(Collectors.toList());
-    }
-
-    public List<UserResponseDto> getPendingUsers() {
-        log.debug("Fetching pending users");
-        return userRepository.findByStatus("PENDING")
                 .stream()
                 .map(this::mapToUserResponse)
                 .collect(Collectors.toList());
@@ -64,6 +59,63 @@ public class UserService {
                         "User not found with username: " + username));
         return mapToUserResponse(user);
     }
+
+    // ─── SIGNUP (OTP-verified, no admin approval needed) ─────────────
+
+    @Transactional
+    public UserResponseDto completeSignup(SetPasswordRequest request) {
+        log.info("Completing signup for username: {}", request.getUsername());
+
+        // Check username not taken
+        if (userRepository.existsByUsername(request.getUsername())) {
+            throw new IllegalArgumentException(
+                    "Username already exists: " + request.getUsername());
+        }
+
+        // Get bank details
+        BankDetails bankDetails = bankDetailsRepository
+                .findByAccountNumber(request.getAccountNumber())
+                .orElseThrow(() -> new IllegalArgumentException("Account not found"));
+
+        if (bankDetails.getRegistered()) {
+            throw new IllegalArgumentException("This account has already been registered");
+        }
+
+        // Create account with ACTIVE status (verified via OTP, no approval needed)
+        Account account = Account.builder()
+                .id(request.getAccountNumber())
+                .holderName(bankDetails.getUserName())
+                .balance(bankDetails.getBalance())
+                .status(AccountStatus.ACTIVE)
+                .version(0)
+                .build();
+        Account savedAccount = accountRepository.save(account);
+
+        // Create user with ACTIVE status directly
+        AppUser user = AppUser.builder()
+                .username(request.getUsername())
+                .password(passwordEncoder.encode(request.getPassword()))
+                .name(bankDetails.getUserName())
+                .email(bankDetails.getEmail())
+                .role("USER")
+                .status("ACTIVE")
+                .accountId(savedAccount.getId())
+                .createdBy("otp-verified")
+                .approvedBy("otp-verified")
+                .approvedDate(LocalDateTime.now())
+                .build();
+
+        AppUser savedUser = userRepository.save(user);
+
+        // Mark bank details as registered
+        bankDetails.setRegistered(true);
+        bankDetailsRepository.save(bankDetails);
+
+        log.info("User signup completed - active immediately: {}", savedUser.getId());
+        return mapToUserResponse(savedUser);
+    }
+
+    // ─── ADMIN: CREATE USER DIRECTLY ─────────────────────────────────
 
     @Transactional
     public UserResponseDto createUser(CreateUserRequest request, String createdBy) {
@@ -101,6 +153,8 @@ public class UserService {
 
         return mapToUserResponse(savedUser);
     }
+
+    // ─── ACTIVATE / DEACTIVATE ───────────────────────────────────────
 
     @Transactional
     public UserResponseDto activateUser(Long userId) {
@@ -144,121 +198,7 @@ public class UserService {
         return mapToUserResponse(userRepository.save(user));
     }
 
-    // ─── NEW METHODS FOR SIGNUP FLOW ──────────────────────────────────
-
-    @Transactional
-    public UserResponseDto signupUser(SignupRequest request) {
-        log.info("User signup request: {}", request.getUsername());
-
-        // Check if username already exists
-        if (userRepository.existsByUsername(request.getUsername())) {
-            throw new IllegalArgumentException(
-                    "Username already exists: " + request.getUsername());
-        }
-
-        // Validate email uniqueness (optional)
-        if (request.getEmail() != null &&
-                !request.getEmail().isEmpty()) {
-            userRepository.findAll().stream()
-                    .filter(u -> request.getEmail().equals(u.getEmail()))
-                    .findFirst()
-                    .ifPresent(u -> {
-                        throw new IllegalArgumentException(
-                                "Email already registered");
-                    });
-        }
-
-        // Create account with LOCKED status
-        Account account = Account.builder()
-                .id(accountService.generateUniqueAccountId())
-                .holderName(request.getName())
-                .balance(request.getInitialBalance())
-                .status(AccountStatus.LOCKED) // Locked until approved
-                .version(0)
-                .build();
-        Account savedAccount = accountRepository.save(account);
-
-        // Create user with PENDING status
-        AppUser user = AppUser.builder()
-                .username(request.getUsername())
-                .password(passwordEncoder.encode(request.getPassword()))
-                .name(request.getName())
-                .email(request.getEmail())
-                .role("USER")
-                .status("PENDING") // Needs admin approval
-                .accountId(savedAccount.getId())
-                .createdBy("self-registration")
-                .build();
-
-        AppUser savedUser = userRepository.save(user);
-        log.info("User signup successful - pending approval: {}",
-                savedUser.getId());
-
-        return mapToUserResponse(savedUser);
-    }
-
-    @Transactional
-    public UserResponseDto approveUser(Long userId, String approvedBy) {
-        log.info("Approving user id: {} by: {}", userId, approvedBy);
-
-        AppUser user = userRepository.findById(userId)
-                .orElseThrow(() -> new AccountNotFoundException(
-                        "User not found with id: " + userId));
-
-        if (!user.getStatus().equals("PENDING")) {
-            throw new IllegalArgumentException(
-                    "User is not in pending status. Current status: " +
-                            user.getStatus());
-        }
-
-        // Activate user
-        user.setStatus("ACTIVE");
-        user.setApprovedBy(approvedBy);
-        user.setApprovedDate(LocalDateTime.now());
-
-        // Activate their account
-        if (user.getAccountId() != null) {
-            accountRepository.findById(user.getAccountId())
-                    .ifPresent(account -> {
-                        account.setStatus(AccountStatus.ACTIVE);
-                        accountRepository.save(account);
-                        log.info("Account {} activated", account.getId());
-                    });
-        }
-
-        AppUser approvedUser = userRepository.save(user);
-        log.info("User {} approved successfully", userId);
-
-        return mapToUserResponse(approvedUser);
-    }
-
-    @Transactional
-    public void rejectUser(Long userId, String reason) {
-        log.info("Rejecting user id: {} - Reason: {}", userId, reason);
-
-        AppUser user = userRepository.findById(userId)
-                .orElseThrow(() -> new AccountNotFoundException(
-                        "User not found with id: " + userId));
-
-        if (!user.getStatus().equals("PENDING")) {
-            throw new IllegalArgumentException(
-                    "User is not in pending status. Current status: " +
-                            user.getStatus());
-        }
-
-        // Delete the user's account if exists
-        if (user.getAccountId() != null) {
-            accountRepository.deleteById(user.getAccountId());
-            log.info("Deleted account {} for rejected user",
-                    user.getAccountId());
-        }
-
-        // Delete the user
-        userRepository.deleteById(userId);
-        log.info("User {} rejected and deleted. Reason: {}", userId, reason);
-    }
-
-    // ─── HELPER METHODS ───────────────────────────────────────────────
+    // ─── HELPER ──────────────────────────────────────────────────────
 
     private UserResponseDto mapToUserResponse(AppUser user) {
         return UserResponseDto.builder()

@@ -15,7 +15,7 @@ export enum UserRole {
 export interface User {
   id: number;
   username: string;
-  password?: string; // Only used during creation, not stored in responses
+  password?: string;
   name: string;
   role: UserRole;
   status: UserStatus;
@@ -49,20 +49,47 @@ export interface UserResponse {
   approvedDate?: Date;
 }
 
-export interface ApproveUserRequest {
-  userId: number;
-  approve: boolean;
-  remarks?: string;
-}
-
 export interface DeactivateUserRequest {
   userId: number;
   reason: string;
 }
-export interface SignupRequest {
+
+// ─── New Signup Flow DTOs ────────────────────────────────────────
+
+export interface VerifyAccountRequest {
+  accountNumber: number;
+  username: string;
+  email: string;
+}
+
+export interface VerifyOtpRequest {
+  email: string;
+  otp: string;
+  purpose: string;
+}
+
+export interface SetPasswordRequest {
+  accountNumber: number;
+  username: string;
+  email: string;
+  password: string;
+}
+
+export interface OtpResponse {
+  message: string;
+  email: string;
+  success: boolean;
+}
+
+// ─── New Login Flow DTOs ─────────────────────────────────────────
+
+export interface LoginOtpRequest {
   username: string;
   password: string;
-  name: string;
-  email?: string;
-  initialBalance: number;
+}
+
+export interface LoginVerifyRequest {
+  username: string;
+  password: string;
+  otp: string;
 }

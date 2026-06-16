@@ -18,57 +18,27 @@ export class UserManagementService {
 
   constructor(private http: HttpClient) {}
 
-  // Get all users
   getAllUsers(): Observable<UserResponse[]> {
     return this.http.get<UserResponse[]>(this.apiUrl);
   }
 
-  // Get pending users
-  getPendingUsers(): Observable<UserResponse[]> {
-    return this.http.get<UserResponse[]>(`${this.apiUrl}/pending`);
-  }
-
-  // Get user by ID
   getUserById(userId: number): Observable<UserResponse> {
     return this.http.get<UserResponse>(`${this.apiUrl}/${userId}`);
   }
 
-  // Create new user
-  createUser(
-    request: CreateUserRequest,
-    createdBy: string
-  ): Observable<UserResponse> {
+  createUser(request: CreateUserRequest): Observable<UserResponse> {
     return this.http.post<UserResponse>(this.apiUrl, request);
   }
 
-  // Activate user
   activateUser(userId: number): Observable<UserResponse> {
     return this.http.put<UserResponse>(
       `${this.apiUrl}/${userId}/activate`, {}
     );
   }
 
-  // Deactivate user
-  deactivateUser(
-    request: DeactivateUserRequest
-  ): Observable<UserResponse> {
+  deactivateUser(request: DeactivateUserRequest): Observable<UserResponse> {
     return this.http.put<UserResponse>(
       `${this.apiUrl}/deactivate`, request
     );
   }
-
-  // Approve pending user
-approveUser(userId: number): Observable<UserResponse> {
-  return this.http.put<UserResponse>(
-    `${this.apiUrl}/${userId}/approve`, {}
-  );
-}
-
-// Reject pending user  
-rejectUser(userId: number, reason?: string): Observable<void> {
-  const params = reason ? `?reason=${encodeURIComponent(reason)}` : '';
-  return this.http.delete<void>(
-    `${this.apiUrl}/${userId}/reject${params}`
-  );
-}
 }

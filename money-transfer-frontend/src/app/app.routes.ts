@@ -4,49 +4,53 @@ import { DashboardComponent } from './components/dashboard/dashboard.component';
 import { TransferComponent } from './components/transfer/transfer.component';
 import { HistoryComponent } from './components/history/history.component';
 import { AdminDashboardComponent } from './components/admin/admin-dashboard/admin-dashboard.component';
+import { AdminLoginComponent } from './components/admin/admin-login/admin-login.component';
 import { UserListComponent } from './components/admin/user-list/user-list.component';
 import { CreateUserComponent } from './components/admin/create-user/create-user.component';
 import { authGuard } from './guards/auth.guard';
-import { adminGuard } from './guards/admin.guard'; // ← Make sure this is correct
+import { adminGuard } from './guards/admin.guard';
 import { SignupComponent } from './components/signup/signup.component';
 
 export const routes: Routes = [
   { path: '', redirectTo: '/login', pathMatch: 'full' },
   { path: 'login', component: LoginComponent },
-  { path: 'signup', component: SignupComponent }, // ← ADD THIS
+  { path: 'signup', component: SignupComponent },
+
+  // Separate admin login (hidden from regular users)
+  { path: 'admin/login', component: AdminLoginComponent },
 
   // User routes
-  { 
-    path: 'dashboard', 
-    component: DashboardComponent, 
-    canActivate: [authGuard] 
+  {
+    path: 'dashboard',
+    component: DashboardComponent,
+    canActivate: [authGuard]
   },
-  { 
-    path: 'transfer', 
-    component: TransferComponent, 
-    canActivate: [authGuard] 
+  {
+    path: 'transfer',
+    component: TransferComponent,
+    canActivate: [authGuard]
   },
-  { 
-    path: 'history', 
-    component: HistoryComponent, 
-    canActivate: [authGuard] 
+  {
+    path: 'history',
+    component: HistoryComponent,
+    canActivate: [authGuard]
   },
 
-  // Admin routes  
-  { 
-    path: 'admin', 
-    component: AdminDashboardComponent, 
-    canActivate: [authGuard, adminGuard]  // ← Must be functions not arrays
+  // Admin routes
+  {
+    path: 'admin',
+    component: AdminDashboardComponent,
+    canActivate: [authGuard, adminGuard]
   },
-  { 
-    path: 'admin/users', 
-    component: UserListComponent, 
-    canActivate: [authGuard, adminGuard] 
+  {
+    path: 'admin/users',
+    component: UserListComponent,
+    canActivate: [authGuard, adminGuard]
   },
-  { 
-    path: 'admin/create-user', 
-    component: CreateUserComponent, 
-    canActivate: [authGuard, adminGuard] 
+  {
+    path: 'admin/create-user',
+    component: CreateUserComponent,
+    canActivate: [authGuard, adminGuard]
   },
 
   { path: '**', redirectTo: '/login' }

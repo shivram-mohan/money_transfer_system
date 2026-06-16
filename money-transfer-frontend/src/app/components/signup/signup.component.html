@@ -2,124 +2,213 @@
 
 <div class="signup-container">
   <mat-card class="signup-card">
-    
+
     <!-- Header -->
     <mat-card-header>
       <div class="header-content">
-        <mat-icon class="header-icon">person_add</mat-icon>
+        <mat-icon class="header-icon">verified_user</mat-icon>
         <mat-card-title>Create Account</mat-card-title>
-        <mat-card-subtitle>Join Money Transfer System</mat-card-subtitle>
+        <mat-card-subtitle>Verify your bank account to get started</mat-card-subtitle>
       </div>
     </mat-card-header>
 
+    <!-- Step Indicator -->
+    <div class="step-indicator">
+      <div class="step" [class.active]="currentStep >= 1" [class.completed]="currentStep > 1">
+        <div class="step-circle">
+          <mat-icon *ngIf="currentStep > 1">check</mat-icon>
+          <span *ngIf="currentStep <= 1">1</span>
+        </div>
+        <span class="step-label">Verify Account</span>
+      </div>
+      <div class="step-line" [class.active]="currentStep > 1"></div>
+      <div class="step" [class.active]="currentStep >= 2" [class.completed]="currentStep > 2">
+        <div class="step-circle">
+          <mat-icon *ngIf="currentStep > 2">check</mat-icon>
+          <span *ngIf="currentStep <= 2">2</span>
+        </div>
+        <span class="step-label">Enter OTP</span>
+      </div>
+      <div class="step-line" [class.active]="currentStep > 2"></div>
+      <div class="step" [class.active]="currentStep >= 3">
+        <div class="step-circle">3</div>
+        <span class="step-label">Set Password</span>
+      </div>
+    </div>
+
     <mat-card-content>
-      <form [formGroup]="signupForm" (ngSubmit)="onSubmit()">
-        
-        <!-- Username -->
+
+      <!-- STEP 1: Verify Account -->
+      <form *ngIf="currentStep === 1" [formGroup]="accountForm" (ngSubmit)="onVerifyAccount()">
+
+        <mat-form-field appearance="outline">
+          <mat-label>Account Number</mat-label>
+          <input matInput
+                 type="number"
+                 formControlName="accountNumber"
+                 placeholder="Enter your bank account number" />
+          <mat-icon matPrefix>account_balance</mat-icon>
+          <mat-error *ngIf="accountForm.get('accountNumber')?.hasError('required')">
+            Account number is required
+          </mat-error>
+        </mat-form-field>
+
         <mat-form-field appearance="outline">
           <mat-label>Username</mat-label>
-          <input matInput 
-                 formControlName="username" 
-                 placeholder="Choose a username"
-                 autocomplete="username"/>
+          <input matInput
+                 formControlName="username"
+                 placeholder="Account holder name"
+                 autocomplete="username" />
           <mat-icon matPrefix>person</mat-icon>
-          <mat-error *ngIf="signupForm.get('username')?.hasError('required')">
+          <mat-error *ngIf="accountForm.get('username')?.hasError('required')">
             Username is required
           </mat-error>
-          <mat-error *ngIf="signupForm.get('username')?.hasError('minlength')">
+          <mat-error *ngIf="accountForm.get('username')?.hasError('minlength')">
             Username must be at least 3 characters
           </mat-error>
         </mat-form-field>
 
-        <!-- Full Name -->
         <mat-form-field appearance="outline">
-          <mat-label>Full Name</mat-label>
-          <input matInput 
-                 formControlName="name" 
-                 placeholder="Enter your full name"
-                 autocomplete="name"/>
-          <mat-icon matPrefix>badge</mat-icon>
-          <mat-error *ngIf="signupForm.get('name')?.hasError('required')">
-            Name is required
-          </mat-error>
-        </mat-form-field>
-
-        <!-- Email (Optional) -->
-        <mat-form-field appearance="outline">
-          <mat-label>Email (Optional)</mat-label>
-          <input matInput 
+          <mat-label>Email</mat-label>
+          <input matInput
                  type="email"
-                 formControlName="email" 
-                 placeholder="your@email.com"
-                 autocomplete="email"/>
+                 formControlName="email"
+                 placeholder="Your registered email"
+                 autocomplete="email" />
           <mat-icon matPrefix>email</mat-icon>
-          <mat-error *ngIf="signupForm.get('email')?.hasError('email')">
+          <mat-error *ngIf="accountForm.get('email')?.hasError('required')">
+            Email is required
+          </mat-error>
+          <mat-error *ngIf="accountForm.get('email')?.hasError('email')">
             Invalid email format
           </mat-error>
         </mat-form-field>
 
-        <!-- Password -->
+        <button mat-raised-button
+                color="primary"
+                type="submit"
+                [disabled]="accountForm.invalid || isLoading"
+                class="submit-btn">
+          <mat-spinner *ngIf="isLoading" diameter="20"></mat-spinner>
+          <span *ngIf="!isLoading">
+            <mat-icon>send</mat-icon>
+            Verify & Send OTP
+          </span>
+        </button>
+      </form>
+
+      <!-- STEP 2: Verify OTP -->
+      <form *ngIf="currentStep === 2" [formGroup]="otpForm" (ngSubmit)="onVerifyOtp()">
+
+        <div class="otp-info">
+          <mat-icon>mail_outline</mat-icon>
+          <p>We've sent a 6-digit OTP to <strong>{{ maskedEmail }}</strong></p>
+        </div>
+
+        <mat-form-field appearance="outline">
+          <mat-label>Enter OTP</mat-label>
+          <input matInput
+                 formControlName="otp"
+                 placeholder="6-digit OTP"
+                 maxlength="6"
+                 autocomplete="one-time-code" />
+          <mat-icon matPrefix>pin</mat-icon>
+          <mat-error *ngIf="otpForm.get('otp')?.hasError('required')">
+            OTP is required
+          </mat-error>
+          <mat-error *ngIf="otpForm.get('otp')?.hasError('minlength')">
+            OTP must be 6 digits
+          </mat-error>
+        </mat-form-field>
+
+        <button mat-raised-button
+                color="primary"
+                type="submit"
+                [disabled]="otpForm.invalid || isLoading"
+                class="submit-btn">
+          <mat-spinner *ngIf="isLoading" diameter="20"></mat-spinner>
+          <span *ngIf="!isLoading">
+            <mat-icon>verified</mat-icon>
+            Verify OTP
+          </span>
+        </button>
+
+        <div class="resend-link">
+          <p>Didn't receive OTP?
+            <a (click)="resendOtp()" class="link">Resend OTP</a>
+          </p>
+        </div>
+      </form>
+
+      <!-- STEP 3: Set Password -->
+      <form *ngIf="currentStep === 3" [formGroup]="passwordForm" (ngSubmit)="onSetPassword()">
+
+        <div class="otp-info success">
+          <mat-icon>check_circle</mat-icon>
+          <p>Account verified! Set your password to complete registration.</p>
+        </div>
+
         <mat-form-field appearance="outline">
           <mat-label>Password</mat-label>
-          <input matInput 
+          <input matInput
                  [type]="hidePassword ? 'password' : 'text'"
-                 formControlName="password" 
+                 formControlName="password"
                  placeholder="Create a password"
-                 autocomplete="new-password"/>
+                 autocomplete="new-password" />
           <mat-icon matPrefix>lock</mat-icon>
-          <button mat-icon-button 
-                  matSuffix 
+          <button mat-icon-button
+                  matSuffix
                   type="button"
                   (click)="togglePasswordVisibility()">
-            <mat-icon>{{hidePassword ? 'visibility_off' : 'visibility'}}</mat-icon>
+            <mat-icon>{{ hidePassword ? 'visibility_off' : 'visibility' }}</mat-icon>
           </button>
-          <mat-error *ngIf="signupForm.get('password')?.hasError('required')">
+          <mat-error *ngIf="passwordForm.get('password')?.hasError('required')">
             Password is required
           </mat-error>
-          <mat-error *ngIf="signupForm.get('password')?.hasError('minlength')">
+          <mat-error *ngIf="passwordForm.get('password')?.hasError('minlength')">
             Password must be at least 6 characters
           </mat-error>
         </mat-form-field>
 
-        <!-- Initial Balance -->
         <mat-form-field appearance="outline">
-          <mat-label>Initial Deposit (₹)</mat-label>
-          <input matInput 
-                 type="number"
-                 formControlName="initialBalance" 
-                 placeholder="Minimum ₹100"/>
-          <mat-icon matPrefix>currency_rupee</mat-icon>
-          <mat-hint>Minimum: ₹100, Maximum: ₹10,00,000</mat-hint>
-          <mat-error *ngIf="signupForm.get('initialBalance')?.hasError('required')">
-            Initial balance is required
-          </mat-error>
-          <mat-error *ngIf="signupForm.get('initialBalance')?.hasError('min')">
-            Minimum deposit is ₹100
-          </mat-error>
-          <mat-error *ngIf="signupForm.get('initialBalance')?.hasError('max')">
-            Maximum deposit is ₹10,00,000
+          <mat-label>Confirm Password</mat-label>
+          <input matInput
+                 [type]="hideConfirmPassword ? 'password' : 'text'"
+                 formControlName="confirmPassword"
+                 placeholder="Confirm your password"
+                 autocomplete="new-password" />
+          <mat-icon matPrefix>lock_outline</mat-icon>
+          <button mat-icon-button
+                  matSuffix
+                  type="button"
+                  (click)="toggleConfirmPasswordVisibility()">
+            <mat-icon>{{ hideConfirmPassword ? 'visibility_off' : 'visibility' }}</mat-icon>
+          </button>
+          <mat-error *ngIf="passwordForm.get('confirmPassword')?.hasError('required')">
+            Please confirm your password
           </mat-error>
         </mat-form-field>
 
-        <!-- Submit Button -->
-        <button mat-raised-button 
-                color="primary" 
+        <button mat-raised-button
+                color="primary"
                 type="submit"
-                [disabled]="signupForm.invalid || isLoading"
+                [disabled]="passwordForm.invalid || isLoading"
                 class="submit-btn">
           <mat-spinner *ngIf="isLoading" diameter="20"></mat-spinner>
-          <span *ngIf="!isLoading">Create Account</span>
+          <span *ngIf="!isLoading">
+            <mat-icon>how_to_reg</mat-icon>
+            Create Account
+          </span>
         </button>
-
-        <!-- Already have account -->
-        <div class="login-link">
-          <p>Already have an account? 
-            <a routerLink="/login" class="link">Login here</a>
-          </p>
-        </div>
-
       </form>
-    </mat-card-content>
 
+      <!-- Login link -->
+      <div class="login-link">
+        <p>Already have an account?
+          <a routerLink="/login" class="link">Login here</a>
+        </p>
+      </div>
+
+    </mat-card-content>
   </mat-card>
 </div>

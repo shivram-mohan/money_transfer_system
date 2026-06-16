@@ -6,7 +6,6 @@ import { Router } from '@angular/router';
 import { MatCardModule } from '@angular/material/card';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
-import { MatBadgeModule } from '@angular/material/badge';
 import { AuthService } from '../../../services/auth.service';
 import { UserManagementService } from '../../../services/user-management.service';
 import { AdminNavbarComponent } from '../admin-navbar/admin-navbar.component';
@@ -19,7 +18,6 @@ import { AdminNavbarComponent } from '../admin-navbar/admin-navbar.component';
     MatCardModule,
     MatButtonModule,
     MatIconModule,
-    MatBadgeModule,
     AdminNavbarComponent
   ],
   templateUrl: './admin-dashboard.component.html',
@@ -41,20 +39,16 @@ export class AdminDashboardComponent implements OnInit {
     this.adminName = this.authService.getHolderName();
     this.loadStatistics();
   }
-  pendingUsers = 0;
 
   loadStatistics(): void {
     this.userManagementService.getAllUsers().subscribe({
       next: (users) => {
-        this.totalUsers = users.filter(u => u.role != 'ADMIN').length;;
-        this.activeUsers = users.filter(u => u.status === 'ACTIVE' && u.role != 'ADMIN').length;
-        this.inactiveUsers = users.filter(u => u.status === 'INACTIVE' && u.role != 'ADMIN').length;
-        this.pendingUsers = users.filter(u => u.status === 'PENDING' && u.role != 'ADMIN').length; // ← ADD THIS
-
+        const nonAdminUsers = users.filter(u => u.role != 'ADMIN');
+        this.totalUsers = nonAdminUsers.length;
+        this.activeUsers = nonAdminUsers.filter(u => u.status === 'ACTIVE').length;
+        this.inactiveUsers = nonAdminUsers.filter(u => u.status === 'INACTIVE').length;
       }
     });
-
-
   }
 
   navigateToUserList(): void {
@@ -64,6 +58,4 @@ export class AdminDashboardComponent implements OnInit {
   navigateToCreateUser(): void {
     this.router.navigate(['/admin/create-user']);
   }
-
-
 }

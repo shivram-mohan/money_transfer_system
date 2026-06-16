@@ -5,15 +5,17 @@ import { isPlatformBrowser } from '@angular/common';
 import { HttpClient } from '@angular/common/http';
 import { BehaviorSubject, Observable } from 'rxjs';
 import { tap } from 'rxjs/operators';
-import { UserRole } from '../models/user.model';
+import {
+  UserRole,
+  VerifyAccountRequest,
+  VerifyOtpRequest,
+  SetPasswordRequest,
+  OtpResponse,
+  LoginOtpRequest,
+  LoginVerifyRequest,
+  UserResponse
+} from '../models/user.model';
 import { environment } from '../../environments/environment';
-import { SignupRequest, UserResponse } from '../models/user.model';
-
-export interface LoginRequest {
-  username: string;
-  password: string;
-  isAdmin?: boolean;
-}
 
 export interface LoginResponse {
   token: string;
@@ -23,6 +25,11 @@ export interface LoginResponse {
   role: UserRole;
   username: string;
   expiresIn: number;
+}
+
+export interface AdminLoginRequest {
+  username: string;
+  password: string;
 }
 
 @Injectable({
@@ -50,46 +57,85 @@ export class AuthService {
     this.isAuthenticated$ = this.isAuthenticatedSubject.asObservable();
   }
 
-  // Add this method after login()
-signup(request: SignupRequest): Observable<UserResponse> {
-  return this.http.post<UserResponse>(
-    `${environment.apiUrl}/auth/signup`,
-    request
-  );
-}
+  // ─── SIGNUP FLOW (3 steps) ──────────────────────────────────────
 
-  login(credentials: LoginRequest): Observable<LoginResponse> {
-    // Call the new JWT login endpoint
-    return this.http.post<LoginResponse>(
+  verifyAccount(request: VerifyAccountRequest): Observable<OtpResponse> {
+    return this.http.post<OtpResponse>(
+      `${environment.apiUrl}/auth/signup/verify-account`,
+      request
+    );
+  }
+
+  verifySignupOtp(request: VerifyOtpRequest): Observable<OtpResponse> {
+    return this.http.post<OtpResponse>(
+      `${environment.apiUrl}/auth/signup/verify-otp`,
+      request
+    );
+  }
+
+  setPassword(request: SetPasswordRequest): Observable<UserResponse> {
+    return this.http.post<UserResponse>(
+      `${environment.apiUrl}/auth/signup/set-password`,
+      request
+    );
+  }
+
+  // ─── USER LOGIN FLOW (2 steps) ─────────────────────────────────
+
+  loginStep1(request: LoginOtpRequest): Observable<OtpResponse> {
+    return this.http.post<OtpResponse>(
       `${environment.apiUrl}/auth/login`,
-      {
-        username: credentials.username,
-        password: credentials.password
-      }
+      request
+    );
+  }
+
+  loginVerifyOtp(request: LoginVerifyRequest): Observable<LoginResponse> {
+    return this.http.post<LoginResponse>(
+      `${environment.apiUrl}/auth/login/verify-otp`,
+      request
     ).pipe(
       tap((response: LoginResponse) => {
         if (this.isBrowser) {
-          // Store JWT token and user info
           localStorage.setItem(this.TOKEN_KEY, response.token);
           localStorage.setItem(
-            this.ACCOUNT_ID_KEY, 
+            this.ACCOUNT_ID_KEY,
             response.accountId?.toString() || '0'
           );
-          localStorage.setItem(
-            this.HOLDER_NAME_KEY, 
-            response.holderName
-          );
+          localStorage.setItem(this.HOLDER_NAME_KEY, response.holderName);
           localStorage.setItem(this.USER_ID_KEY, '1');
           localStorage.setItem(this.USERNAME_KEY, response.username);
-          localStorage.setItem(
-            this.USER_ROLE_KEY, 
-            response.role
-          );
+          localStorage.setItem(this.USER_ROLE_KEY, response.role);
         }
         this.isAuthenticatedSubject.next(true);
       })
     );
   }
+
+  // ─── ADMIN LOGIN (direct, no OTP) ──────────────────────────────
+
+  adminLogin(credentials: AdminLoginRequest): Observable<LoginResponse> {
+    return this.http.post<LoginResponse>(
+      `${environment.apiUrl}/auth/admin/login`,
+      credentials
+    ).pipe(
+      tap((response: LoginResponse) => {
+        if (this.isBrowser) {
+          localStorage.setItem(this.TOKEN_KEY, response.token);
+          localStorage.setItem(
+            this.ACCOUNT_ID_KEY,
+            response.accountId?.toString() || '0'
+          );
+          localStorage.setItem(this.HOLDER_NAME_KEY, response.holderName);
+          localStorage.setItem(this.USER_ID_KEY, '1');
+          localStorage.setItem(this.USERNAME_KEY, response.username);
+          localStorage.setItem(this.USER_ROLE_KEY, response.role);
+        }
+        this.isAuthenticatedSubject.next(true);
+      })
+    );
+  }
+
+  // ─── SESSION MANAGEMENT ────────────────────────────────────────
 
   logout(): void {
     if (this.isBrowser) {

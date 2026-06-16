@@ -10,136 +10,113 @@
     </mat-card-header>
 
     <mat-card-content>
-      <mat-tab-group [(selectedIndex)]="selectedTabIndex" class="login-tabs">
-        <!-- USER LOGIN TAB -->
-        <mat-tab>
-          <ng-template mat-tab-label>
-            <mat-icon class="tab-icon">person</mat-icon>
-            User Login
-          </ng-template>
-          
-          <div class="tab-content">
-            <p class="tab-subtitle">Sign in to your account</p>
-            
-            <form [formGroup]="userLoginForm" (ngSubmit)="onUserLogin()">
-              <mat-form-field appearance="outline" class="full-width">
-                <mat-label>Username</mat-label>
-                <input matInput formControlName="username" autocomplete="username" />
-                <mat-icon matPrefix>person</mat-icon>
-                <mat-error *ngIf="userLoginForm.get('username')?.hasError('required')">
-                  Username is required
-                </mat-error>
-              </mat-form-field>
 
-              <mat-form-field appearance="outline" class="full-width">
-                <mat-label>Password</mat-label>
-                <input 
-                  matInput 
-                  [type]="hideUserPassword ? 'password' : 'text'" 
-                  formControlName="password"
-                  autocomplete="current-password" 
-                />
-                <mat-icon matPrefix>lock</mat-icon>
-                <button 
-                  mat-icon-button 
-                  matSuffix 
-                  type="button"
-                  (click)="toggleUserPasswordVisibility()"
-                  [attr.aria-label]="'Hide password'" 
-                  [attr.aria-pressed]="hideUserPassword"
-                >
-                  <mat-icon>{{hideUserPassword ? 'visibility_off' : 'visibility'}}</mat-icon>
-                </button>
-                <mat-error *ngIf="userLoginForm.get('password')?.hasError('required')">
-                  Password is required
-                </mat-error>
-              </mat-form-field>
+      <!-- STEP 1: Username & Password -->
+      <div *ngIf="currentStep === 1" class="tab-content">
+        <p class="tab-subtitle">Sign in to your account</p>
 
-              <button 
-                mat-raised-button 
-                color="primary" 
-                type="submit" 
-                class="full-width login-button"
-                [disabled]="!userLoginForm.valid || isUserLoading"
-              >
-                <mat-spinner *ngIf="isUserLoading" diameter="20" class="button-spinner"></mat-spinner>
-                <span *ngIf="!isUserLoading">
-                  <mat-icon>login</mat-icon>
-                  Sign In
-                </span>
-              </button>
-            </form>
-          </div>
-        </mat-tab>
+        <form [formGroup]="loginForm" (ngSubmit)="onLogin()">
+          <mat-form-field appearance="outline" class="full-width">
+            <mat-label>Username</mat-label>
+            <input matInput formControlName="username" autocomplete="username" />
+            <mat-icon matPrefix>person</mat-icon>
+            <mat-error *ngIf="loginForm.get('username')?.hasError('required')">
+              Username is required
+            </mat-error>
+          </mat-form-field>
 
-        <!-- ADMIN LOGIN TAB -->
-        <mat-tab>
-          <ng-template mat-tab-label>
-            <mat-icon class="tab-icon">admin_panel_settings</mat-icon>
-            Admin Login
-          </ng-template>
-          
-          <div class="tab-content">
-            <p class="tab-subtitle admin-subtitle">Administrator Portal</p>
-            
-            <form [formGroup]="adminLoginForm" (ngSubmit)="onAdminLogin()">
-              <mat-form-field appearance="outline" class="full-width">
-                <mat-label>Admin Username</mat-label>
-                <input matInput formControlName="username" autocomplete="username" />
-                <mat-icon matPrefix>admin_panel_settings</mat-icon>
-                <mat-error *ngIf="adminLoginForm.get('username')?.hasError('required')">
-                  Username is required
-                </mat-error>
-              </mat-form-field>
+          <mat-form-field appearance="outline" class="full-width">
+            <mat-label>Password</mat-label>
+            <input
+              matInput
+              [type]="hidePassword ? 'password' : 'text'"
+              formControlName="password"
+              autocomplete="current-password"
+            />
+            <mat-icon matPrefix>lock</mat-icon>
+            <button
+              mat-icon-button
+              matSuffix
+              type="button"
+              (click)="togglePasswordVisibility()"
+              [attr.aria-label]="'Hide password'"
+              [attr.aria-pressed]="hidePassword"
+            >
+              <mat-icon>{{ hidePassword ? 'visibility_off' : 'visibility' }}</mat-icon>
+            </button>
+            <mat-error *ngIf="loginForm.get('password')?.hasError('required')">
+              Password is required
+            </mat-error>
+          </mat-form-field>
 
-              <mat-form-field appearance="outline" class="full-width">
-                <mat-label>Admin Password</mat-label>
-                <input 
-                  matInput 
-                  [type]="hideAdminPassword ? 'password' : 'text'" 
-                  formControlName="password"
-                  autocomplete="current-password" 
-                />
-                <mat-icon matPrefix>lock</mat-icon>
-                <button 
-                  mat-icon-button 
-                  matSuffix 
-                  type="button"
-                  (click)="toggleAdminPasswordVisibility()"
-                  [attr.aria-label]="'Hide password'" 
-                  [attr.aria-pressed]="hideAdminPassword"
-                >
-                  <mat-icon>{{hideAdminPassword ? 'visibility_off' : 'visibility'}}</mat-icon>
-                </button>
-                <mat-error *ngIf="adminLoginForm.get('password')?.hasError('required')">
-                  Password is required
-                </mat-error>
-              </mat-form-field>
+          <button
+            mat-raised-button
+            color="primary"
+            type="submit"
+            class="full-width login-button"
+            [disabled]="!loginForm.valid || isLoading"
+          >
+            <mat-spinner *ngIf="isLoading" diameter="20" class="button-spinner"></mat-spinner>
+            <span *ngIf="!isLoading">
+              <mat-icon>login</mat-icon>
+              Sign In
+            </span>
+          </button>
+        </form>
+      </div>
 
-              <button 
-                mat-raised-button 
-                color="warn" 
-                type="submit" 
-                class="full-width login-button admin-button"
-                [disabled]="!adminLoginForm.valid || isAdminLoading"
-              >
-                <mat-spinner *ngIf="isAdminLoading" diameter="20" class="button-spinner"></mat-spinner>
-                <span *ngIf="!isAdminLoading">
-                  <mat-icon>admin_panel_settings</mat-icon>
-                  Admin Sign In
-                </span>
-              </button>
-            </form>
-          </div>
-        </mat-tab>
-      </mat-tab-group>
+      <!-- STEP 2: OTP Verification -->
+      <div *ngIf="currentStep === 2" class="tab-content">
+        <div class="otp-info">
+          <mat-icon>mail_outline</mat-icon>
+          <p>We've sent a 6-digit OTP to <strong>{{ maskedEmail }}</strong></p>
+        </div>
+
+        <form [formGroup]="otpForm" (ngSubmit)="onVerifyOtp()">
+          <mat-form-field appearance="outline" class="full-width">
+            <mat-label>Enter OTP</mat-label>
+            <input matInput
+                   formControlName="otp"
+                   placeholder="6-digit OTP"
+                   maxlength="6"
+                   autocomplete="one-time-code" />
+            <mat-icon matPrefix>pin</mat-icon>
+            <mat-error *ngIf="otpForm.get('otp')?.hasError('required')">
+              OTP is required
+            </mat-error>
+            <mat-error *ngIf="otpForm.get('otp')?.hasError('minlength')">
+              OTP must be 6 digits
+            </mat-error>
+          </mat-form-field>
+
+          <button
+            mat-raised-button
+            color="primary"
+            type="submit"
+            class="full-width login-button"
+            [disabled]="!otpForm.valid || isLoading"
+          >
+            <mat-spinner *ngIf="isLoading" diameter="20" class="button-spinner"></mat-spinner>
+            <span *ngIf="!isLoading">
+              <mat-icon>verified</mat-icon>
+              Verify & Login
+            </span>
+          </button>
+        </form>
+
+        <div class="otp-actions">
+          <a (click)="resendOtp()" class="link">Resend OTP</a>
+          <span class="separator">|</span>
+          <a (click)="goBack()" class="link">Back to Login</a>
+        </div>
+      </div>
+
     </mat-card-content>
 
-    <!-- ✅ MOVED OUTSIDE mat-card-content -->
     <mat-card-actions class="card-actions">
       <mat-divider></mat-divider>
       <div class="signup-link">
-        <p>New user? 
+        <p>New user?
           <a routerLink="/signup" class="link">Create an account</a>
         </p>
       </div>

@@ -1,0 +1,63 @@
+<!-- src/app/components/admin/admin-login/admin-login.component.html -->
+
+<div class="admin-login-container">
+  <mat-card class="admin-login-card">
+    <mat-card-header>
+      <mat-card-title class="login-title">
+        <mat-icon class="title-icon">admin_panel_settings</mat-icon>
+        Administrator Portal
+      </mat-card-title>
+    </mat-card-header>
+
+    <mat-card-content>
+      <p class="subtitle">Admin access only</p>
+
+      <form [formGroup]="adminLoginForm" (ngSubmit)="onAdminLogin()">
+        <mat-form-field appearance="outline" class="full-width">
+          <mat-label>Admin Username</mat-label>
+          <input matInput formControlName="username" autocomplete="username" />
+          <mat-icon matPrefix>admin_panel_settings</mat-icon>
+          <mat-error *ngIf="adminLoginForm.get('username')?.hasError('required')">
+            Username is required
+          </mat-error>
+        </mat-form-field>
+
+        <mat-form-field appearance="outline" class="full-width">
+          <mat-label>Admin Password</mat-label>
+          <input
+            matInput
+            [type]="hidePassword ? 'password' : 'text'"
+            formControlName="password"
+            autocomplete="current-password"
+          />
+          <mat-icon matPrefix>lock</mat-icon>
+          <button
+            mat-icon-button
+            matSuffix
+            type="button"
+            (click)="togglePasswordVisibility()"
+          >
+            <mat-icon>{{ hidePassword ? 'visibility_off' : 'visibility' }}</mat-icon>
+          </button>
+          <mat-error *ngIf="adminLoginForm.get('password')?.hasError('required')">
+            Password is required
+          </mat-error>
+        </mat-form-field>
+
+        <button
+          mat-raised-button
+          color="warn"
+          type="submit"
+          class="full-width login-button"
+          [disabled]="!adminLoginForm.valid || isLoading"
+        >
+          <mat-spinner *ngIf="isLoading" diameter="20" class="button-spinner"></mat-spinner>
+          <span *ngIf="!isLoading">
+            <mat-icon>admin_panel_settings</mat-icon>
+            Admin Sign In
+          </span>
+        </button>
+      </form>
+    </mat-card-content>
+  </mat-card>
+</div>

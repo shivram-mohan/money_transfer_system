@@ -23,7 +23,7 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 public class SecurityConfig {
 
     private final JwtAuthFilter jwtAuthFilter;
-    private final UserDetailsService userDetailsService; // ← This is CustomUserDetailsService now
+    private final UserDetailsService userDetailsService;
     private final PasswordEncoder passwordEncoder;
 
     @Bean
@@ -32,9 +32,11 @@ public class SecurityConfig {
         http
                 .csrf(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(auth -> auth
+                        // Public: all auth endpoints (signup steps, login steps, admin login)
                         .requestMatchers("/api/v1/auth/**").permitAll()
+
+                        // Admin-only endpoints
                         .requestMatchers(HttpMethod.GET, "/api/v1/users").hasRole("ADMIN")
-                        .requestMatchers(HttpMethod.GET, "/api/v1/users/pending").hasRole("ADMIN")
                         .requestMatchers(HttpMethod.POST, "/api/v1/users").hasRole("ADMIN")
                         .requestMatchers(HttpMethod.PUT, "/api/v1/users/*/activate").hasRole("ADMIN")
                         .requestMatchers(HttpMethod.PUT, "/api/v1/users/deactivate").hasRole("ADMIN")
@@ -42,6 +44,8 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.PUT, "/api/v1/accounts/*/activate").hasRole("ADMIN")
                         .requestMatchers(HttpMethod.PUT, "/api/v1/accounts/*/deactivate").hasRole("ADMIN")
                         .requestMatchers(HttpMethod.GET, "/api/v1/accounts").hasRole("ADMIN")
+
+                        // Everything else requires authentication
                         .requestMatchers("/api/v1/**").authenticated()
                         .anyRequest().permitAll()
                 )
@@ -57,7 +61,7 @@ public class SecurityConfig {
     @Bean
     public AuthenticationProvider authenticationProvider() {
         DaoAuthenticationProvider provider = new DaoAuthenticationProvider();
-        provider.setUserDetailsService(userDetailsService); // ← Uses CustomUserDetailsService
+        provider.setUserDetailsService(userDetailsService);
         provider.setPasswordEncoder(passwordEncoder);
         return provider;
     }

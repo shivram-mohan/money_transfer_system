@@ -1,11 +1,11 @@
 package com.fidelity.moneytransfer.controller;
 
 import com.fidelity.moneytransfer.config.JwtUtil;
-import com.fidelity.moneytransfer.dto.AuthRequest;
-import com.fidelity.moneytransfer.dto.AuthResponse;
-import com.fidelity.moneytransfer.dto.SignupRequest;
-import com.fidelity.moneytransfer.dto.UserResponseDto;
+import com.fidelity.moneytransfer.dto.*;
+import com.fidelity.moneytransfer.entity.BankDetails;
+import com.fidelity.moneytransfer.repository.BankDetailsRepository;
 import com.fidelity.moneytransfer.repository.UserRepository;
+import com.fidelity.moneytransfer.service.OtpService;
 import com.fidelity.moneytransfer.service.UserService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -29,97 +29,225 @@ public class AuthController {
     private final JwtUtil jwtUtil;
     private final UserRepository userRepository;
     private final UserService userService;
+    private final OtpService otpService;
+    private final BankDetailsRepository bankDetailsRepository;
 
+    // ─── SIGNUP FLOW (3 steps) ────────────────────────────────────────
+
+    /**
+     * Step 1: User provides account_number, username, email.
+     * We verify against bank_details table and send OTP to email.
+     */
+    @PostMapping("/signup/verify-account")
+    public ResponseEntity<OtpResponse> verifyAccount(
+            @Valid @RequestBody VerifyAccountRequest request) {
+
+        log.info("Signup step 1 - verifying account: {}", request.getAccountNumber());
+
+        // Check if username already taken
+        if (userRepository.existsByUsername(request.getUsername())) {
+            throw new IllegalArgumentException("Username already exists: " + request.getUsername());
+        }
+
+        // Look up account in bank_details
+        BankDetails bankDetails = bankDetailsRepository
+                .findByAccountNumber(request.getAccountNumber())
+                .orElseThrow(() -> new IllegalArgumentException(
+                        "Account number not found in our banking records"));
+
+        // Verify the email matches the bank record
+        if (!bankDetails.getEmail().equalsIgnoreCase(request.getEmail())) {
+            throw new IllegalArgumentException(
+                    "Email does not match the account on record");
+        }
+
+        // Verify the username matches the bank record
+        if (!bankDetails.getUserName().equalsIgnoreCase(request.getUsername())) {
+            throw new IllegalArgumentException(
+                    "Username does not match the account holder name");
+        }
+
+        // Check if already registered
+        if (bankDetails.getRegistered()) {
+            throw new IllegalArgumentException(
+                    "This account has already been registered");
+        }
+
+        // Send OTP to email
+        otpService.generateAndSendOtp(request.getEmail(), "SIGNUP");
+
+        return ResponseEntity.ok(OtpResponse.builder()
+                .message("OTP sent to your registered email")
+                .email(maskEmail(request.getEmail()))
+                .success(true)
+                .build());
+    }
+
+    /**
+     * Step 2: User provides the OTP received via email.
+     */
+    @PostMapping("/signup/verify-otp")
+    public ResponseEntity<OtpResponse> verifySignupOtp(
+            @Valid @RequestBody VerifyOtpRequest request) {
+
+        log.info("Signup step 2 - verifying OTP for: {}", request.getEmail());
+
+        boolean isValid = otpService.verifyOtp(
+                request.getEmail(), request.getOtp(), "SIGNUP");
+
+        if (!isValid) {
+            throw new IllegalArgumentException("Invalid or expired OTP");
+        }
+
+        return ResponseEntity.ok(OtpResponse.builder()
+                .message("OTP verified successfully. Please set your password.")
+                .email(request.getEmail())
+                .success(true)
+                .build());
+    }
+
+    /**
+     * Step 3: User sets password. Account is created and activated immediately.
+     */
+    @PostMapping("/signup/set-password")
+    public ResponseEntity<UserResponseDto> setPassword(
+            @Valid @RequestBody SetPasswordRequest request) {
+
+        log.info("Signup step 3 - setting password for: {}", request.getUsername());
+
+        UserResponseDto user = userService.completeSignup(request);
+
+        return ResponseEntity.status(HttpStatus.CREATED).body(user);
+    }
+
+    // ─── USER LOGIN FLOW (2 steps) ───────────────────────────────────
+
+    /**
+     * Step 1: User provides username + password. If valid, OTP is sent to email.
+     */
     @PostMapping("/login")
-    public ResponseEntity<AuthResponse> login(
-            @Valid @RequestBody AuthRequest request) {
+    public ResponseEntity<OtpResponse> loginStep1(
+            @Valid @RequestBody LoginOtpRequest request) {
 
-        log.info("Login attempt for: {}", request.getUsername());
+        log.info("Login step 1 - credentials check for: {}", request.getUsername());
 
         try {
-            // Step 1: Authenticate
-            Authentication authentication = authenticationManager.authenticate(
+            // Validate credentials
+            authenticationManager.authenticate(
                     new UsernamePasswordAuthenticationToken(
-                            request.getUsername(),
-                            request.getPassword()
-                    )
-            );
-            log.info("Authentication successful for: {}",
-                    request.getUsername());
+                            request.getUsername(), request.getPassword()));
 
-            UserDetails userDetails =
-                    (UserDetails) authentication.getPrincipal();
+            // Get user email
+            var appUser = userRepository.findByUsername(request.getUsername())
+                    .orElseThrow(() -> new BadCredentialsException("User not found"));
 
-            // Step 2: Determine role
-            String role = userDetails.getAuthorities().stream()
-                    .anyMatch(a -> a.getAuthority().equals("ROLE_ADMIN"))
-                    ? "ADMIN" : "USER";
-            log.info("Role determined: {}", role);
+            // Send OTP to user's email
+            otpService.generateAndSendOtp(appUser.getEmail(), "LOGIN");
 
-            // Step 3: Get account ID and holder name
-            Long accountId = null;
-            String holderName = request.getUsername();
-
-            if (!role.equals("ADMIN")) {
-                var userOptional = userRepository
-                        .findByUsername(request.getUsername());
-
-                if (userOptional.isPresent()) {
-                    accountId = userOptional.get().getAccountId();
-                    holderName = userOptional.get().getName();
-                    log.info("Found user account: {}", accountId);
-                } else {
-                    log.warn("No user record found for: {}",
-                            request.getUsername());
-                    accountId = 1L;
-                }
-            }
-
-            // Step 4: Generate JWT
-            String token = jwtUtil.generateToken(
-                    userDetails, role, accountId
-            );
-            log.info("JWT generated successfully");
-
-            return ResponseEntity.ok(AuthResponse.builder()
-                    .token(token)
-                    .username(request.getUsername())
-                    .role(role)
-                    .accountId(accountId)
-                    .holderName(holderName)
-                    .expiresIn(86400000L)
+            return ResponseEntity.ok(OtpResponse.builder()
+                    .message("OTP sent to your registered email")
+                    .email(maskEmail(appUser.getEmail()))
+                    .success(true)
                     .build());
 
         } catch (BadCredentialsException e) {
             log.error("Bad credentials for: {}", request.getUsername());
-            throw new BadCredentialsException(
-                    "Invalid username or password"
-            );
-        } catch (Exception e) {
-            log.error("Login error for {}: {}",
-                    request.getUsername(), e.getMessage(), e);
-            throw e;
+            throw new BadCredentialsException("Invalid username or password");
         }
     }
 
-    @PostMapping("/signup")
-    public ResponseEntity<UserResponseDto> signup(
-            @Valid @RequestBody SignupRequest request) {
+    /**
+     * Step 2: User provides username + password + OTP. Returns JWT on success.
+     */
+    @PostMapping("/login/verify-otp")
+    public ResponseEntity<AuthResponse> loginVerifyOtp(
+            @Valid @RequestBody LoginVerifyRequest request) {
 
-        log.info("Signup request for username: {}", request.getUsername());
+        log.info("Login step 2 - OTP verification for: {}", request.getUsername());
+
+        // Re-authenticate credentials
+        Authentication authentication = authenticationManager.authenticate(
+                new UsernamePasswordAuthenticationToken(
+                        request.getUsername(), request.getPassword()));
+
+        // Get user
+        var appUser = userRepository.findByUsername(request.getUsername())
+                .orElseThrow(() -> new BadCredentialsException("User not found"));
+
+        // Verify OTP
+        boolean isValid = otpService.verifyOtp(
+                appUser.getEmail(), request.getOtp(), "LOGIN");
+
+        if (!isValid) {
+            throw new IllegalArgumentException("Invalid or expired OTP");
+        }
+
+        // Generate JWT
+        UserDetails userDetails = (UserDetails) authentication.getPrincipal();
+        String role = userDetails.getAuthorities().stream()
+                .anyMatch(a -> a.getAuthority().equals("ROLE_ADMIN"))
+                ? "ADMIN" : "USER";
+
+        Long accountId = appUser.getAccountId();
+        String holderName = appUser.getName();
+
+        String token = jwtUtil.generateToken(userDetails, role, accountId);
+
+        return ResponseEntity.ok(AuthResponse.builder()
+                .token(token)
+                .username(request.getUsername())
+                .role(role)
+                .accountId(accountId)
+                .holderName(holderName)
+                .expiresIn(86400000L)
+                .build());
+    }
+
+    // ─── ADMIN LOGIN (direct, no OTP) ────────────────────────────────
+
+    @PostMapping("/admin/login")
+    public ResponseEntity<AuthResponse> adminLogin(
+            @Valid @RequestBody AuthRequest request) {
+
+        log.info("Admin login attempt for: {}", request.getUsername());
 
         try {
-            UserResponseDto user = userService.signupUser(request);
-            log.info("Signup successful - awaiting approval: {}",
-                    request.getUsername());
+            Authentication authentication = authenticationManager.authenticate(
+                    new UsernamePasswordAuthenticationToken(
+                            request.getUsername(), request.getPassword()));
 
-            return ResponseEntity
-                    .status(HttpStatus.CREATED)
-                    .body(user);
+            UserDetails userDetails = (UserDetails) authentication.getPrincipal();
 
-        } catch (IllegalArgumentException e) {
-            log.error("Signup failed: {}", e.getMessage());
-            throw e;
+            // Verify this is actually an admin
+            boolean isAdmin = userDetails.getAuthorities().stream()
+                    .anyMatch(a -> a.getAuthority().equals("ROLE_ADMIN"));
+
+            if (!isAdmin) {
+                throw new BadCredentialsException("Access denied. Not an admin account.");
+            }
+
+            String token = jwtUtil.generateToken(userDetails, "ADMIN", null);
+
+            return ResponseEntity.ok(AuthResponse.builder()
+                    .token(token)
+                    .username(request.getUsername())
+                    .role("ADMIN")
+                    .accountId(null)
+                    .holderName(request.getUsername())
+                    .expiresIn(86400000L)
+                    .build());
+
+        } catch (BadCredentialsException e) {
+            log.error("Admin login failed for: {}", request.getUsername());
+            throw new BadCredentialsException("Invalid admin credentials");
         }
+    }
+
+    // ─── HELPER ──────────────────────────────────────────────────────
+
+    private String maskEmail(String email) {
+        int atIndex = email.indexOf('@');
+        if (atIndex <= 2) return email;
+        return email.substring(0, 2) + "***" + email.substring(atIndex);
     }
 }

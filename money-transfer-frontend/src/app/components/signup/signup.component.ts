@@ -11,8 +11,8 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
 import { MatIconModule } from '@angular/material/icon';
+import { MatStepperModule } from '@angular/material/stepper';
 import { AuthService } from '../../services/auth.service';
-import { SignupRequest } from '../../models/user.model';
 
 @Component({
   selector: 'app-signup',
@@ -27,15 +27,29 @@ import { SignupRequest } from '../../models/user.model';
     MatButtonModule,
     MatProgressSpinnerModule,
     MatSnackBarModule,
-    MatIconModule
+    MatIconModule,
+    MatStepperModule
   ],
   templateUrl: './signup.component.html',
   styleUrls: ['./signup.component.scss']
 })
 export class SignupComponent {
-  signupForm: FormGroup;
+  // Step forms
+  accountForm: FormGroup;
+  otpForm: FormGroup;
+  passwordForm: FormGroup;
+
+  // State
+  currentStep = 1; // 1: Account verify, 2: OTP verify, 3: Set password
   isLoading = false;
   hidePassword = true;
+  hideConfirmPassword = true;
+  maskedEmail = '';
+
+  // Store data between steps
+  private accountNumber: number = 0;
+  private username: string = '';
+  private email: string = '';
 
   constructor(
     private fb: FormBuilder,
@@ -43,77 +57,168 @@ export class SignupComponent {
     private router: Router,
     private snackBar: MatSnackBar
   ) {
-    this.signupForm = this.fb.group({
-      username: ['', [
-        Validators.required, 
-        Validators.minLength(3),
-        Validators.maxLength(50)
-      ]],
-      password: ['', [
-        Validators.required, 
-        Validators.minLength(6)
-      ]],
-      name: ['', [
-        Validators.required, 
-        Validators.minLength(2)
-      ]],
-      email: ['', [Validators.email]],
-      initialBalance: [1000, [
-        Validators.required, 
-        Validators.min(100),
-        Validators.max(1000000)
-      ]]
+    this.accountForm = this.fb.group({
+      accountNumber: ['', [Validators.required]],
+      username: ['', [Validators.required, Validators.minLength(3), Validators.maxLength(50)]],
+      email: ['', [Validators.required, Validators.email]]
+    });
+
+    this.otpForm = this.fb.group({
+      otp: ['', [Validators.required, Validators.minLength(6), Validators.maxLength(6)]]
+    });
+
+    this.passwordForm = this.fb.group({
+      password: ['', [Validators.required, Validators.minLength(6)]],
+      confirmPassword: ['', [Validators.required]]
     });
   }
 
-  onSubmit(): void {
-    if (this.signupForm.valid) {
+  // Step 1: Verify account and send OTP
+  onVerifyAccount(): void {
+    if (this.accountForm.valid) {
       this.isLoading = true;
-      
-      const request: SignupRequest = this.signupForm.value;
-      
-      this.authService.signup(request).subscribe({
+
+      this.accountNumber = this.accountForm.value.accountNumber;
+      this.username = this.accountForm.value.username;
+      this.email = this.accountForm.value.email;
+
+      this.authService.verifyAccount({
+        accountNumber: this.accountNumber,
+        username: this.username,
+        email: this.email
+      }).subscribe({
         next: (response) => {
           this.isLoading = false;
+          this.maskedEmail = response.email;
+          this.currentStep = 2;
           this.snackBar.open(
-            'Account created successfully! Please wait for admin approval.', 
-            'Close', 
-            {
-              duration: 5000,
-              horizontalPosition: 'center',
-              verticalPosition: 'top',
-              panelClass: ['success-snackbar']
-            }
+            `OTP sent to ${response.email}`,
+            'Close',
+            { duration: 5000, panelClass: ['success-snackbar'] }
           );
-          // Redirect to login after 2 seconds
-          setTimeout(() => {
-            this.router.navigate(['/login']);
-          }, 2000);
         },
         error: (error) => {
           this.isLoading = false;
-          const errorMsg = error.error?.message || 'Signup failed. Please try again.';
-          this.snackBar.open(errorMsg, 'Close', {
-            duration: 5000,
-            horizontalPosition: 'center',
-            verticalPosition: 'top',
-            panelClass: ['error-snackbar']
-          });
+          this.snackBar.open(
+            error.error?.message || 'Account verification failed',
+            'Close',
+            { duration: 5000, panelClass: ['error-snackbar'] }
+          );
         }
       });
     } else {
-      // Mark all fields as touched to show validation errors
-      Object.keys(this.signupForm.controls).forEach(key => {
-        this.signupForm.get(key)?.markAsTouched();
+      Object.keys(this.accountForm.controls).forEach(key => {
+        this.accountForm.get(key)?.markAsTouched();
       });
     }
+  }
+
+  // Step 2: Verify OTP
+  onVerifyOtp(): void {
+    if (this.otpForm.valid) {
+      this.isLoading = true;
+
+      this.authService.verifySignupOtp({
+        email: this.email,
+        otp: this.otpForm.value.otp,
+        purpose: 'SIGNUP'
+      }).subscribe({
+        next: () => {
+          this.isLoading = false;
+          this.currentStep = 3;
+          this.snackBar.open(
+            'OTP verified! Please set your password.',
+            'Close',
+            { duration: 3000, panelClass: ['success-snackbar'] }
+          );
+        },
+        error: (error) => {
+          this.isLoading = false;
+          this.snackBar.open(
+            error.error?.message || 'Invalid or expired OTP',
+            'Close',
+            { duration: 5000, panelClass: ['error-snackbar'] }
+          );
+        }
+      });
+    }
+  }
+
+  // Step 3: Set password and complete signup
+  onSetPassword(): void {
+    if (this.passwordForm.valid) {
+      if (this.passwordForm.value.password !== this.passwordForm.value.confirmPassword) {
+        this.snackBar.open('Passwords do not match', 'Close', {
+          duration: 3000, panelClass: ['error-snackbar']
+        });
+        return;
+      }
+
+      this.isLoading = true;
+
+      this.authService.setPassword({
+        accountNumber: this.accountNumber,
+        username: this.username,
+        email: this.email,
+        password: this.passwordForm.value.password
+      }).subscribe({
+        next: () => {
+          this.isLoading = false;
+          this.snackBar.open(
+            'Account created successfully! You can now login.',
+            'Close',
+            { duration: 5000, panelClass: ['success-snackbar'] }
+          );
+          setTimeout(() => this.router.navigate(['/login']), 2000);
+        },
+        error: (error) => {
+          this.isLoading = false;
+          this.snackBar.open(
+            error.error?.message || 'Signup failed. Please try again.',
+            'Close',
+            { duration: 5000, panelClass: ['error-snackbar'] }
+          );
+        }
+      });
+    } else {
+      Object.keys(this.passwordForm.controls).forEach(key => {
+        this.passwordForm.get(key)?.markAsTouched();
+      });
+    }
+  }
+
+  // Resend OTP
+  resendOtp(): void {
+    this.isLoading = true;
+    this.authService.verifyAccount({
+      accountNumber: this.accountNumber,
+      username: this.username,
+      email: this.email
+    }).subscribe({
+      next: (response) => {
+        this.isLoading = false;
+        this.snackBar.open(
+          `New OTP sent to ${response.email}`,
+          'Close',
+          { duration: 3000, panelClass: ['success-snackbar'] }
+        );
+      },
+      error: (error) => {
+        this.isLoading = false;
+        this.snackBar.open(
+          error.error?.message || 'Failed to resend OTP',
+          'Close',
+          { duration: 3000, panelClass: ['error-snackbar'] }
+        );
+      }
+    });
   }
 
   togglePasswordVisibility(): void {
     this.hidePassword = !this.hidePassword;
   }
 
-  goToLogin(): void {
-    this.router.navigate(['/login']);
+  toggleConfirmPasswordVisibility(): void {
+    this.hideConfirmPassword = !this.hideConfirmPassword;
   }
 }

@@ -1,0 +1,124 @@
+// src/app/components/admin/admin-login/admin-login.component.scss
+
+.admin-login-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+  background: var(--aurora-bg-primary);
+  padding: 20px;
+  position: relative;
+  overflow: hidden;
+  box-sizing: border-box;
+
+  &::before {
+    content: '';
+    position: absolute;
+    width: 600px;
+    height: 600px;
+    background: radial-gradient(circle, rgba(236, 72, 153, 0.15) 0%, rgba(139, 92, 246, 0.1) 40%, transparent 70%);
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    pointer-events: none;
+    z-index: 0;
+  }
+}
+
+.admin-login-card {
+  max-width: 450px;
+  width: 100%;
+  padding: 20px;
+  position: relative;
+  z-index: 1;
+  background: var(--aurora-glass-bg) !important;
+  backdrop-filter: var(--aurora-glass-blur);
+  -webkit-backdrop-filter: var(--aurora-glass-blur);
+  border: 1px solid rgba(236, 72, 153, 0.3) !important;
+  border-radius: 12px;
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
+}
+
+.login-title {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 24px;
+  font-weight: 600;
+  margin-bottom: 8px;
+  color: var(--aurora-pink);
+}
+
+.title-icon {
+  margin-right: 10px;
+  font-size: 32px;
+  height: 32px;
+  width: 32px;
+}
+
+.subtitle {
+  text-align: center;
+  color: var(--aurora-text-secondary);
+  font-size: 14px;
+  margin-bottom: 24px;
+  font-style: italic;
+}
+
+mat-card-content {
+  padding-top: 20px;
+}
+
+.full-width {
+  width: 100%;
+  margin-bottom: 16px;
+}
+
+.login-button {
+  height: 48px;
+  font-size: 16px;
+  font-weight: 500;
+  margin-top: 16px;
+  position: relative;
+  background: var(--aurora-gradient-danger) !important;
+  color: white;
+
+  mat-icon {
+    margin-right: 8px;
+    vertical-align: middle;
+  }
+
+  &:hover:not(:disabled) {
+    box-shadow: var(--aurora-glow-pink);
+  }
+}
+
+.button-spinner {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+}
+
+@media (max-width: 480px) {
+  .admin-login-container {
+    padding: 12px;
+
+    &::before {
+      width: 300px;
+      height: 300px;
+    }
+  }
+
+  .admin-login-card {
+    padding: 12px;
+  }
+
+  .login-title {
+    font-size: 18px;
+  }
+
+  .login-button {
+    height: 44px;
+    font-size: 14px;
+  }
+}

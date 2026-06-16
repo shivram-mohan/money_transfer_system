@@ -9,7 +9,6 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
-import { AuthService } from '../../../services/auth.service';
 import { UserManagementService } from '../../../services/user-management.service';
 import { AdminNavbarComponent } from '../admin-navbar/admin-navbar.component';
 
@@ -38,7 +37,6 @@ export class CreateUserComponent {
 
   constructor(
     private fb: FormBuilder,
-    private authService: AuthService,
     private userManagementService: UserManagementService,
     private router: Router,
     private snackBar: MatSnackBar
@@ -55,9 +53,8 @@ export class CreateUserComponent {
   onSubmit(): void {
     if (this.createUserForm.valid) {
       this.isLoading = true;
-      const adminName = this.authService.getHolderName() || 'admin';
-      
-      this.userManagementService.createUser(this.createUserForm.value, adminName).subscribe({
+
+      this.userManagementService.createUser(this.createUserForm.value).subscribe({
         next: (response) => {
           this.isLoading = false;
           this.snackBar.open('User created successfully!', 'Close', {

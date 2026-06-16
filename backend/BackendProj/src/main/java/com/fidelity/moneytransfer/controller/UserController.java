@@ -22,18 +22,10 @@ public class UserController {
 
     private final UserService userService;
 
-    // ─── EXISTING ENDPOINTS ───────────────────────────────────────────
-
     @GetMapping
     public ResponseEntity<List<UserResponseDto>> getAllUsers() {
         log.info("Admin: Fetching all users");
         return ResponseEntity.ok(userService.getAllUsers());
-    }
-
-    @GetMapping("/pending")
-    public ResponseEntity<List<UserResponseDto>> getPendingUsers() {
-        log.info("Admin: Fetching pending users");
-        return ResponseEntity.ok(userService.getPendingUsers());
     }
 
     @GetMapping("/{id}")
@@ -64,25 +56,5 @@ public class UserController {
             @RequestBody DeactivateUserRequest request) {
         log.info("Admin: Deactivating user id: {}", request.getUserId());
         return ResponseEntity.ok(userService.deactivateUser(request));
-    }
-
-    // ─── NEW ENDPOINTS FOR SIGNUP APPROVAL ────────────────────────────
-
-    @PutMapping("/{id}/approve")
-    public ResponseEntity<UserResponseDto> approveUser(
-            @PathVariable Long id,
-            Authentication authentication) {
-        log.info("Admin: Approving pending user id: {}", id);
-        String approvedBy = authentication.getName();
-        return ResponseEntity.ok(userService.approveUser(id, approvedBy));
-    }
-
-    @DeleteMapping("/{id}/reject")
-    public ResponseEntity<Void> rejectUser(
-            @PathVariable Long id,
-            @RequestParam(required = false) String reason) {
-        log.info("Admin: Rejecting pending user id: {}", id);
-        userService.rejectUser(id, reason != null ? reason : "Rejected by admin");
-        return ResponseEntity.noContent().build();
     }
 }
