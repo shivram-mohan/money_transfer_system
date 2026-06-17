@@ -2,6 +2,7 @@ package com.fidelity.moneytransfer.service;
 
 import com.fidelity.moneytransfer.dto.CreateUserRequest;
 import com.fidelity.moneytransfer.dto.DeactivateUserRequest;
+import com.fidelity.moneytransfer.dto.LinkBankResponse;
 import com.fidelity.moneytransfer.dto.SetPasswordRequest;
 import com.fidelity.moneytransfer.dto.UserResponseDto;
 import com.fidelity.moneytransfer.entity.Account;
@@ -72,34 +73,23 @@ public class UserService {
                     "Username already exists: " + request.getUsername());
         }
 
-        // Get bank details
-        BankDetails bankDetails = bankDetailsRepository
-                .findByAccountNumber(request.getAccountNumber())
-                .orElseThrow(() -> new IllegalArgumentException("Account not found"));
-
-        if (bankDetails.getRegistered()) {
-            throw new IllegalArgumentException("This account has already been registered");
+        // Check email not already used
+        if (userRepository.existsByEmailIgnoreCase(request.getEmail())) {
+            throw new IllegalArgumentException(
+                    "An account with this email already exists");
         }
 
-        // Create account with ACTIVE status (verified via OTP, no approval needed)
-        Account account = Account.builder()
-                .id(request.getAccountNumber())
-                .holderName(bankDetails.getUserName())
-                .balance(bankDetails.getBalance())
-                .status(AccountStatus.ACTIVE)
-                .version(0)
-                .build();
-        Account savedAccount = accountRepository.save(account);
-
-        // Create user with ACTIVE status directly
+        // Create user with ACTIVE status but NO bank account linked yet.
+        // The user links their bank account as a separate step after login.
         AppUser user = AppUser.builder()
                 .username(request.getUsername())
+                // request.getPassword() is the SHA-256 hash sent by the client
                 .password(passwordEncoder.encode(request.getPassword()))
-                .name(bankDetails.getUserName())
-                .email(bankDetails.getEmail())
+                .name(request.getName())
+                .email(request.getEmail())
                 .role("USER")
                 .status("ACTIVE")
-                .accountId(savedAccount.getId())
+                .accountId(null)
                 .createdBy("otp-verified")
                 .approvedBy("otp-verified")
                 .approvedDate(LocalDateTime.now())
@@ -107,12 +97,67 @@ public class UserService {
 
         AppUser savedUser = userRepository.save(user);
 
-        // Mark bank details as registered
+        log.info("User signup completed (bank not yet linked): {}", savedUser.getId());
+        return mapToUserResponse(savedUser);
+    }
+
+    // ─── LINK BANK ACCOUNT (post-signup) ─────────────────────────────
+
+    @Transactional
+    public LinkBankResponse linkBankAccount(String username, Long accountNumber) {
+        log.info("Linking bank account {} for user {}", accountNumber, username);
+
+        AppUser user = userRepository.findByUsername(username)
+                .orElseThrow(() -> new AccountNotFoundException(
+                        "User not found: " + username));
+
+        if (user.getAccountId() != null) {
+            throw new IllegalArgumentException(
+                    "A bank account is already linked to this profile");
+        }
+
+        BankDetails bankDetails = bankDetailsRepository
+                .findByAccountNumber(accountNumber)
+                .orElseThrow(() -> new IllegalArgumentException(
+                        "Account number not found in our banking records"));
+
+        // The user proved ownership of their email via OTP at signup, so the
+        // bank record's email must match to prove the account is theirs.
+        if (!bankDetails.getEmail().equalsIgnoreCase(user.getEmail())) {
+            throw new IllegalArgumentException(
+                    "This account is not registered under your email");
+        }
+
+        if (Boolean.TRUE.equals(bankDetails.getRegistered())) {
+            throw new IllegalArgumentException(
+                    "This bank account has already been linked");
+        }
+
+        // Create the money-transfer account seeded from the verified bank record
+        Account account = Account.builder()
+                .id(accountNumber)
+                .holderName(bankDetails.getUserName())
+                .balance(bankDetails.getBalance())
+                .status(AccountStatus.ACTIVE)
+                .version(0)
+                .build();
+        Account savedAccount = accountRepository.save(account);
+
+        user.setAccountId(savedAccount.getId());
+        user.setName(bankDetails.getUserName());
+        userRepository.save(user);
+
         bankDetails.setRegistered(true);
         bankDetailsRepository.save(bankDetails);
 
-        log.info("User signup completed - active immediately: {}", savedUser.getId());
-        return mapToUserResponse(savedUser);
+        log.info("Bank account {} linked to user {}", accountNumber, username);
+
+        return LinkBankResponse.builder()
+                .accountId(savedAccount.getId())
+                .holderName(savedAccount.getHolderName())
+                .balance(savedAccount.getBalance())
+                .message("Bank account linked successfully")
+                .build();
     }
 
     // ─── ADMIN: CREATE USER DIRECTLY ─────────────────────────────────

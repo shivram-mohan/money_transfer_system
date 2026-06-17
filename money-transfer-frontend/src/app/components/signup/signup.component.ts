@@ -47,7 +47,7 @@ export class SignupComponent {
   maskedEmail = '';
 
   // Store data between steps
-  private accountNumber: number = 0;
+  private fullName: string = '';
   private username: string = '';
   private email: string = '';
 
@@ -58,7 +58,7 @@ export class SignupComponent {
     private snackBar: MatSnackBar
   ) {
     this.accountForm = this.fb.group({
-      accountNumber: ['', [Validators.required]],
+      fullName: ['', [Validators.required, Validators.minLength(2), Validators.maxLength(100)]],
       username: ['', [Validators.required, Validators.minLength(3), Validators.maxLength(50)]],
       email: ['', [Validators.required, Validators.email]]
     });
@@ -78,12 +78,11 @@ export class SignupComponent {
     if (this.accountForm.valid) {
       this.isLoading = true;
 
-      this.accountNumber = this.accountForm.value.accountNumber;
+      this.fullName = this.accountForm.value.fullName;
       this.username = this.accountForm.value.username;
       this.email = this.accountForm.value.email;
 
       this.authService.verifyAccount({
-        accountNumber: this.accountNumber,
         username: this.username,
         email: this.email
       }).subscribe({
@@ -157,9 +156,9 @@ export class SignupComponent {
       this.isLoading = true;
 
       this.authService.setPassword({
-        accountNumber: this.accountNumber,
         username: this.username,
         email: this.email,
+        name: this.fullName,
         password: this.passwordForm.value.password
       }).subscribe({
         next: () => {
@@ -191,7 +190,6 @@ export class SignupComponent {
   resendOtp(): void {
     this.isLoading = true;
     this.authService.verifyAccount({
-      accountNumber: this.accountNumber,
       username: this.username,
       email: this.email
     }).subscribe({

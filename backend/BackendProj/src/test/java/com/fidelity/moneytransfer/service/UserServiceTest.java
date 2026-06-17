@@ -1,12 +1,16 @@
 package com.fidelity.moneytransfer.service;
 
-import com.fidelity.moneytransfer.dto.SignupRequest;
+import com.fidelity.moneytransfer.dto.DeactivateUserRequest;
+import com.fidelity.moneytransfer.dto.LinkBankResponse;
+import com.fidelity.moneytransfer.dto.SetPasswordRequest;
 import com.fidelity.moneytransfer.dto.UserResponseDto;
 import com.fidelity.moneytransfer.entity.Account;
 import com.fidelity.moneytransfer.entity.AppUser;
+import com.fidelity.moneytransfer.entity.BankDetails;
 import com.fidelity.moneytransfer.enums.AccountStatus;
 import com.fidelity.moneytransfer.exception.AccountNotFoundException;
 import com.fidelity.moneytransfer.repository.AccountRepository;
+import com.fidelity.moneytransfer.repository.BankDetailsRepository;
 import com.fidelity.moneytransfer.repository.UserRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -35,7 +39,13 @@ class UserServiceTest {
     private AccountRepository accountRepository;
 
     @Mock
+    private AccountService accountService;
+
+    @Mock
     private PasswordEncoder passwordEncoder;
+
+    @Mock
+    private BankDetailsRepository bankDetailsRepository;
 
     @InjectMocks
     private UserService userService;
@@ -49,7 +59,7 @@ class UserServiceTest {
                 .id(1L)
                 .holderName("Test User")
                 .balance(new BigDecimal("1000.00"))
-                .status(AccountStatus.LOCKED)
+                .status(AccountStatus.ACTIVE)
                 .build();
 
         testUser = AppUser.builder()
@@ -59,14 +69,13 @@ class UserServiceTest {
                 .name("Test User")
                 .email("test@example.com")
                 .role("USER")
-                .status("PENDING")
+                .status("ACTIVE")
                 .accountId(1L)
                 .build();
     }
 
     @Test
     void getAllUsers_Success() {
-        // Arrange
         AppUser user2 = AppUser.builder()
                 .id(2L)
                 .username("user2")
@@ -78,48 +87,21 @@ class UserServiceTest {
         when(userRepository.findAll())
                 .thenReturn(Arrays.asList(testUser, user2));
 
-        // Act
         List<UserResponseDto> users = userService.getAllUsers();
 
-        // Assert
         assertEquals(2, users.size());
         assertEquals("testuser", users.get(0).getUsername());
         assertEquals("user2", users.get(1).getUsername());
     }
 
     @Test
-    void getPendingUsers_Success() {
-        // Arrange
-        when(userRepository.findByStatus("PENDING"))
-                .thenReturn(Arrays.asList(testUser));
-
-        // Act
-        List<UserResponseDto> pendingUsers = userService.getPendingUsers();
-
-        // Assert
-        assertEquals(1, pendingUsers.size());
-        assertEquals("PENDING", pendingUsers.get(0).getStatus());
-    }
-
-    @Test
-    void signupUser_Success() {
-        // Arrange
-        SignupRequest request = SignupRequest.builder()
-                .username("newuser")
-                .password("password123")
-                .name("New User")
-                .email("new@example.com")
-                .initialBalance(new BigDecimal("5000.00"))
-                .build();
+    void completeSignup_Success_CreatesUserWithoutBankAccount() {
+        SetPasswordRequest request = new SetPasswordRequest(
+                "newuser", "new@example.com", "New User", "hashed-password");
 
         when(userRepository.existsByUsername("newuser")).thenReturn(false);
-        when(passwordEncoder.encode("password123")).thenReturn("encoded-pwd");
-        when(accountRepository.save(any(Account.class)))
-                .thenAnswer(inv -> {
-                    Account acc = inv.getArgument(0);
-                    acc.setId(10L);
-                    return acc;
-                });
+        when(userRepository.existsByEmailIgnoreCase("new@example.com")).thenReturn(false);
+        when(passwordEncoder.encode("hashed-password")).thenReturn("bcrypt-hash");
         when(userRepository.save(any(AppUser.class)))
                 .thenAnswer(inv -> {
                     AppUser user = inv.getArgument(0);
@@ -127,41 +109,113 @@ class UserServiceTest {
                     return user;
                 });
 
-        // Act
-        UserResponseDto response = userService.signupUser(request);
+        UserResponseDto response = userService.completeSignup(request);
 
-        // Assert
         assertNotNull(response);
         assertEquals("newuser", response.getUsername());
-        assertEquals("PENDING", response.getStatus());
-        verify(accountRepository, times(1)).save(any(Account.class));
+        assertEquals("ACTIVE", response.getStatus());
+        // No bank account is linked at signup time
+        assertNull(response.getAccountId());
+        verify(accountRepository, never()).save(any(Account.class));
         verify(userRepository, times(1)).save(any(AppUser.class));
     }
 
     @Test
-    void signupUser_DuplicateUsername_ThrowsException() {
-        // Arrange
-        SignupRequest request = SignupRequest.builder()
-                .username("testuser")
-                .password("password123")
-                .name("Test")
-                .initialBalance(new BigDecimal("1000.00"))
-                .build();
+    void completeSignup_DuplicateUsername_ThrowsException() {
+        SetPasswordRequest request = new SetPasswordRequest(
+                "testuser", "test@example.com", "Test", "hashed-password");
 
         when(userRepository.existsByUsername("testuser")).thenReturn(true);
 
-        // Act & Assert
-        assertThrows(IllegalArgumentException.class, () -> {
-            userService.signupUser(request);
-        });
+        assertThrows(IllegalArgumentException.class,
+                () -> userService.completeSignup(request));
 
-        verify(accountRepository, never()).save(any());
         verify(userRepository, never()).save(any());
     }
 
     @Test
-    void approveUser_Success() {
-        // Arrange
+    void linkBankAccount_Success() {
+        AppUser unlinkedUser = AppUser.builder()
+                .id(5L)
+                .username("alice")
+                .name("alice")
+                .email("alice.brown@example.com")
+                .role("USER")
+                .status("ACTIVE")
+                .accountId(null)
+                .build();
+
+        BankDetails bankDetails = BankDetails.builder()
+                .accountNumber(1001001004L)
+                .userName("Alice Brown")
+                .email("alice.brown@example.com")
+                .balance(new BigDecimal("30000.00"))
+                .registered(false)
+                .build();
+
+        when(userRepository.findByUsername("alice")).thenReturn(Optional.of(unlinkedUser));
+        when(bankDetailsRepository.findByAccountNumber(1001001004L))
+                .thenReturn(Optional.of(bankDetails));
+        when(accountRepository.save(any(Account.class)))
+                .thenAnswer(inv -> inv.getArgument(0));
+        when(userRepository.save(any(AppUser.class)))
+                .thenAnswer(inv -> inv.getArgument(0));
+
+        LinkBankResponse response = userService.linkBankAccount("alice", 1001001004L);
+
+        assertEquals(1001001004L, response.getAccountId());
+        assertEquals("Alice Brown", response.getHolderName());
+        assertEquals(new BigDecimal("30000.00"), response.getBalance());
+        assertEquals(1001001004L, unlinkedUser.getAccountId());
+        assertTrue(bankDetails.getRegistered());
+        verify(accountRepository, times(1)).save(any(Account.class));
+    }
+
+    @Test
+    void linkBankAccount_AlreadyLinked_ThrowsException() {
+        // testUser already has accountId = 1L
+        when(userRepository.findByUsername("testuser")).thenReturn(Optional.of(testUser));
+
+        assertThrows(IllegalArgumentException.class,
+                () -> userService.linkBankAccount("testuser", 1001001001L));
+
+        verify(accountRepository, never()).save(any());
+    }
+
+    @Test
+    void linkBankAccount_EmailMismatch_ThrowsException() {
+        AppUser unlinkedUser = AppUser.builder()
+                .id(5L)
+                .username("bob")
+                .name("bob")
+                .email("bob@example.com")
+                .role("USER")
+                .status("ACTIVE")
+                .accountId(null)
+                .build();
+
+        BankDetails bankDetails = BankDetails.builder()
+                .accountNumber(1001001001L)
+                .userName("John Doe")
+                .email("john.doe@example.com")
+                .balance(new BigDecimal("50000.00"))
+                .registered(false)
+                .build();
+
+        when(userRepository.findByUsername("bob")).thenReturn(Optional.of(unlinkedUser));
+        when(bankDetailsRepository.findByAccountNumber(1001001001L))
+                .thenReturn(Optional.of(bankDetails));
+
+        assertThrows(IllegalArgumentException.class,
+                () -> userService.linkBankAccount("bob", 1001001001L));
+
+        verify(accountRepository, never()).save(any());
+    }
+
+    @Test
+    void deactivateUser_Success() {
+        DeactivateUserRequest request = new DeactivateUserRequest(1L, "Policy violation");
+
         when(userRepository.findById(1L)).thenReturn(Optional.of(testUser));
         when(accountRepository.findById(1L)).thenReturn(Optional.of(testAccount));
         when(userRepository.save(any(AppUser.class)))
@@ -169,51 +223,18 @@ class UserServiceTest {
         when(accountRepository.save(any(Account.class)))
                 .thenAnswer(inv -> inv.getArgument(0));
 
-        // Act
-        UserResponseDto response = userService.approveUser(1L, "admin");
+        UserResponseDto response = userService.deactivateUser(request);
 
-        // Assert
-        assertEquals("ACTIVE", response.getStatus());
-        assertEquals("ACTIVE", testUser.getStatus());
-        assertEquals(AccountStatus.ACTIVE, testAccount.getStatus());
-        assertNotNull(testUser.getApprovedBy());
-        verify(userRepository, times(1)).save(testUser);
-        verify(accountRepository, times(1)).save(testAccount);
-    }
-
-    @Test
-    void approveUser_NotPending_ThrowsException() {
-        // Arrange
-        testUser.setStatus("ACTIVE");
-        when(userRepository.findById(1L)).thenReturn(Optional.of(testUser));
-
-        // Act & Assert
-        assertThrows(IllegalArgumentException.class, () -> {
-            userService.approveUser(1L, "admin");
-        });
-    }
-
-    @Test
-    void rejectUser_Success() {
-        // Arrange
-        when(userRepository.findById(1L)).thenReturn(Optional.of(testUser));
-
-        // Act
-        userService.rejectUser(1L, "Not eligible");
-
-        // Assert
-        verify(accountRepository, times(1)).deleteById(1L);
-        verify(userRepository, times(1)).deleteById(1L);
+        assertEquals("INACTIVE", response.getStatus());
+        assertEquals("INACTIVE", testUser.getStatus());
+        assertEquals(AccountStatus.LOCKED, testAccount.getStatus());
     }
 
     @Test
     void getUserById_NotFound_ThrowsException() {
-        // Arrange
         when(userRepository.findById(999L)).thenReturn(Optional.empty());
 
-        // Act & Assert
-        assertThrows(AccountNotFoundException.class, () -> {
-            userService.getUserById(999L);
-        });
+        assertThrows(AccountNotFoundException.class,
+                () -> userService.getUserById(999L));
     }
 }

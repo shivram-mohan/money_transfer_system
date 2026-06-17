@@ -61,9 +61,20 @@ export class TransferComponent implements OnInit {
   }
 
   ngOnInit(): void {
+    // Block access until the user has linked a bank account
+    if (!this.authService.isBankLinked()) {
+      this.snackBar.open(
+        'Link a bank account to start transferring money',
+        'Close',
+        { duration: 4000 }
+      );
+      this.router.navigate(['/dashboard']);
+      return;
+    }
+
     this.currentAccountId = this.authService.getCurrentAccountId();
     this.holderName = this.authService.getHolderName();
-    
+
     if (this.currentAccountId) {
       this.loadBalance();
     }

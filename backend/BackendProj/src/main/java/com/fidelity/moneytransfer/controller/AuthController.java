@@ -2,8 +2,6 @@ package com.fidelity.moneytransfer.controller;
 
 import com.fidelity.moneytransfer.config.JwtUtil;
 import com.fidelity.moneytransfer.dto.*;
-import com.fidelity.moneytransfer.entity.BankDetails;
-import com.fidelity.moneytransfer.repository.BankDetailsRepository;
 import com.fidelity.moneytransfer.repository.UserRepository;
 import com.fidelity.moneytransfer.service.OtpService;
 import com.fidelity.moneytransfer.service.UserService;
@@ -30,54 +28,35 @@ public class AuthController {
     private final UserRepository userRepository;
     private final UserService userService;
     private final OtpService otpService;
-    private final BankDetailsRepository bankDetailsRepository;
 
     // ─── SIGNUP FLOW (3 steps) ────────────────────────────────────────
 
     /**
-     * Step 1: User provides account_number, username, email.
-     * We verify against bank_details table and send OTP to email.
+     * Step 1: User provides username + email. We verify the email belongs to
+     * them by sending an OTP. Bank account linking happens later, post-login.
      */
     @PostMapping("/signup/verify-account")
     public ResponseEntity<OtpResponse> verifyAccount(
             @Valid @RequestBody VerifyAccountRequest request) {
 
-        log.info("Signup step 1 - verifying account: {}", request.getAccountNumber());
+        log.info("Signup step 1 - sending OTP for username: {}", request.getUsername());
 
         // Check if username already taken
         if (userRepository.existsByUsername(request.getUsername())) {
             throw new IllegalArgumentException("Username already exists: " + request.getUsername());
         }
 
-        // Look up account in bank_details
-        BankDetails bankDetails = bankDetailsRepository
-                .findByAccountNumber(request.getAccountNumber())
-                .orElseThrow(() -> new IllegalArgumentException(
-                        "Account number not found in our banking records"));
-
-        // Verify the email matches the bank record
-        if (!bankDetails.getEmail().equalsIgnoreCase(request.getEmail())) {
+        // Check if email already in use by another registered user
+        if (userRepository.existsByEmailIgnoreCase(request.getEmail())) {
             throw new IllegalArgumentException(
-                    "Email does not match the account on record");
+                    "An account with this email already exists");
         }
 
-        // Verify the username matches the bank record
-        if (!bankDetails.getUserName().equalsIgnoreCase(request.getUsername())) {
-            throw new IllegalArgumentException(
-                    "Username does not match the account holder name");
-        }
-
-        // Check if already registered
-        if (bankDetails.getRegistered()) {
-            throw new IllegalArgumentException(
-                    "This account has already been registered");
-        }
-
-        // Send OTP to email
+        // Send OTP to verify email ownership
         otpService.generateAndSendOtp(request.getEmail(), "SIGNUP");
 
         return ResponseEntity.ok(OtpResponse.builder()
-                .message("OTP sent to your registered email")
+                .message("OTP sent to your email")
                 .email(maskEmail(request.getEmail()))
                 .success(true)
                 .build());

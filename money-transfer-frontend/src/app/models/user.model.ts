@@ -57,7 +57,6 @@ export interface DeactivateUserRequest {
 // ─── New Signup Flow DTOs ────────────────────────────────────────
 
 export interface VerifyAccountRequest {
-  accountNumber: number;
   username: string;
   email: string;
 }
@@ -69,9 +68,9 @@ export interface VerifyOtpRequest {
 }
 
 export interface SetPasswordRequest {
-  accountNumber: number;
   username: string;
   email: string;
+  name: string;
   password: string;
 }
 
@@ -79,6 +78,19 @@ export interface OtpResponse {
   message: string;
   email: string;
   success: boolean;
+}
+
+// ─── Link Bank Account (post-signup) ─────────────────────────────
+
+export interface LinkBankRequest {
+  accountNumber: number;
+}
+
+export interface LinkBankResponse {
+  accountId: number;
+  holderName: string;
+  balance: number;
+  message: string;
 }
 
 // ─── New Login Flow DTOs ─────────────────────────────────────────

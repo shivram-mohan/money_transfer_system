@@ -6,6 +6,7 @@ import { Observable } from 'rxjs';
 import { environment } from '../../environments/environment';
 import { AccountResponse } from '../models/account.model';
 import { TransactionLog } from '../models/transaction.model';
+import { LinkBankRequest, LinkBankResponse } from '../models/user.model';
 import { HttpParams } from '@angular/common/http';
 
 
@@ -39,6 +40,14 @@ export class AccountService {
   getTransactions(accountId: number): Observable<TransactionLog[]> {
     return this.http.get<TransactionLog[]>(
       `${this.apiUrl}/accounts/${accountId}/transactions`
+    );
+  }
+
+  // Link a verified bank account to the logged-in user (post-signup)
+  linkBankAccount(request: LinkBankRequest): Observable<LinkBankResponse> {
+    return this.http.post<LinkBankResponse>(
+      `${this.apiUrl}/users/link-bank`,
+      request
     );
   }
 

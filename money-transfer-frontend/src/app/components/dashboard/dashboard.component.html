@@ -8,7 +8,47 @@
     <p class="subtitle">Manage your account and transfer funds securely</p>
   </div>
 
-  <div class="dashboard-content">
+  <!-- Link Bank Account prompt (shown until the user links an account) -->
+  <div class="dashboard-content" *ngIf="!isBankLinked">
+    <mat-card class="link-bank-card">
+      <mat-card-content>
+        <div class="link-bank-header">
+          <mat-icon class="link-bank-icon">account_balance</mat-icon>
+          <h2>Link bank account to unlock all features</h2>
+          <p>Enter your bank account number to verify and link your account.
+             Transfers, balance and history unlock once it's linked.</p>
+        </div>
+
+        <form [formGroup]="linkForm" (ngSubmit)="linkBankAccount()" class="link-bank-form">
+          <mat-form-field appearance="outline">
+            <mat-label>Bank Account Number</mat-label>
+            <input matInput
+                   type="number"
+                   formControlName="accountNumber"
+                   placeholder="Enter your bank account number" />
+            <mat-icon matPrefix>credit_card</mat-icon>
+            <mat-error *ngIf="linkForm.get('accountNumber')?.hasError('required')">
+              Account number is required
+            </mat-error>
+          </mat-form-field>
+
+          <button mat-raised-button
+                  color="primary"
+                  type="submit"
+                  [disabled]="linkForm.invalid || isLinking"
+                  class="link-bank-btn">
+            <mat-spinner *ngIf="isLinking" diameter="20"></mat-spinner>
+            <span *ngIf="!isLinking">
+              <mat-icon>link</mat-icon>
+              Link Bank Account
+            </span>
+          </button>
+        </form>
+      </mat-card-content>
+    </mat-card>
+  </div>
+
+  <div class="dashboard-content" *ngIf="isBankLinked">
     <!-- Balance Card -->
     <mat-card class="balance-card">
       <mat-card-header>

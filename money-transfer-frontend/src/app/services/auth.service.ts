@@ -3,8 +3,8 @@
 import { Injectable, PLATFORM_ID, inject } from '@angular/core';
 import { isPlatformBrowser } from '@angular/common';
 import { HttpClient } from '@angular/common/http';
-import { BehaviorSubject, Observable } from 'rxjs';
-import { tap } from 'rxjs/operators';
+import { BehaviorSubject, Observable, from } from 'rxjs';
+import { switchMap, tap } from 'rxjs/operators';
 import {
   UserRole,
   VerifyAccountRequest,
@@ -16,6 +16,7 @@ import {
   UserResponse
 } from '../models/user.model';
 import { environment } from '../../environments/environment';
+import { hashPassword } from '../utils/crypto.util';
 
 export interface LoginResponse {
   token: string;
@@ -74,25 +75,38 @@ export class AuthService {
   }
 
   setPassword(request: SetPasswordRequest): Observable<UserResponse> {
-    return this.http.post<UserResponse>(
-      `${environment.apiUrl}/auth/signup/set-password`,
-      request
+    // Hash the password client-side so plaintext never leaves the browser
+    return from(hashPassword(request.password)).pipe(
+      switchMap((hashed) =>
+        this.http.post<UserResponse>(
+          `${environment.apiUrl}/auth/signup/set-password`,
+          { ...request, password: hashed }
+        )
+      )
     );
   }
 
   // ─── USER LOGIN FLOW (2 steps) ─────────────────────────────────
 
   loginStep1(request: LoginOtpRequest): Observable<OtpResponse> {
-    return this.http.post<OtpResponse>(
-      `${environment.apiUrl}/auth/login`,
-      request
+    return from(hashPassword(request.password)).pipe(
+      switchMap((hashed) =>
+        this.http.post<OtpResponse>(
+          `${environment.apiUrl}/auth/login`,
+          { ...request, password: hashed }
+        )
+      )
     );
   }
 
   loginVerifyOtp(request: LoginVerifyRequest): Observable<LoginResponse> {
-    return this.http.post<LoginResponse>(
-      `${environment.apiUrl}/auth/login/verify-otp`,
-      request
+    return from(hashPassword(request.password)).pipe(
+      switchMap((hashed) =>
+        this.http.post<LoginResponse>(
+          `${environment.apiUrl}/auth/login/verify-otp`,
+          { ...request, password: hashed }
+        )
+      )
     ).pipe(
       tap((response: LoginResponse) => {
         if (this.isBrowser) {
@@ -114,9 +128,13 @@ export class AuthService {
   // ─── ADMIN LOGIN (direct, no OTP) ──────────────────────────────
 
   adminLogin(credentials: AdminLoginRequest): Observable<LoginResponse> {
-    return this.http.post<LoginResponse>(
-      `${environment.apiUrl}/auth/admin/login`,
-      credentials
+    return from(hashPassword(credentials.password)).pipe(
+      switchMap((hashed) =>
+        this.http.post<LoginResponse>(
+          `${environment.apiUrl}/auth/admin/login`,
+          { ...credentials, password: hashed }
+        )
+      )
     ).pipe(
       tap((response: LoginResponse) => {
         if (this.isBrowser) {
@@ -162,7 +180,20 @@ export class AuthService {
   getCurrentAccountId(): number | null {
     if (!this.isBrowser) return null;
     const accountId = localStorage.getItem(this.ACCOUNT_ID_KEY);
-    return accountId ? parseInt(accountId, 10) : null;
+    const parsed = accountId ? parseInt(accountId, 10) : NaN;
+    return Number.isNaN(parsed) || parsed <= 0 ? null : parsed;
+  }
+
+  isBankLinked(): boolean {
+    return this.getCurrentAccountId() !== null;
+  }
+
+  // Called after the user links a bank account post-signup
+  setLinkedAccount(accountId: number, holderName: string): void {
+    if (this.isBrowser) {
+      localStorage.setItem(this.ACCOUNT_ID_KEY, accountId.toString());
+      localStorage.setItem(this.HOLDER_NAME_KEY, holderName);
+    }
   }
 
   getCurrentUserId(): number | null {

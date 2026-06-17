@@ -10,6 +10,7 @@ import com.fidelity.moneytransfer.exception.AccountNotFoundException;
 import com.fidelity.moneytransfer.exception.DuplicateTransferException;
 import com.fidelity.moneytransfer.exception.InsufficientBalanceException;
 import com.fidelity.moneytransfer.repository.AccountRepository;
+import com.fidelity.moneytransfer.repository.BankDetailsRepository;
 import com.fidelity.moneytransfer.repository.TransactionLogRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -36,6 +37,9 @@ class TransferServiceTest {
 
     @Mock
     private TransactionLogRepository transactionLogRepository;
+
+    @Mock
+    private BankDetailsRepository bankDetailsRepository;
 
     @InjectMocks
     private TransferService transferService;

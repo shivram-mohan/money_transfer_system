@@ -3,10 +3,14 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router } from '@angular/router';
+import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
 import { MatCardModule } from '@angular/material/card';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
+import { MatFormFieldModule } from '@angular/material/form-field';
+import { MatInputModule } from '@angular/material/input';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
+import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
 import { AuthService } from '../../services/auth.service';
 import { AccountService } from '../../services/account.service';
 import { NavbarComponent } from '../navbar/navbar.component';
@@ -16,10 +20,14 @@ import { NavbarComponent } from '../navbar/navbar.component';
   standalone: true,
   imports: [
     CommonModule,
+    ReactiveFormsModule,
     MatCardModule,
     MatButtonModule,
     MatIconModule,
+    MatFormFieldModule,
+    MatInputModule,
     MatProgressSpinnerModule,
+    MatSnackBarModule,
     NavbarComponent
   ],
   templateUrl: './dashboard.component.html',
@@ -31,18 +39,32 @@ export class DashboardComponent implements OnInit {
   balance: number = 0;
   isLoading = true;
 
+  // Bank linking
+  isBankLinked = false;
+  isLinking = false;
+  linkForm: FormGroup;
+
   constructor(
     private authService: AuthService,
     private accountService: AccountService,
-    private router: Router
-  ) {}
+    private router: Router,
+    private fb: FormBuilder,
+    private snackBar: MatSnackBar
+  ) {
+    this.linkForm = this.fb.group({
+      accountNumber: ['', [Validators.required, Validators.min(1)]]
+    });
+  }
 
   ngOnInit(): void {
     this.holderName = this.authService.getHolderName();
     this.accountId = this.authService.getCurrentAccountId();
-    
-    if (this.accountId) {
+    this.isBankLinked = this.authService.isBankLinked();
+
+    if (this.isBankLinked && this.accountId) {
       this.loadBalance();
+    } else {
+      this.isLoading = false;
     }
   }
 
@@ -60,6 +82,40 @@ export class DashboardComponent implements OnInit {
         }
       });
     }
+  }
+
+  linkBankAccount(): void {
+    if (this.linkForm.invalid) {
+      this.linkForm.markAllAsTouched();
+      return;
+    }
+
+    this.isLinking = true;
+    this.accountService.linkBankAccount({
+      accountNumber: this.linkForm.value.accountNumber
+    }).subscribe({
+      next: (response) => {
+        this.isLinking = false;
+        this.authService.setLinkedAccount(response.accountId, response.holderName);
+        this.holderName = response.holderName;
+        this.accountId = response.accountId;
+        this.balance = response.balance;
+        this.isBankLinked = true;
+        this.snackBar.open(
+          'Bank account linked! All features are now unlocked.',
+          'Close',
+          { duration: 5000, panelClass: ['success-snackbar'] }
+        );
+      },
+      error: (error) => {
+        this.isLinking = false;
+        this.snackBar.open(
+          error.error?.message || 'Failed to link bank account',
+          'Close',
+          { duration: 5000, panelClass: ['error-snackbar'] }
+        );
+      }
+    });
   }
 
   navigateToTransfer(): void {

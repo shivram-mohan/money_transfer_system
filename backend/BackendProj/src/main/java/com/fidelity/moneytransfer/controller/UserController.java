@@ -2,6 +2,8 @@ package com.fidelity.moneytransfer.controller;
 
 import com.fidelity.moneytransfer.dto.CreateUserRequest;
 import com.fidelity.moneytransfer.dto.DeactivateUserRequest;
+import com.fidelity.moneytransfer.dto.LinkBankRequest;
+import com.fidelity.moneytransfer.dto.LinkBankResponse;
 import com.fidelity.moneytransfer.dto.UserResponseDto;
 import com.fidelity.moneytransfer.service.UserService;
 import jakarta.validation.Valid;
@@ -32,6 +34,20 @@ public class UserController {
     public ResponseEntity<UserResponseDto> getUserById(@PathVariable Long id) {
         log.info("Fetching user with id: {}", id);
         return ResponseEntity.ok(userService.getUserById(id));
+    }
+
+    /**
+     * Link a verified bank account to the currently logged-in user.
+     * Authenticated (any user), not admin-only.
+     */
+    @PostMapping("/link-bank")
+    public ResponseEntity<LinkBankResponse> linkBankAccount(
+            @Valid @RequestBody LinkBankRequest request,
+            Authentication authentication) {
+        String username = authentication.getName();
+        log.info("User {} linking bank account {}", username, request.getAccountNumber());
+        return ResponseEntity.ok(
+                userService.linkBankAccount(username, request.getAccountNumber()));
     }
 
     @PostMapping

@@ -8,7 +8,7 @@
       <div class="header-content">
         <mat-icon class="header-icon">verified_user</mat-icon>
         <mat-card-title>Create Account</mat-card-title>
-        <mat-card-subtitle>Verify your bank account to get started</mat-card-subtitle>
+        <mat-card-subtitle>Sign up with your email — link your bank account later</mat-card-subtitle>
       </div>
     </mat-card-header>
 
@@ -19,7 +19,7 @@
           <mat-icon *ngIf="currentStep > 1">check</mat-icon>
           <span *ngIf="currentStep <= 1">1</span>
         </div>
-        <span class="step-label">Verify Account</span>
+        <span class="step-label">Your Details</span>
       </div>
       <div class="step-line" [class.active]="currentStep > 1"></div>
       <div class="step" [class.active]="currentStep >= 2" [class.completed]="currentStep > 2">
@@ -42,14 +42,17 @@
       <form *ngIf="currentStep === 1" [formGroup]="accountForm" (ngSubmit)="onVerifyAccount()">
 
         <mat-form-field appearance="outline">
-          <mat-label>Account Number</mat-label>
+          <mat-label>Full Name</mat-label>
           <input matInput
-                 type="number"
-                 formControlName="accountNumber"
-                 placeholder="Enter your bank account number" />
-          <mat-icon matPrefix>account_balance</mat-icon>
-          <mat-error *ngIf="accountForm.get('accountNumber')?.hasError('required')">
-            Account number is required
+                 formControlName="fullName"
+                 placeholder="Your full name"
+                 autocomplete="name" />
+          <mat-icon matPrefix>badge</mat-icon>
+          <mat-error *ngIf="accountForm.get('fullName')?.hasError('required')">
+            Full name is required
+          </mat-error>
+          <mat-error *ngIf="accountForm.get('fullName')?.hasError('minlength')">
+            Full name must be at least 2 characters
           </mat-error>
         </mat-form-field>
 
@@ -57,7 +60,7 @@
           <mat-label>Username</mat-label>
           <input matInput
                  formControlName="username"
-                 placeholder="Account holder name"
+                 placeholder="Choose a username"
                  autocomplete="username" />
           <mat-icon matPrefix>person</mat-icon>
           <mat-error *ngIf="accountForm.get('username')?.hasError('required')">
@@ -73,7 +76,7 @@
           <input matInput
                  type="email"
                  formControlName="email"
-                 placeholder="Your registered email"
+                 placeholder="Your email address"
                  autocomplete="email" />
           <mat-icon matPrefix>email</mat-icon>
           <mat-error *ngIf="accountForm.get('email')?.hasError('required')">

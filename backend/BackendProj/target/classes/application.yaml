@@ -25,6 +25,10 @@ spring:
           auth: true
           starttls:
             enable: true
+          # Fail fast instead of hanging if Gmail's SMTP is slow/unreachable
+          connectiontimeout: 5000
+          timeout: 5000
+          writetimeout: 5000
 
 server:
   port: 8080

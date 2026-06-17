@@ -8,10 +8,13 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.CommandLineRunner;
+import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
 
 import java.math.BigDecimal;
+
+import com.fidelity.moneytransfer.util.PasswordHasher;
 
 @Component
 @RequiredArgsConstructor
@@ -21,6 +24,7 @@ public class DataSeeder implements CommandLineRunner {
     private final UserRepository userRepository;
     private final BankDetailsRepository bankDetailsRepository;
     private final PasswordEncoder passwordEncoder;
+    private final JdbcTemplate jdbcTemplate;
 
     @Value("${app.admin.username:admin}")
     private String adminUsername;
@@ -36,8 +40,30 @@ public class DataSeeder implements CommandLineRunner {
 
     @Override
     public void run(String... args) {
+        migrateOtpTokens();
         seedAdmin();
         seedBankDetails();
+    }
+
+    /**
+     * One-time cleanup for the OTP table redesign: the legacy schema had a
+     * NOT NULL {@code verified} column and allowed multiple rows per email.
+     * The table now keeps a single (unique) row per email, so we drop the old
+     * column and clear stale rows. Wrapped defensively so a fresh database
+     * (where the column never existed) is unaffected.
+     */
+    private void migrateOtpTokens() {
+        try {
+            jdbcTemplate.execute("DELETE FROM otp_tokens");
+        } catch (Exception e) {
+            log.debug("Skipping otp_tokens cleanup: {}", e.getMessage());
+        }
+        try {
+            jdbcTemplate.execute("ALTER TABLE otp_tokens DROP COLUMN verified");
+            log.info("Dropped legacy 'verified' column from otp_tokens");
+        } catch (Exception e) {
+            log.debug("No legacy 'verified' column to drop: {}", e.getMessage());
+        }
     }
 
     private void seedAdmin() {
@@ -48,7 +74,8 @@ public class DataSeeder implements CommandLineRunner {
 
         AppUser admin = AppUser.builder()
                 .username(adminUsername)
-                .password(passwordEncoder.encode(adminPassword))
+                // Frontend sends SHA-256(password); store bcrypt of that hash
+                .password(passwordEncoder.encode(PasswordHasher.sha256Hex(adminPassword)))
                 .name(adminName)
                 .email(adminEmail)
                 .role("ADMIN")

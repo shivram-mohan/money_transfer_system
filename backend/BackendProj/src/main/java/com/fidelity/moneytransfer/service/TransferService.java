@@ -14,6 +14,7 @@ import com.fidelity.moneytransfer.exception.AccountNotActiveException;
 import com.fidelity.moneytransfer.exception.DuplicateTransferException;
 import com.fidelity.moneytransfer.exception.InsufficientBalanceException;
 import com.fidelity.moneytransfer.repository.AccountRepository;
+import com.fidelity.moneytransfer.repository.BankDetailsRepository;
 import com.fidelity.moneytransfer.repository.TransactionLogRepository;
 import java.math.BigDecimal;
 import java.util.UUID;
@@ -28,6 +29,7 @@ public class TransferService {
     private final AccountService accountService;
     private final AccountRepository accountRepository;
     private final TransactionLogRepository transactionLogRepository;
+    private final BankDetailsRepository bankDetailsRepository;
 
     @Transactional
     public TransferResponse transfer(TransferRequest request) {
@@ -90,6 +92,9 @@ public class TransferService {
             toAccount.credit(request.getAmount());
             this.accountRepository.save(fromAccount);
             this.accountRepository.save(toAccount);
+            // Keep the source-of-truth bank_details balances in sync with the accounts
+            this.syncBankDetailsBalance(fromAccount);
+            this.syncBankDetailsBalance(toAccount);
             transactionLog = this.createTransactionLog(request, TransactionStatus.SUCCESS, (String)null);
             this.transactionLogRepository.save(transactionLog);
             log.info("Transfer successful. Transaction ID: {}", transactionLog.getId());
@@ -100,6 +105,21 @@ public class TransferService {
             this.transactionLogRepository.save(transactionLog);
             throw var5;
         }
+    }
+
+    /**
+     * Mirrors an account's balance back to its originating bank_details record.
+     * A linked account's id equals the bank account number, so we match on that.
+     * Admin-created accounts have no bank_details row and are simply skipped.
+     */
+    private void syncBankDetailsBalance(Account account) {
+        this.bankDetailsRepository.findByAccountNumber(account.getId())
+                .ifPresent((bankDetails) -> {
+                    bankDetails.setBalance(account.getBalance());
+                    this.bankDetailsRepository.save(bankDetails);
+                    log.debug("Synced bank_details balance for account {}: {}",
+                            account.getId(), account.getBalance());
+                });
     }
 
     private TransactionLog createTransactionLog(
@@ -119,9 +139,10 @@ public class TransferService {
                 .build();
     }
 
-    public TransferService(final AccountService accountService, final AccountRepository accountRepository, final TransactionLogRepository transactionLogRepository) {
+    public TransferService(final AccountService accountService, final AccountRepository accountRepository, final TransactionLogRepository transactionLogRepository, final BankDetailsRepository bankDetailsRepository) {
         this.accountService = accountService;
         this.accountRepository = accountRepository;
         this.transactionLogRepository = transactionLogRepository;
+        this.bankDetailsRepository = bankDetailsRepository;
     }
 }

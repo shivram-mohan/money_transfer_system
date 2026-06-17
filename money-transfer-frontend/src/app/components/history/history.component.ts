@@ -73,8 +73,19 @@ export class HistoryComponent implements OnInit {
   ) {}
 
   ngOnInit(): void {
+    // Block access until the user has linked a bank account
+    if (!this.authService.isBankLinked()) {
+      this.snackBar.open(
+        'Link a bank account to view transaction history',
+        'Close',
+        { duration: 4000 }
+      );
+      this.router.navigate(['/dashboard']);
+      return;
+    }
+
     this.currentAccountId = this.authService.getCurrentAccountId();
-    
+
     if (this.currentAccountId) {
       this.loadTransactions();
       this.setupFilterListener();
