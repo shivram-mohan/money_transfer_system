@@ -101,6 +101,37 @@ public class UserService {
         return mapToUserResponse(savedUser);
     }
 
+    // ─── FORGOT / RESET PASSWORD (OTP-verified) ──────────────────────
+
+    /**
+     * Looks up a user by username and returns their registered email so the
+     * caller can dispatch a password-reset OTP. Throws if the user is unknown.
+     */
+    public AppUser getUserForPasswordReset(String username) {
+        return userRepository.findByUsername(username)
+                .orElseThrow(() -> new AccountNotFoundException(
+                        "No account found with username: " + username));
+    }
+
+    /**
+     * Sets a new password for the user. Caller must have already verified the
+     * reset OTP. The incoming password is the client-side SHA-256 hash, which
+     * we bcrypt-encode before persisting (same scheme as signup).
+     */
+    @Transactional
+    public void resetPassword(String username, String hashedPassword) {
+        log.info("Resetting password for username: {}", username);
+
+        AppUser user = userRepository.findByUsername(username)
+                .orElseThrow(() -> new AccountNotFoundException(
+                        "No account found with username: " + username));
+
+        user.setPassword(passwordEncoder.encode(hashedPassword));
+        userRepository.save(user);
+
+        log.info("Password reset completed for username: {}", username);
+    }
+
     // ─── LINK BANK ACCOUNT (post-signup) ─────────────────────────────
 
     @Transactional

@@ -17,6 +17,7 @@ import { TransferService } from '../../services/transfer.service';
 import { AccountService } from '../../services/account.service';
 import { NavbarComponent } from '../navbar/navbar.component';
 import { TransferRequest } from '../../models/transaction.model';
+import { ConfirmDialogComponent } from '../admin/confirm-dialog/confirm-dialog.component';
 
 @Component({
   selector: 'app-transfer',
@@ -52,7 +53,8 @@ export class TransferComponent implements OnInit {
     private transferService: TransferService,
     private accountService: AccountService,
     private router: Router,
-    private snackBar: MatSnackBar
+    private snackBar: MatSnackBar,
+    private dialog: MatDialog
   ) {
     this.transferForm = this.fb.group({
       toAccountId: ['', [Validators.required, Validators.min(1)]],
@@ -108,26 +110,68 @@ export class TransferComponent implements OnInit {
         return;
       }
 
-      // Check sufficient balance
-      if (amount > this.currentBalance) {
-        this.snackBar.open('Insufficient balance', 'Close', {
-          duration: 5000,
-          panelClass: ['error-snackbar']
-        });
-        return;
-      }
+      // NOTE: We intentionally do NOT block an over-balance transfer here.
+      // The backend is the source of truth: it rejects the transfer AND records
+      // it as a FAILED transaction in the history (e.g. insufficient balance),
+      // which is exactly what we want the user to be able to review later.
 
+      // Look up the receiver so the user can confirm WHO they're paying
+      // before any money moves.
       this.isLoading = true;
-      this.transferSuccess = false;
+      this.accountService.getAccount(toAccountId).subscribe({
+        next: (account) => {
+          this.isLoading = false;
+          this.confirmAndTransfer(toAccountId, amount, account.holderName);
+        },
+        error: () => {
+          this.isLoading = false;
+          this.snackBar.open(
+            `No account found with ID ${toAccountId}. Please check and try again.`,
+            'Close',
+            { duration: 5000, panelClass: ['error-snackbar'] }
+          );
+        }
+      });
+    }
+  }
 
-      const transferRequest: TransferRequest = {
-        fromAccountId: this.currentAccountId,
-        toAccountId: toAccountId,
-        amount: amount,
-        idempotencyKey: this.transferService.generateIdempotencyKey()
-      };
+  // Show a confirmation dialog with the receiver's name, then transfer on confirm.
+  private confirmAndTransfer(toAccountId: number, amount: number, receiverName: string): void {
+    const dialogRef = this.dialog.open(ConfirmDialogComponent, {
+      width: '420px',
+      data: {
+        title: 'Confirm Transfer',
+        message: `You are about to send ₹${amount.toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} to ${receiverName} (Account #${toAccountId}). Do you want to proceed?`,
+        confirmText: 'Send Money',
+        cancelText: 'Cancel',
+        icon: 'send',
+        color: 'primary'
+      }
+    });
 
-      this.transferService.transfer(transferRequest).subscribe({
+    dialogRef.afterClosed().subscribe((confirmed) => {
+      if (confirmed) {
+        this.executeTransfer(toAccountId, amount);
+      }
+    });
+  }
+
+  private executeTransfer(toAccountId: number, amount: number): void {
+    if (!this.currentAccountId) {
+      return;
+    }
+
+    this.isLoading = true;
+    this.transferSuccess = false;
+
+    const transferRequest: TransferRequest = {
+      fromAccountId: this.currentAccountId,
+      toAccountId: toAccountId,
+      amount: amount,
+      idempotencyKey: this.transferService.generateIdempotencyKey()
+    };
+
+    this.transferService.transfer(transferRequest).subscribe({
   next: (response) => {
     this.isLoading = false;
     this.transferSuccess = true;
@@ -170,7 +214,6 @@ export class TransferComponent implements OnInit {
     });
   }
 });
-    }
   }
 
   resetForm(): void {

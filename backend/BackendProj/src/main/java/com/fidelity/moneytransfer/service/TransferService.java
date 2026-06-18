@@ -30,6 +30,7 @@ public class TransferService {
     private final AccountRepository accountRepository;
     private final TransactionLogRepository transactionLogRepository;
     private final BankDetailsRepository bankDetailsRepository;
+    private final TransactionLogService transactionLogService;
 
     @Transactional
     public TransferResponse transfer(TransferRequest request) {
@@ -38,14 +39,27 @@ public class TransferService {
                 request.getToAccountId(),
                 request.getAmount());
 
-        // Step 1: Check for duplicate transfers
-        checkIdempotency(request.getIdempotencyKey());
+        try {
+            // Step 1: Check for duplicate transfers
+            checkIdempotency(request.getIdempotencyKey());
 
-        // Step 2: Validate transfer request
-        validateTransfer(request);
+            // Step 2: Validate transfer request
+            validateTransfer(request);
 
-        // Step 3: Execute the transfer
-        return executeTransfer(request);
+            // Step 3: Execute the transfer
+            return executeTransfer(request);
+        } catch (DuplicateTransferException e) {
+            // Idempotent replay of an already-processed transfer is not a real
+            // failure, so we don't add a FAILED row for it.
+            throw e;
+        } catch (Exception e) {
+            // Record the failed attempt (insufficient balance, inactive account,
+            // self-transfer, missing account, ...) in its own transaction so it
+            // survives the rollback of this one, then re-throw for the API.
+            log.warn("Transfer failed, recording failed transaction: {}", e.getMessage());
+            transactionLogService.logFailedTransfer(request, e.getMessage());
+            throw e;
+        }
     }
 
     private void checkIdempotency(String idempotencyKey) {
@@ -83,28 +97,22 @@ public class TransferService {
 
     private TransferResponse executeTransfer(TransferRequest request) {
         log.info("Executing transfer from account {} to account {}, amount: {}", new Object[]{request.getFromAccountId(), request.getToAccountId(), request.getAmount()});
-        TransactionLog transactionLog = null;
 
-        try {
-            Account fromAccount = this.accountService.getAccountById(request.getFromAccountId());
-            Account toAccount = this.accountService.getAccountById(request.getToAccountId());
-            fromAccount.debit(request.getAmount());
-            toAccount.credit(request.getAmount());
-            this.accountRepository.save(fromAccount);
-            this.accountRepository.save(toAccount);
-            // Keep the source-of-truth bank_details balances in sync with the accounts
-            this.syncBankDetailsBalance(fromAccount);
-            this.syncBankDetailsBalance(toAccount);
-            transactionLog = this.createTransactionLog(request, TransactionStatus.SUCCESS, (String)null);
-            this.transactionLogRepository.save(transactionLog);
-            log.info("Transfer successful. Transaction ID: {}", transactionLog.getId());
-            return TransferResponse.builder().TransactionId(transactionLog.getId()).status("SUCCESS").message("Transfer completed successfully").debitedFrom(request.getFromAccountId()).creditedTo(request.getToAccountId()).amount(request.getAmount()).build();
-        } catch (Exception var5) {
-            log.error("Transfer failed: {}", var5.getMessage(), var5);
-            transactionLog = this.createTransactionLog(request, TransactionStatus.FAILED, var5.getMessage());
-            this.transactionLogRepository.save(transactionLog);
-            throw var5;
-        }
+        Account fromAccount = this.accountService.getAccountById(request.getFromAccountId());
+        Account toAccount = this.accountService.getAccountById(request.getToAccountId());
+        fromAccount.debit(request.getAmount());
+        toAccount.credit(request.getAmount());
+        this.accountRepository.save(fromAccount);
+        this.accountRepository.save(toAccount);
+        // Keep the source-of-truth bank_details balances in sync with the accounts
+        this.syncBankDetailsBalance(fromAccount);
+        this.syncBankDetailsBalance(toAccount);
+        // Failures here propagate to transfer(), which records the FAILED log in
+        // a separate transaction so it isn't lost when this transaction rolls back.
+        TransactionLog transactionLog = this.createTransactionLog(request, TransactionStatus.SUCCESS, (String) null);
+        this.transactionLogRepository.save(transactionLog);
+        log.info("Transfer successful. Transaction ID: {}", transactionLog.getId());
+        return TransferResponse.builder().TransactionId(transactionLog.getId()).status("SUCCESS").message("Transfer completed successfully").debitedFrom(request.getFromAccountId()).creditedTo(request.getToAccountId()).amount(request.getAmount()).build();
     }
 
     /**
@@ -139,10 +147,11 @@ public class TransferService {
                 .build();
     }
 
-    public TransferService(final AccountService accountService, final AccountRepository accountRepository, final TransactionLogRepository transactionLogRepository, final BankDetailsRepository bankDetailsRepository) {
+    public TransferService(final AccountService accountService, final AccountRepository accountRepository, final TransactionLogRepository transactionLogRepository, final BankDetailsRepository bankDetailsRepository, final TransactionLogService transactionLogService) {
         this.accountService = accountService;
         this.accountRepository = accountRepository;
         this.transactionLogRepository = transactionLogRepository;
         this.bankDetailsRepository = bankDetailsRepository;
+        this.transactionLogService = transactionLogService;
     }
 }

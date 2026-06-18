@@ -105,3 +105,15 @@ export interface LoginVerifyRequest {
   password: string;
   otp: string;
 }
+
+// ─── Forgot / Reset Password DTOs ────────────────────────────────
+
+export interface ForgotPasswordRequest {
+  username: string;
+}
+
+export interface ResetPasswordRequest {
+  username: string;
+  otp: string;
+  password: string;
+}

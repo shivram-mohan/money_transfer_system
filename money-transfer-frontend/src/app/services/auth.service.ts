@@ -13,7 +13,9 @@ import {
   OtpResponse,
   LoginOtpRequest,
   LoginVerifyRequest,
-  UserResponse
+  UserResponse,
+  ForgotPasswordRequest,
+  ResetPasswordRequest
 } from '../models/user.model';
 import { environment } from '../../environments/environment';
 import { hashPassword } from '../utils/crypto.util';
@@ -122,6 +124,27 @@ export class AuthService {
         }
         this.isAuthenticatedSubject.next(true);
       })
+    );
+  }
+
+  // ─── FORGOT / RESET PASSWORD ───────────────────────────────────
+
+  forgotPassword(request: ForgotPasswordRequest): Observable<OtpResponse> {
+    return this.http.post<OtpResponse>(
+      `${environment.apiUrl}/auth/forgot-password`,
+      request
+    );
+  }
+
+  resetPassword(request: ResetPasswordRequest): Observable<OtpResponse> {
+    // Hash the new password client-side so plaintext never leaves the browser
+    return from(hashPassword(request.password)).pipe(
+      switchMap((hashed) =>
+        this.http.post<OtpResponse>(
+          `${environment.apiUrl}/auth/reset-password`,
+          { ...request, password: hashed }
+        )
+      )
     );
   }
 

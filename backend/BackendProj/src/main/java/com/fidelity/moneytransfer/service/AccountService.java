@@ -66,9 +66,9 @@ public class AccountService {
         // Verify account exists
         getAccountById(accountId);
 
-        // Get transactions
+        // Get transactions, newest first
         List<TransactionLog> transactions = transactionLogRepository
-                .findByFromAccountIdOrToAccountId(accountId, accountId);
+                .findByFromAccountIdOrToAccountIdOrderByCreatedOnDesc(accountId, accountId);
 
         // ✅ NEW - Populate account holder names
         transactions.forEach(txn -> {

@@ -41,6 +41,13 @@ public class EmailService {
                         "This OTP is valid for " + (otpExpirationSeconds / 60) + " minutes.\n\n" +
                         "If you did not request this, please ignore this email."
                 );
+            } else if ("RESET".equals(purpose)) {
+                message.setSubject("Money Transfer System - Password Reset OTP");
+                message.setText(
+                        "Your OTP to reset your password is: " + otp + "\n\n" +
+                        "This OTP is valid for " + (otpExpirationSeconds / 60) + " minutes.\n\n" +
+                        "If you did not request a password reset, please secure your account immediately."
+                );
             } else {
                 message.setSubject("Money Transfer System - Login OTP");
                 message.setText(

@@ -182,6 +182,63 @@ public class AuthController {
                 .build());
     }
 
+    // ─── FORGOT PASSWORD FLOW (2 steps) ──────────────────────────────
+
+    /**
+     * Step 1: User provides their username. If it exists, a reset OTP is sent
+     * to the registered email. The response masks the email and never reveals
+     * whether the account exists in a way that aids enumeration.
+     */
+    @PostMapping("/forgot-password")
+    public ResponseEntity<OtpResponse> forgotPassword(
+            @Valid @RequestBody ForgotPasswordRequest request) {
+
+        log.info("Forgot password - sending reset OTP for username: {}", request.getUsername());
+
+        var appUser = userService.getUserForPasswordReset(request.getUsername());
+
+        if (appUser.getEmail() == null || appUser.getEmail().isBlank()) {
+            throw new IllegalArgumentException(
+                    "No email is registered for this account. Please contact support.");
+        }
+
+        otpService.generateAndSendOtp(appUser.getEmail(), "RESET");
+
+        return ResponseEntity.ok(OtpResponse.builder()
+                .message("A password reset OTP has been sent to your registered email")
+                .email(maskEmail(appUser.getEmail()))
+                .success(true)
+                .build());
+    }
+
+    /**
+     * Step 2: User provides username + OTP + new password. The OTP is verified
+     * and, on success, the password is updated.
+     */
+    @PostMapping("/reset-password")
+    public ResponseEntity<OtpResponse> resetPassword(
+            @Valid @RequestBody ResetPasswordRequest request) {
+
+        log.info("Reset password - verifying OTP for username: {}", request.getUsername());
+
+        var appUser = userService.getUserForPasswordReset(request.getUsername());
+
+        boolean isValid = otpService.verifyOtp(
+                appUser.getEmail(), request.getOtp(), "RESET");
+
+        if (!isValid) {
+            throw new IllegalArgumentException("Invalid or expired OTP");
+        }
+
+        userService.resetPassword(request.getUsername(), request.getPassword());
+
+        return ResponseEntity.ok(OtpResponse.builder()
+                .message("Password reset successfully. You can now log in with your new password.")
+                .email(maskEmail(appUser.getEmail()))
+                .success(true)
+                .build());
+    }
+
     // ─── ADMIN LOGIN (direct, no OTP) ────────────────────────────────
 
     @PostMapping("/admin/login")
