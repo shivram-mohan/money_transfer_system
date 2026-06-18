@@ -18,6 +18,7 @@ import { AccountService } from '../../services/account.service';
 import { NavbarComponent } from '../navbar/navbar.component';
 import { TransferRequest } from '../../models/transaction.model';
 import { ConfirmDialogComponent } from '../admin/confirm-dialog/confirm-dialog.component';
+import { RewardPopupComponent } from '../rewards/reward-popup/reward-popup.component';
 
 @Component({
   selector: 'app-transfer',
@@ -176,13 +177,13 @@ export class TransferComponent implements OnInit {
     this.isLoading = false;
     this.transferSuccess = true;
     this.transferResult = response;
-    
+
     // ✅ Show recipient name if available
     this.accountService.getAccount(response.creditedTo).subscribe({
       next: (account) => {
         this.snackBar.open(
-          `₹${response.amount} sent successfully to ${account.holderName}!`, 
-          'Close', 
+          `₹${response.amount} sent successfully to ${account.holderName}!`,
+          'Close',
           {
             duration: 5000,
             panelClass: ['success-snackbar']
@@ -192,8 +193,8 @@ export class TransferComponent implements OnInit {
       error: () => {
         // Fallback if account fetch fails
         this.snackBar.open(
-          'Transfer completed successfully!', 
-          'Close', 
+          'Transfer completed successfully!',
+          'Close',
           {
             duration: 5000,
             panelClass: ['success-snackbar']
@@ -201,7 +202,10 @@ export class TransferComponent implements OnInit {
         );
       }
     });
-    
+
+    // 🎁 Celebrate any reward points earned on this transfer
+    this.showRewardPopup(response.reward);
+
     this.loadBalance();
     this.transferForm.reset();
   },
@@ -214,6 +218,21 @@ export class TransferComponent implements OnInit {
     });
   }
 });
+  }
+
+  // Open the celebratory rewards popup when a transfer earned points. Small
+  // delay so it appears after the success snackbar, not on top of it.
+  private showRewardPopup(reward: any): void {
+    if (!reward || !reward.earned) {
+      return;
+    }
+    setTimeout(() => {
+      this.dialog.open(RewardPopupComponent, {
+        width: '380px',
+        panelClass: 'reward-dialog',
+        data: reward
+      });
+    }, 600);
   }
 
   resetForm(): void {

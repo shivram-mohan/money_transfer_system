@@ -1,5 +1,7 @@
 // src/app/models/transaction.model.ts
 
+import { RewardEarnResult } from './reward.model';
+
 export enum TransactionStatus {
   SUCCESS = 'SUCCESS',
   FAILED = 'FAILED'
@@ -32,6 +34,7 @@ export interface TransferResponse {
   debitedFrom: number;
   creditedTo: number;
   amount: number;
+  reward?: RewardEarnResult;
 }
 
 export interface ErrorResponse {

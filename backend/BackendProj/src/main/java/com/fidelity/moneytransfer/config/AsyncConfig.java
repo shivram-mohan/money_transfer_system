@@ -25,4 +25,20 @@ public class AsyncConfig {
         executor.initialize();
         return executor;
     }
+
+    /**
+     * Dedicated pool for rewards notification emails (per-transaction alerts,
+     * tier changes, monthly summaries) so they never contend with OTP delivery
+     * or tie up request threads.
+     */
+    @Bean(name = "rewardMailExecutor")
+    public Executor rewardMailExecutor() {
+        ThreadPoolTaskExecutor executor = new ThreadPoolTaskExecutor();
+        executor.setCorePoolSize(2);
+        executor.setMaxPoolSize(5);
+        executor.setQueueCapacity(500);
+        executor.setThreadNamePrefix("reward-mail-");
+        executor.initialize();
+        return executor;
+    }
 }

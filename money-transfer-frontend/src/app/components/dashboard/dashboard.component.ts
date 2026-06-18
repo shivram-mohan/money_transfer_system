@@ -13,6 +13,8 @@ import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
 import { AuthService } from '../../services/auth.service';
 import { AccountService } from '../../services/account.service';
+import { RewardService } from '../../services/reward.service';
+import { RewardResponse } from '../../models/reward.model';
 import { NavbarComponent } from '../navbar/navbar.component';
 
 @Component({
@@ -44,9 +46,13 @@ export class DashboardComponent implements OnInit {
   isLinking = false;
   linkForm: FormGroup;
 
+  // Rewards
+  rewards: RewardResponse | null = null;
+
   constructor(
     private authService: AuthService,
     private accountService: AccountService,
+    private rewardService: RewardService,
     private router: Router,
     private fb: FormBuilder,
     private snackBar: MatSnackBar
@@ -63,8 +69,18 @@ export class DashboardComponent implements OnInit {
 
     if (this.isBankLinked && this.accountId) {
       this.loadBalance();
+      this.loadRewards();
     } else {
       this.isLoading = false;
+    }
+  }
+
+  loadRewards(): void {
+    if (this.accountId) {
+      this.rewardService.getRewards(this.accountId).subscribe({
+        next: (rewards) => (this.rewards = rewards),
+        error: (error) => console.error('Error loading rewards:', error)
+      });
     }
   }
 
@@ -101,6 +117,7 @@ export class DashboardComponent implements OnInit {
         this.accountId = response.accountId;
         this.balance = response.balance;
         this.isBankLinked = true;
+        this.loadRewards();
         this.snackBar.open(
           'Bank account linked! All features are now unlocked.',
           'Close',

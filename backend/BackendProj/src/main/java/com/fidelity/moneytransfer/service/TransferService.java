@@ -5,6 +5,7 @@
 
 package com.fidelity.moneytransfer.service;
 
+import com.fidelity.moneytransfer.dto.RewardEarnResult;
 import com.fidelity.moneytransfer.dto.TransferRequest;
 import com.fidelity.moneytransfer.dto.TransferResponse;
 import com.fidelity.moneytransfer.entity.Account;
@@ -31,6 +32,7 @@ public class TransferService {
     private final TransactionLogRepository transactionLogRepository;
     private final BankDetailsRepository bankDetailsRepository;
     private final TransactionLogService transactionLogService;
+    private final RewardService rewardService;
 
     @Transactional
     public TransferResponse transfer(TransferRequest request) {
@@ -112,7 +114,13 @@ public class TransferService {
         TransactionLog transactionLog = this.createTransactionLog(request, TransactionStatus.SUCCESS, (String) null);
         this.transactionLogRepository.save(transactionLog);
         log.info("Transfer successful. Transaction ID: {}", transactionLog.getId());
-        return TransferResponse.builder().TransactionId(transactionLog.getId()).status("SUCCESS").message("Transfer completed successfully").debitedFrom(request.getFromAccountId()).creditedTo(request.getToAccountId()).amount(request.getAmount()).build();
+
+        // Award loyalty reward points to the sender. Runs in this same
+        // transaction so points commit atomically with the money movement.
+        RewardEarnResult reward = this.rewardService.awardForTransfer(
+                request.getFromAccountId(), request.getToAccountId(), request.getAmount());
+
+        return TransferResponse.builder().TransactionId(transactionLog.getId()).status("SUCCESS").message("Transfer completed successfully").debitedFrom(request.getFromAccountId()).creditedTo(request.getToAccountId()).amount(request.getAmount()).reward(reward).build();
     }
 
     /**
@@ -147,11 +155,12 @@ public class TransferService {
                 .build();
     }
 
-    public TransferService(final AccountService accountService, final AccountRepository accountRepository, final TransactionLogRepository transactionLogRepository, final BankDetailsRepository bankDetailsRepository, final TransactionLogService transactionLogService) {
+    public TransferService(final AccountService accountService, final AccountRepository accountRepository, final TransactionLogRepository transactionLogRepository, final BankDetailsRepository bankDetailsRepository, final TransactionLogService transactionLogService, final RewardService rewardService) {
         this.accountService = accountService;
         this.accountRepository = accountRepository;
         this.transactionLogRepository = transactionLogRepository;
         this.bankDetailsRepository = bankDetailsRepository;
         this.transactionLogService = transactionLogService;
+        this.rewardService = rewardService;
     }
 }

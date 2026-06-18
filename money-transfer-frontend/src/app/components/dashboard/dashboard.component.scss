@@ -335,3 +335,154 @@
     }
   }
 }
+
+// Rewards / Tier Card
+.rewards-card {
+  position: relative;
+  overflow: hidden;
+  border: 1px solid rgba(148, 163, 184, 0.25) !important;
+  background:
+    linear-gradient(135deg, color-mix(in srgb, var(--tier-color) 18%, transparent), transparent 60%),
+    var(--aurora-bg-secondary, #1e293b) !important;
+
+  .rewards-glow {
+    position: absolute;
+    top: -80px;
+    right: -40px;
+    width: 220px;
+    height: 220px;
+    background: radial-gradient(circle, var(--tier-color) 0%, transparent 70%);
+    opacity: 0.3;
+    pointer-events: none;
+  }
+
+  .rewards-top {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    position: relative;
+    z-index: 1;
+  }
+
+  .tier-badge {
+    width: 64px;
+    height: 64px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 6px 18px rgba(0, 0, 0, 0.3);
+    flex-shrink: 0;
+
+    .tier-emoji { font-size: 34px; line-height: 1; }
+  }
+
+  .tier-meta {
+    flex: 1;
+
+    .tier-label {
+      font-size: 12px;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--aurora-text-secondary, #94a3b8);
+    }
+
+    .tier-name {
+      margin: 2px 0;
+      font-size: 24px;
+      font-weight: 700;
+      color: var(--aurora-text-primary, #f1f5f9);
+    }
+
+    .tier-mult {
+      font-size: 13px;
+      color: var(--aurora-text-secondary, #94a3b8);
+    }
+  }
+
+  .points-box {
+    text-align: right;
+
+    .points-value {
+      display: block;
+      font-size: 28px;
+      font-weight: 800;
+      color: var(--aurora-text-primary, #f1f5f9);
+    }
+
+    .points-label {
+      font-size: 12px;
+      color: var(--aurora-text-secondary, #94a3b8);
+    }
+  }
+
+  .rewards-progress {
+    margin-top: 20px;
+    position: relative;
+    z-index: 1;
+
+    .progress-labels {
+      display: flex;
+      justify-content: space-between;
+      font-size: 12px;
+      color: var(--aurora-text-secondary, #94a3b8);
+      margin-bottom: 6px;
+    }
+
+    .progress-track {
+      background: rgba(148, 163, 184, 0.25);
+      border-radius: 999px;
+      height: 12px;
+      overflow: hidden;
+    }
+
+    .progress-fill {
+      height: 12px;
+      border-radius: 999px;
+      background: linear-gradient(90deg, #6366f1, #8b5cf6);
+      transition: width 0.8s ease;
+    }
+
+    .to-next {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      margin: 10px 0 0;
+      font-size: 13px;
+      color: var(--aurora-text-secondary, #94a3b8);
+
+      mat-icon { font-size: 16px; width: 16px; height: 16px; }
+    }
+  }
+
+  .at-top {
+    margin-top: 18px;
+    font-size: 14px;
+    font-weight: 600;
+    color: #16a34a;
+    position: relative;
+    z-index: 1;
+  }
+
+  .rewards-foot {
+    display: flex;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-top: 18px;
+    padding-top: 14px;
+    border-top: 1px solid rgba(148, 163, 184, 0.2);
+    font-size: 12px;
+    color: var(--aurora-text-secondary, #94a3b8);
+    position: relative;
+    z-index: 1;
+
+    span {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+    }
+
+    mat-icon { font-size: 15px; width: 15px; height: 15px; }
+  }
+}

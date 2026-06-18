@@ -20,4 +20,7 @@ public class TransferResponse {
     private Long debitedFrom;
     private Long creditedTo;
     private BigDecimal amount;
+
+    /** Rewards earned on this transfer (null/non-earning when no points apply). */
+    private RewardEarnResult reward;
 }

@@ -82,6 +82,49 @@
       </mat-card-content>
     </mat-card>
 
+    <!-- Rewards / Tier Card -->
+    <mat-card class="rewards-card" *ngIf="rewards" [style.--tier-color]="rewards.tierColor">
+      <div class="rewards-glow"></div>
+      <mat-card-content>
+        <div class="rewards-top">
+          <div class="tier-badge" [style.background]="rewards.tierColor">
+            <span class="tier-emoji">{{ rewards.tierIcon }}</span>
+          </div>
+          <div class="tier-meta">
+            <span class="tier-label">Rewards Tier</span>
+            <h2 class="tier-name">{{ rewards.tierName }}</h2>
+            <span class="tier-mult">{{ rewards.multiplier }}x points multiplier</span>
+          </div>
+          <div class="points-box">
+            <span class="points-value">{{ rewards.points | number }}</span>
+            <span class="points-label">points</span>
+          </div>
+        </div>
+
+        <div class="rewards-progress" *ngIf="rewards.nextTier; else atTop">
+          <div class="progress-labels">
+            <span>{{ rewards.tierName }}</span>
+            <span>{{ rewards.nextTier }}</span>
+          </div>
+          <div class="progress-track">
+            <div class="progress-fill" [style.width.%]="rewards.progressPercent"></div>
+          </div>
+          <p class="to-next">
+            <mat-icon>flag</mat-icon>
+            {{ rewards.pointsToNextTier | number }} points to {{ rewards.nextTier }}
+          </p>
+        </div>
+        <ng-template #atTop>
+          <p class="at-top">🚀 Top tier reached — you're earning the maximum multiplier!</p>
+        </ng-template>
+
+        <div class="rewards-foot">
+          <span><mat-icon>military_tech</mat-icon> Lifetime: {{ rewards.lifetimePoints | number }} pts</span>
+          <span><mat-icon>redeem</mat-icon> Earn 1 pt / ₹100 sent</span>
+        </div>
+      </mat-card-content>
+    </mat-card>
+
     <!-- Quick Actions -->
     <div class="action-cards">
       <mat-card class="action-card transfer-card" (click)="navigateToTransfer()">
