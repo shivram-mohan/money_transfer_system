@@ -16,7 +16,7 @@
     position: absolute;
     width: 600px;
     height: 600px;
-    background: radial-gradient(circle, rgba(236, 72, 153, 0.15) 0%, rgba(139, 92, 246, 0.1) 40%, transparent 70%);
+    background: radial-gradient(circle, rgba(255, 255, 255, 0.06) 0%, rgba(255, 255, 255, 0.03) 40%, transparent 70%);
     top: 50%;
     left: 50%;
     transform: translate(-50%, -50%);
@@ -34,7 +34,7 @@
   background: var(--aurora-glass-bg) !important;
   backdrop-filter: var(--aurora-glass-blur);
   -webkit-backdrop-filter: var(--aurora-glass-blur);
-  border: 1px solid rgba(236, 72, 153, 0.3) !important;
+  border: 1px solid var(--aurora-glass-border) !important;
   border-radius: 12px;
   box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
 }
@@ -79,16 +79,10 @@ mat-card-content {
   font-weight: 500;
   margin-top: 16px;
   position: relative;
-  background: var(--aurora-gradient-danger) !important;
-  color: white;
 
   mat-icon {
     margin-right: 8px;
     vertical-align: middle;
-  }
-
-  &:hover:not(:disabled) {
-    box-shadow: var(--aurora-glow-pink);
   }
 }
 

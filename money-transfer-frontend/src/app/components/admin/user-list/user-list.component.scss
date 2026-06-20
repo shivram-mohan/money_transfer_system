@@ -140,11 +140,11 @@
 }
 
 .account-chip {
-  background: rgba(59, 130, 246, 0.15) !important;
-  color: var(--aurora-blue) !important;
+  background: rgba(255, 255, 255, 0.08) !important;
+  color: var(--aurora-text-primary) !important;
   font-weight: 500;
   font-size: 12px;
-  border-color: rgba(59, 130, 246, 0.3) !important;
+  border-color: var(--aurora-border) !important;
 }
 
 // Status Chips
@@ -164,27 +164,27 @@ mat-chip {
 }
 
 .status-active {
-  background: rgba(16, 185, 129, 0.15) !important;
-  color: var(--aurora-emerald) !important;
-  border-color: rgba(16, 185, 129, 0.3) !important;
+  background: var(--color-success-bg) !important;
+  color: var(--color-success) !important;
+  border-color: var(--color-success-border) !important;
 }
 
 .status-inactive {
-  background: rgba(248, 113, 113, 0.15) !important;
-  color: #f87171 !important;
-  border-color: rgba(248, 113, 113, 0.3) !important;
+  background: var(--color-error-bg) !important;
+  color: var(--color-error) !important;
+  border-color: var(--color-error-border) !important;
 }
 
 .status-pending {
-  background: rgba(245, 158, 11, 0.15) !important;
-  color: #f59e0b !important;
-  border-color: rgba(245, 158, 11, 0.3) !important;
+  background: rgba(255, 255, 255, 0.08) !important;
+  color: var(--aurora-text-muted) !important;
+  border-color: var(--aurora-border) !important;
 }
 
 .status-locked {
-  background: rgba(255, 255, 255, 0.08) !important;
-  color: var(--aurora-text-muted) !important;
-  border-color: rgba(255, 255, 255, 0.15) !important;
+  background: var(--color-error-bg) !important;
+  color: var(--color-error) !important;
+  border-color: var(--color-error-border) !important;
 }
 
 // Actions
@@ -195,7 +195,7 @@ mat-chip {
 
   .pending-text {
     font-size: 12px;
-    color: #f59e0b;
+    color: var(--aurora-text-secondary);
     font-style: italic;
   }
 }

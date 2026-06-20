@@ -3,8 +3,8 @@
 import { Injectable, PLATFORM_ID, inject } from '@angular/core';
 import { isPlatformBrowser } from '@angular/common';
 import { HttpClient } from '@angular/common/http';
-import { BehaviorSubject, Observable, from } from 'rxjs';
-import { switchMap, tap } from 'rxjs/operators';
+import { BehaviorSubject, Observable } from 'rxjs';
+import { tap } from 'rxjs/operators';
 import {
   UserRole,
   VerifyAccountRequest,
@@ -18,7 +18,6 @@ import {
   ResetPasswordRequest
 } from '../models/user.model';
 import { environment } from '../../environments/environment';
-import { hashPassword } from '../utils/crypto.util';
 
 export interface LoginResponse {
   token: string;
@@ -79,38 +78,26 @@ export class AuthService {
   }
 
   setPassword(request: SetPasswordRequest): Observable<UserResponse> {
-    // Hash the password client-side so plaintext never leaves the browser
-    return from(hashPassword(request.password)).pipe(
-      switchMap((hashed) =>
-        this.http.post<UserResponse>(
-          `${environment.apiUrl}/auth/signup/set-password`,
-          { ...request, password: hashed }
-        )
-      )
+    // Password is sent as-is over HTTPS; the backend bcrypt-encodes it for storage
+    return this.http.post<UserResponse>(
+      `${environment.apiUrl}/auth/signup/set-password`,
+      request
     );
   }
 
   // ─── USER LOGIN FLOW (2 steps) ─────────────────────────────────
 
   loginStep1(request: LoginOtpRequest): Observable<OtpResponse> {
-    return from(hashPassword(request.password)).pipe(
-      switchMap((hashed) =>
-        this.http.post<OtpResponse>(
-          `${environment.apiUrl}/auth/login`,
-          { ...request, password: hashed }
-        )
-      )
+    return this.http.post<OtpResponse>(
+      `${environment.apiUrl}/auth/login`,
+      request
     );
   }
 
   loginVerifyOtp(request: LoginVerifyRequest): Observable<LoginResponse> {
-    return from(hashPassword(request.password)).pipe(
-      switchMap((hashed) =>
-        this.http.post<LoginResponse>(
-          `${environment.apiUrl}/auth/login/verify-otp`,
-          { ...request, password: hashed }
-        )
-      )
+    return this.http.post<LoginResponse>(
+      `${environment.apiUrl}/auth/login/verify-otp`,
+      request
     ).pipe(
       tap((response: LoginResponse) => this.persistSession(response))
     );
@@ -126,27 +113,19 @@ export class AuthService {
   }
 
   resetPassword(request: ResetPasswordRequest): Observable<OtpResponse> {
-    // Hash the new password client-side so plaintext never leaves the browser
-    return from(hashPassword(request.password)).pipe(
-      switchMap((hashed) =>
-        this.http.post<OtpResponse>(
-          `${environment.apiUrl}/auth/reset-password`,
-          { ...request, password: hashed }
-        )
-      )
+    // Password is sent as-is over HTTPS; the backend bcrypt-encodes it for storage
+    return this.http.post<OtpResponse>(
+      `${environment.apiUrl}/auth/reset-password`,
+      request
     );
   }
 
   // ─── ADMIN LOGIN (direct, no OTP) ──────────────────────────────
 
   adminLogin(credentials: AdminLoginRequest): Observable<LoginResponse> {
-    return from(hashPassword(credentials.password)).pipe(
-      switchMap((hashed) =>
-        this.http.post<LoginResponse>(
-          `${environment.apiUrl}/auth/admin/login`,
-          { ...credentials, password: hashed }
-        )
-      )
+    return this.http.post<LoginResponse>(
+      `${environment.apiUrl}/auth/admin/login`,
+      credentials
     ).pipe(
       tap((response: LoginResponse) => this.persistSession(response))
     );
@@ -175,13 +154,9 @@ export class AuthService {
    */
   verifyPassword(password: string): Observable<OtpResponse> {
     const username = this.getUsername() ?? '';
-    return from(hashPassword(password)).pipe(
-      switchMap((hashed) =>
-        this.http.post<OtpResponse>(
-          `${environment.apiUrl}/auth/verify-password`,
-          { username, password: hashed }
-        )
-      )
+    return this.http.post<OtpResponse>(
+      `${environment.apiUrl}/auth/verify-password`,
+      { username, password }
     );
   }
 

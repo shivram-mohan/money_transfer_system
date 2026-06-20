@@ -146,17 +146,17 @@
   font-weight: 600;
 
   &.amount-debit {
-    color: #f87171;
+    color: var(--color-error);
   }
 
   &.amount-credit {
-    color: var(--aurora-emerald);
+    color: var(--color-success);
   }
 }
 
 .failure-reason {
   font-size: 12px;
-  color: #f87171;
+  color: var(--color-error);
   margin-top: 4px;
   font-style: italic;
 }
@@ -179,27 +179,27 @@ mat-chip {
 }
 
 .type-debit {
-  background: rgba(248, 113, 113, 0.15) !important;
-  color: #f87171 !important;
-  border-color: rgba(248, 113, 113, 0.3) !important;
+  background: var(--color-error-bg) !important;
+  color: var(--color-error) !important;
+  border-color: var(--color-error-border) !important;
 }
 
 .type-credit {
-  background: rgba(16, 185, 129, 0.15) !important;
-  color: var(--aurora-emerald) !important;
-  border-color: rgba(16, 185, 129, 0.3) !important;
+  background: var(--color-success-bg) !important;
+  color: var(--color-success) !important;
+  border-color: var(--color-success-border) !important;
 }
 
 .status-success {
-  background: rgba(16, 185, 129, 0.15) !important;
-  color: var(--aurora-emerald) !important;
-  border-color: rgba(16, 185, 129, 0.3) !important;
+  background: var(--color-success-bg) !important;
+  color: var(--color-success) !important;
+  border-color: var(--color-success-border) !important;
 }
 
 .status-failed {
-  background: rgba(248, 113, 113, 0.15) !important;
-  color: #f87171 !important;
-  border-color: rgba(248, 113, 113, 0.3) !important;
+  background: var(--color-error-bg) !important;
+  color: var(--color-error) !important;
+  border-color: var(--color-error-border) !important;
 }
 
 // Mobile List
@@ -260,16 +260,16 @@ mat-chip {
         font-weight: 600;
 
         &.amount-debit {
-          color: #f87171;
+          color: var(--color-error);
         }
 
         &.amount-credit {
-          color: var(--aurora-emerald);
+          color: var(--color-success);
         }
       }
 
       &.error {
-        color: #f87171;
+        color: var(--color-error);
         font-size: 12px;
         font-style: italic;
       }

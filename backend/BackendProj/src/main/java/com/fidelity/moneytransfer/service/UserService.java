@@ -81,7 +81,7 @@ public class UserService {
         // The user links their bank account as a separate step after login.
         AppUser user = AppUser.builder()
                 .username(request.getUsername())
-                // request.getPassword() is the SHA-256 hash sent by the client
+                // bcrypt-encode the plaintext password received over HTTPS
                 .password(passwordEncoder.encode(request.getPassword()))
                 .name(request.getName())
                 .email(request.getEmail())
@@ -113,18 +113,18 @@ public class UserService {
 
     /**
      * Sets a new password for the user. Caller must have already verified the
-     * reset OTP. The incoming password is the client-side SHA-256 hash, which
-     * we bcrypt-encode before persisting (same scheme as signup).
+     * reset OTP. The incoming password is plaintext (sent over HTTPS), which we
+     * bcrypt-encode before persisting (same scheme as signup).
      */
     @Transactional
-    public void resetPassword(String username, String hashedPassword) {
+    public void resetPassword(String username, String newPassword) {
         log.info("Resetting password for username: {}", username);
 
         AppUser user = userRepository.findByUsername(username)
                 .orElseThrow(() -> new AccountNotFoundException(
                         "No account found with username: " + username));
 
-        user.setPassword(passwordEncoder.encode(hashedPassword));
+        user.setPassword(passwordEncoder.encode(newPassword));
         userRepository.save(user);
 
         log.info("Password reset completed for username: {}", username);

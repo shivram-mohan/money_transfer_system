@@ -48,7 +48,6 @@
             <mat-error *ngIf="transferForm.get('toAccountId')?.hasError('min')">
               Invalid account ID
             </mat-error>
-            <mat-hint>Available test accounts: 2, 3, 4</mat-hint>
           </mat-form-field>
 
           <mat-form-field appearance="outline" class="full-width">
@@ -60,7 +59,6 @@
               placeholder="0.00"
               step="0.01"
             />
-            <span matPrefix>₹&nbsp;</span>
             <mat-icon matSuffix>payments</mat-icon>
             <mat-error *ngIf="transferForm.get('amount')?.hasError('required')">
               Amount is required
@@ -68,7 +66,6 @@
             <mat-error *ngIf="transferForm.get('amount')?.hasError('min')">
               Amount must be greater than 0
             </mat-error>
-            <mat-hint>Maximum: ₹{{ currentBalance | number:'1.2-2' }}</mat-hint>
           </mat-form-field>
 
           <div class="form-actions">

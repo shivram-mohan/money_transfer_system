@@ -6,13 +6,13 @@ h2[mat-dialog-title] {
   gap: 8px;
 
   .warn-icon {
-    color: #f57c00;
+    color: var(--aurora-text-primary);
   }
 }
 
 .message {
   margin: 0;
-  color: rgba(0, 0, 0, 0.7);
+  color: var(--aurora-text-secondary);
   text-align: center;
 }
 
@@ -21,12 +21,12 @@ h2[mat-dialog-title] {
   text-align: center;
   font-size: 40px;
   font-weight: 700;
-  color: #f57c00;
+  color: var(--aurora-text-primary);
 }
 
 .sub-message {
   margin: 0;
   text-align: center;
-  color: rgba(0, 0, 0, 0.5);
+  color: var(--aurora-text-muted);
   font-size: 0.875rem;
 }

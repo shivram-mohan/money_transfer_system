@@ -31,11 +31,10 @@
 
 // Balance Card
 .balance-card {
-  background: var(--aurora-gradient-primary) !important;
-  color: white;
+  background: var(--aurora-bg-secondary) !important;
+  color: var(--aurora-text-primary);
   padding: 8px;
-  border: 1px solid rgba(6, 182, 212, 0.3) !important;
-  box-shadow: var(--aurora-glow-teal) !important;
+  border: 1px solid var(--aurora-border) !important;
 
   mat-card-header {
     padding-bottom: 16px;
@@ -138,8 +137,7 @@
 
   &:hover {
     transform: translateY(-4px);
-    box-shadow: var(--aurora-glow-teal) !important;
-    border-color: rgba(6, 182, 212, 0.3) !important;
+    border-color: var(--aurora-border-hover) !important;
   }
 
   mat-card-content {
@@ -155,21 +153,19 @@
     align-items: center;
     justify-content: center;
     margin: 0 auto 16px;
+    overflow: hidden;
 
-    mat-icon {
-      font-size: 40px;
-      height: 40px;
-      width: 40px;
-      color: white;
+    .action-img {
+      width: 48px;
+      height: 48px;
+      object-fit: contain;
     }
   }
 
-  .transfer-icon {
-    background: var(--aurora-gradient-success);
-  }
-
+  .transfer-icon,
   .history-icon {
-    background: var(--aurora-gradient-danger);
+    background: #ffffff;
+    border: 1px solid var(--aurora-border);
   }
 
   h3 {
@@ -290,8 +286,8 @@
   max-width: 560px;
   margin: 0 auto;
   border-radius: 16px;
-  border: 1px dashed #b0bec5;
-  background: linear-gradient(135deg, #f8fafc 0%, #eef2f7 100%);
+  border: 1px dashed var(--aurora-border-hover);
+  background: var(--aurora-bg-secondary);
 
   .link-bank-header {
     text-align: center;
@@ -301,17 +297,17 @@
       font-size: 56px;
       height: 56px;
       width: 56px;
-      color: #3f51b5;
+      color: var(--aurora-text-primary);
     }
 
     h2 {
       margin: 12px 0 8px;
       font-size: 22px;
-      color: #263238;
+      color: var(--aurora-text-primary);
     }
 
     p {
-      color: #607d8b;
+      color: var(--aurora-text-secondary);
       font-size: 14px;
       line-height: 1.5;
       margin: 0 auto;

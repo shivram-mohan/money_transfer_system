@@ -271,7 +271,7 @@ public class PdfService {
 
         Paragraph footer = new Paragraph(
                 "This is a computer-generated statement and does not require a signature.\n" +
-                        "For any queries, please contact support@moneytransfer.com"
+                        "For any queries, please contact gamingsiteforever@gmail.com"
         )
                 .setFontSize(8)
                 .setItalic()

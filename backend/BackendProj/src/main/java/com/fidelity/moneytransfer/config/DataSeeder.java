@@ -14,8 +14,6 @@ import org.springframework.stereotype.Component;
 
 import java.math.BigDecimal;
 
-import com.fidelity.moneytransfer.util.PasswordHasher;
-
 @Component
 @RequiredArgsConstructor
 @Slf4j
@@ -74,8 +72,8 @@ public class DataSeeder implements CommandLineRunner {
 
         AppUser admin = AppUser.builder()
                 .username(adminUsername)
-                // Frontend sends SHA-256(password); store bcrypt of that hash
-                .password(passwordEncoder.encode(PasswordHasher.sha256Hex(adminPassword)))
+                // Store the bcrypt hash of the admin password
+                .password(passwordEncoder.encode(adminPassword))
                 .name(adminName)
                 .email(adminEmail)
                 .role("ADMIN")

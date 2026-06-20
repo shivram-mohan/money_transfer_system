@@ -15,7 +15,7 @@
     position: absolute;
     width: 600px;
     height: 600px;
-    background: radial-gradient(circle, rgba(6, 182, 212, 0.15) 0%, rgba(139, 92, 246, 0.1) 40%, transparent 70%);
+    background: radial-gradient(circle, rgba(255, 255, 255, 0.06) 0%, rgba(255, 255, 255, 0.03) 40%, transparent 70%);
     top: 50%;
     left: 50%;
     transform: translate(-50%, -50%);
@@ -115,22 +115,21 @@ mat-card-header {
 
   &.active {
     .step-circle {
-      background: var(--aurora-teal);
-      color: white;
-      border-color: var(--aurora-teal);
-      box-shadow: 0 0 12px rgba(6, 182, 212, 0.4);
+      background: #ffffff;
+      color: #000000;
+      border-color: #ffffff;
     }
     .step-label {
-      color: var(--aurora-teal);
+      color: var(--aurora-text-primary);
       font-weight: 600;
     }
   }
 
   &.completed {
     .step-circle {
-      background: #10b981;
-      border-color: #10b981;
-      color: white;
+      background: var(--aurora-text-secondary);
+      border-color: var(--aurora-text-secondary);
+      color: #000000;
     }
   }
 }
@@ -196,14 +195,14 @@ mat-form-field {
   gap: 12px;
   padding: 16px;
   border-radius: 12px;
-  background: rgba(6, 182, 212, 0.1);
-  border: 1px solid rgba(6, 182, 212, 0.25);
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid var(--aurora-border);
 
   mat-icon {
     font-size: 28px;
     width: 28px;
     height: 28px;
-    color: var(--aurora-teal);
+    color: var(--aurora-text-primary);
   }
 
   p {
@@ -218,11 +217,11 @@ mat-form-field {
   }
 
   &.success {
-    background: rgba(16, 185, 129, 0.1);
-    border-color: rgba(16, 185, 129, 0.25);
+    background: var(--color-success-bg);
+    border-color: var(--color-success-border);
 
     mat-icon {
-      color: #10b981;
+      color: var(--color-success);
     }
   }
 }

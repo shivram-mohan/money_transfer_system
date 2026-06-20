@@ -19,7 +19,7 @@ public class SetPasswordRequest {
     @NotBlank(message = "Name is required")
     private String name;
 
-    // SHA-256 hash of the password (hashed client-side); bcrypt-encoded on save
+    // Plaintext password (sent over HTTPS); bcrypt-encoded on save
     @NotBlank(message = "Password is required")
     private String password;
 }

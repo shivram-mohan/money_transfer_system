@@ -4,8 +4,9 @@
   position: sticky;
   top: 0;
   z-index: 1000;
-  box-shadow: 0 2px 20px rgba(139, 92, 246, 0.2);
-  background: var(--aurora-gradient-admin) !important;
+  box-shadow: 0 2px 20px rgba(0, 0, 0, 0.5);
+  background: var(--aurora-bg-secondary) !important;
+  border-bottom: 1px solid var(--aurora-border);
 }
 
 .toolbar-content {
@@ -73,9 +74,8 @@
 }
 
 .active-link {
-  background-color: rgba(255, 255, 255, 0.2) !important;
+  background-color: rgba(255, 255, 255, 0.12) !important;
   border-radius: 4px;
-  box-shadow: 0 0 10px rgba(139, 92, 246, 0.3);
 
   &::before {
     content: '';
@@ -124,8 +124,8 @@
 // Badge styling
 ::ng-deep {
   .mat-badge-content {
-    background-color: var(--aurora-pink);
-    color: white;
+    background-color: #ffffff;
+    color: #000000;
     font-size: 10px;
     font-weight: 600;
   }
@@ -178,7 +178,7 @@
 
   .mat-mdc-menu-item:disabled {
     .mat-icon {
-      color: var(--aurora-purple);
+      color: var(--aurora-text-primary);
     }
 
     span {

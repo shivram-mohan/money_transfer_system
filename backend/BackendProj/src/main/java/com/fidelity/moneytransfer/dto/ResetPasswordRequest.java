@@ -16,7 +16,7 @@ public class ResetPasswordRequest {
     @NotBlank(message = "OTP is required")
     private String otp;
 
-    // SHA-256 hash of the new password (hashed client-side); bcrypt-encoded on save
+    // Plaintext new password (sent over HTTPS); bcrypt-encoded on save
     @NotBlank(message = "Password is required")
     private String password;
 }

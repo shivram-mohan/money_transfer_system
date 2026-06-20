@@ -82,19 +82,23 @@
   }
 
   &.total-users .stat-icon {
-    background: var(--aurora-gradient-primary);
+    background: rgba(255, 255, 255, 0.18);
+    border: 1px solid var(--aurora-border);
   }
 
   &.active-users .stat-icon {
-    background: var(--aurora-gradient-success);
+    background: rgba(255, 255, 255, 0.14);
+    border: 1px solid var(--aurora-border);
   }
 
   &.pending-users .stat-icon {
-    background: var(--aurora-gradient-danger);
+    background: rgba(255, 255, 255, 0.10);
+    border: 1px solid var(--aurora-border);
   }
 
   &.inactive-users .stat-icon {
-    background: linear-gradient(135deg, #475569 0%, #334155 100%);
+    background: rgba(255, 255, 255, 0.06);
+    border: 1px solid var(--aurora-border);
   }
 }
 
@@ -138,6 +142,7 @@
     align-items: center;
     justify-content: center;
     margin: 0 auto 16px;
+    overflow: hidden;
 
     mat-icon {
       font-size: 40px;
@@ -145,18 +150,19 @@
       width: 40px;
       color: white;
     }
+
+    .action-img {
+      width: 48px;
+      height: 48px;
+      object-fit: contain;
+    }
   }
 
-  .create-icon {
-    background: var(--aurora-gradient-primary);
-  }
-
-  .approve-icon {
-    background: var(--aurora-gradient-danger);
-  }
-
+  .create-icon,
+  .approve-icon,
   .manage-icon {
-    background: var(--aurora-gradient-success);
+    background: #ffffff;
+    border: 1px solid var(--aurora-border);
   }
 
   h3 {
