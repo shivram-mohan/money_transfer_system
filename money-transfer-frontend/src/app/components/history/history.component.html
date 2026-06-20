@@ -116,7 +116,11 @@
           <ng-container matColumnDef="type">
             <th mat-header-cell *matHeaderCellDef>Type</th>
             <td mat-cell *matCellDef="let transaction">
-              <mat-chip [class]="getTypeClass(transaction.type)">
+              <mat-chip *ngIf="transaction.isCashback" class="type-cashback">
+                <mat-icon>redeem</mat-icon>
+                CASHBACK
+              </mat-chip>
+              <mat-chip *ngIf="!transaction.isCashback" [class]="getTypeClass(transaction.type)">
                 <mat-icon>{{ transaction.type === 'DEBIT' ? 'arrow_upward' : 'arrow_downward' }}</mat-icon>
                 {{ transaction.type }}
               </mat-chip>
@@ -134,17 +138,19 @@
                     <span class="account-name">
                       {{ transaction.toAccountHolderName || 'Unknown' }}
                     </span>
-                    <span class="account-id">(#{{ transaction.toAccountId }})</span>
+                    <span class="account-id" *ngIf="transaction.toAccountId">(#{{ transaction.toAccountId }})</span>
                   </div>
                 </div>
-                
+
                 <div *ngIf="transaction.type === 'CREDIT'" class="account-info">
-                  <mat-icon class="small-icon">arrow_back</mat-icon>
+                  <mat-icon class="small-icon" [class.cashback-icon]="transaction.isCashback">
+                    {{ transaction.isCashback ? 'redeem' : 'arrow_back' }}
+                  </mat-icon>
                   <div class="account-text">
                     <span class="account-name">
                       {{ transaction.fromAccountHolderName || 'Unknown' }}
                     </span>
-                    <span class="account-id">(#{{ transaction.fromAccountId }})</span>
+                    <span class="account-id" *ngIf="transaction.fromAccountId">(#{{ transaction.fromAccountId }})</span>
                   </div>
                 </div>
               </div>
@@ -186,7 +192,11 @@
       <div class="mobile-list" *ngIf="!isLoading && transactions.length > 0">
         <div class="transaction-card" *ngFor="let transaction of transactions">
           <div class="transaction-header">
-            <mat-chip [class]="getTypeClass(transaction.type)" class="type-chip">
+            <mat-chip *ngIf="transaction.isCashback" class="type-cashback type-chip">
+              <mat-icon>redeem</mat-icon>
+              CASHBACK
+            </mat-chip>
+            <mat-chip *ngIf="!transaction.isCashback" [class]="getTypeClass(transaction.type)" class="type-chip">
               <mat-icon>{{ transaction.type === 'DEBIT' ? 'arrow_upward' : 'arrow_downward' }}</mat-icon>
               {{ transaction.type }}
             </mat-chip>
@@ -207,7 +217,8 @@
                 <span class="account-name-mobile">
                   {{ transaction.type === 'DEBIT' ? (transaction.toAccountHolderName || 'Unknown') : (transaction.fromAccountHolderName || 'Unknown') }}
                 </span>
-                <span class="account-id-mobile">
+                <span class="account-id-mobile"
+                      *ngIf="(transaction.type === 'DEBIT' ? transaction.toAccountId : transaction.fromAccountId)">
                   (#{{ transaction.type === 'DEBIT' ? transaction.toAccountId : transaction.fromAccountId }})
                 </span>
               </span>

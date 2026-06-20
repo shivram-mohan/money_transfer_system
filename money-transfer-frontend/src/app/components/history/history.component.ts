@@ -25,6 +25,7 @@ import { NavbarComponent } from '../navbar/navbar.component';
 interface TransactionDisplay extends TransactionLog {
   type: 'DEBIT' | 'CREDIT';
   displayAmount: number;
+  isCashback: boolean;
 }
 
 type FilterType = 'ALL' | 'LAST_WEEK' | 'LAST_MONTH' | 'LAST_YEAR' | 'CUSTOM';
@@ -248,10 +249,13 @@ export class HistoryComponent implements OnInit {
   private processTransactions(transactions: TransactionLog[]): void {
     this.transactions = transactions.map(txn => {
       const isDebit = txn.fromAccountId === this.currentAccountId;
+      // Redemptions arrive as a CREDIT from the masked "CASHBACK" account.
+      const isCashback = !isDebit && txn.fromAccountHolderName === 'CASHBACK';
       return {
         ...txn,
         type: isDebit ? 'DEBIT' : 'CREDIT',
-        displayAmount: txn.amount
+        displayAmount: txn.amount,
+        isCashback
       } as TransactionDisplay;
     });
   }

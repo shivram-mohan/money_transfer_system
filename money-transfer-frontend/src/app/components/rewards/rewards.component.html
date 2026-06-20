@@ -1,0 +1,83 @@
+<!-- src/app/components/rewards/rewards.component.html -->
+
+<app-navbar></app-navbar>
+
+<div class="rewards-container">
+  <div class="header-section">
+    <button mat-icon-button (click)="backToDashboard()" class="back-button">
+      <mat-icon>arrow_back</mat-icon>
+    </button>
+    <h1>My Rewards</h1>
+  </div>
+
+  <div class="loading-spinner" *ngIf="isLoading">
+    <mat-spinner diameter="50"></mat-spinner>
+  </div>
+
+  <div class="rewards-content" *ngIf="!isLoading && profile">
+
+    <!-- Weekend bonus banner -->
+    <div class="weekend-banner" *ngIf="profile.weekendBonusActive">
+      <mat-icon>auto_awesome</mat-icon>
+      <span>Weekend bonus is live — earn <strong>2× points</strong> on every transfer!</span>
+    </div>
+
+    <!-- Hero balance card -->
+    <mat-card class="hero-card">
+      <div class="coin-badge">
+        <mat-icon class="coin-icon">stars</mat-icon>
+      </div>
+      <div class="hero-info">
+        <span class="balance-label">Available points</span>
+        <div class="balance-row">
+          <span class="balance">{{ profile.pointsBalance | number }}</span>
+          <span class="balance-cur">≈ ₹{{ profile.pointsBalance | number }}</span>
+        </div>
+        <div class="lifetime-chip">
+          <mat-icon>military_tech</mat-icon>
+          {{ profile.lifetimePoints | number }} lifetime points
+        </div>
+      </div>
+    </mat-card>
+
+    <!-- Redeem card -->
+    <mat-card class="redeem-card">
+      <div class="redeem-head">
+        <span>Redeem for cash</span>
+        <span class="redeem-points" *ngIf="!profile.canRedeem">
+          {{ (profile.redeemThreshold - profile.pointsBalance) | number }} pts to unlock
+        </span>
+        <span class="redeem-points unlocked" *ngIf="profile.canRedeem">
+          <mat-icon>lock_open</mat-icon> Ready to redeem
+        </span>
+      </div>
+      <mat-progress-bar mode="determinate" [value]="profile.progressPercent"></mat-progress-bar>
+      <div class="progress-foot">
+        <span>0</span>
+        <span>{{ profile.redeemThreshold | number }} pts minimum</span>
+      </div>
+      <button mat-raised-button color="primary" class="redeem-btn"
+              [disabled]="!profile.canRedeem || isRedeeming"
+              (click)="openRedeemDialog()">
+        <mat-icon>payments</mat-icon>
+        {{ profile.canRedeem ? 'Redeem points for cash' : 'Reach 500 points to redeem' }}
+      </button>
+    </mat-card>
+
+    <!-- How it works -->
+    <mat-card class="info-card">
+      <mat-card-header>
+        <mat-icon class="info-icon">info</mat-icon>
+        <mat-card-title>How rewards work</mat-card-title>
+      </mat-card-header>
+      <mat-card-content>
+        <ul>
+          <li>Earn 1 point per ₹100 transferred (on transfers over ₹100).</li>
+          <li><strong>2× points on weekends</strong> (Saturday &amp; Sunday).</li>
+          <li>Only the first transfer per day to the same recipient is rewarded.</li>
+          <li>Once you reach {{ profile.redeemThreshold }} points, redeem them as cash (1 point = ₹1) straight to your account.</li>
+        </ul>
+      </mat-card-content>
+    </mat-card>
+  </div>
+</div>

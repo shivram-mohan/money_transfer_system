@@ -52,10 +52,25 @@ public class AppUser {
     @Column(name = "approved_date")
     private LocalDateTime approvedDate;
 
+    // ─── Rewards ────────────────────────────────────────────────────
+    // Spendable reward-point balance (decreases when points are redeemed).
+    @Column(name = "reward_points")
+    private Long rewardPoints;
+
+    // Total points ever earned; only ever increases (shown as "lifetime").
+    @Column(name = "lifetime_reward_points")
+    private Long lifetimeRewardPoints;
+
     @PrePersist
     public void prePersist() {
         this.createdDate = LocalDateTime.now();
         this.lastModifiedDate = LocalDateTime.now();
+        if (this.rewardPoints == null) {
+            this.rewardPoints = 0L;
+        }
+        if (this.lifetimeRewardPoints == null) {
+            this.lifetimeRewardPoints = 0L;
+        }
     }
 
     @PreUpdate

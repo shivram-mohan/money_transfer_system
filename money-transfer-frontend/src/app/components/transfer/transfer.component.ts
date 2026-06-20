@@ -176,7 +176,16 @@ export class TransferComponent implements OnInit {
     this.isLoading = false;
     this.transferSuccess = true;
     this.transferResult = response;
-    
+
+    // Nudge the user to redeem when this transfer unlocked the threshold
+    if (response.reward?.reachedRedeemThreshold) {
+      this.snackBar.open(
+        '🎉 You\'ve reached 500 points — you can now redeem for cash!',
+        'Redeem',
+        { duration: 8000, panelClass: ['success-snackbar'] }
+      ).onAction().subscribe(() => this.router.navigate(['/rewards']));
+    }
+
     // ✅ Show recipient name if available
     this.accountService.getAccount(response.creditedTo).subscribe({
       next: (account) => {

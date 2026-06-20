@@ -11,6 +11,7 @@ import { adminGuard } from './guards/admin.guard';
 import { userGuard } from './guards/user.guard';
 import { SignupComponent } from './components/signup/signup.component';
 import { ForgotPasswordComponent } from './components/forgot-password/forgot-password.component';
+import { RewardsComponent } from './components/rewards/rewards.component';
 
 export const routes: Routes = [
   { path: '', redirectTo: '/login', pathMatch: 'full' },
@@ -35,6 +36,11 @@ export const routes: Routes = [
   {
     path: 'history',
     component: HistoryComponent,
+    canActivate: [authGuard, userGuard]
+  },
+  {
+    path: 'rewards',
+    component: RewardsComponent,
     canActivate: [authGuard, userGuard]
   },
 

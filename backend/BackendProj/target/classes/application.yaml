@@ -25,10 +25,16 @@ spring:
           auth: true
           starttls:
             enable: true
-          # Fail fast instead of hanging if Gmail's SMTP is slow/unreachable
-          connectiontimeout: 5000
-          timeout: 5000
-          writetimeout: 5000
+            required: true
+          # Trust Gmail's TLS cert so the STARTTLS handshake can't hang
+          ssl:
+            trust: smtp.gmail.com
+          # Gmail's STARTTLS handshake on 587 can take >5s on some networks;
+          # give the connect/read/write enough room so a slow-but-working SMTP
+          # conversation isn't aborted mid-dialog ("Read timed out").
+          connectiontimeout: 30000
+          timeout: 30000
+          writetimeout: 30000
 
 server:
   port: 8080

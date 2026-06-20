@@ -1,5 +1,6 @@
 package com.fidelity.moneytransfer.service;
 
+import com.fidelity.moneytransfer.constants.RewardConstants;
 import com.fidelity.moneytransfer.dto.AccountResponse;
 import com.fidelity.moneytransfer.dto.CreateAccountRequest;
 import com.fidelity.moneytransfer.entity.Account;
@@ -89,6 +90,10 @@ public class AccountService {
             }
         });
 
+        // Hide the corporate cashback account's id from user-facing history;
+        // it surfaces only as the "CASHBACK" label.
+        transactions.forEach(this::maskCashbackAccount);
+
         return transactions;
     }
 
@@ -144,6 +149,24 @@ public class AccountService {
 
     // ─── HELPER METHODS ───────────────────────────────────────────────
 
+    /**
+     * Replaces the cashback account's id with {@code null} (and labels it
+     * "CASHBACK") on a transaction so its real id is never exposed in history.
+     * Runs inside a read-only transaction, so these mutations are not flushed.
+     */
+    private void maskCashbackAccount(TransactionLog txn) {
+        if (txn.getFromAccountId() != null
+                && txn.getFromAccountId() == RewardConstants.CASHBACK_ACCOUNT_ID) {
+            txn.setFromAccountHolderName(RewardConstants.CASHBACK_ACCOUNT_NAME);
+            txn.setFromAccountId(null);
+        }
+        if (txn.getToAccountId() != null
+                && txn.getToAccountId() == RewardConstants.CASHBACK_ACCOUNT_ID) {
+            txn.setToAccountHolderName(RewardConstants.CASHBACK_ACCOUNT_NAME);
+            txn.setToAccountId(null);
+        }
+    }
+
     private AccountResponse mapToAccountResponse(Account account) {
         return AccountResponse.builder()
                 .id(account.getId())
@@ -189,6 +212,10 @@ public class AccountService {
                         );
             }
         });
+
+        // Hide the corporate cashback account's id from user-facing history;
+        // it surfaces only as the "CASHBACK" label.
+        transactions.forEach(this::maskCashbackAccount);
 
         return transactions;
     }

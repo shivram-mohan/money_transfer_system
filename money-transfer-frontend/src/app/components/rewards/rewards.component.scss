@@ -1,0 +1,209 @@
+// src/app/components/rewards/rewards.component.scss
+// The rewards module is intentionally colorful (gamification); the rest of the
+// app stays black & white.
+
+.rewards-container {
+  max-width: 760px;
+  margin: 0 auto;
+  padding: 24px;
+}
+
+.header-section {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 24px;
+
+  h1 {
+    margin: 0;
+    font-size: 28px;
+    font-weight: 600;
+  }
+}
+
+.loading-spinner {
+  display: flex;
+  justify-content: center;
+  padding: 80px 0;
+}
+
+.rewards-content {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+/* ── Weekend banner ─────────────────────────────────────────── */
+.weekend-banner {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 12px 18px;
+  border-radius: 12px;
+  font-weight: 600;
+  color: #1a1200;
+  background: linear-gradient(135deg, #ffd700 0%, #ff9d2f 100%);
+  box-shadow: 0 0 24px rgba(255, 175, 47, 0.45);
+
+  mat-icon { color: #1a1200; }
+}
+
+/* ── Hero balance card ──────────────────────────────────────── */
+.hero-card {
+  display: flex;
+  align-items: center;
+  gap: 28px;
+  padding: 28px !important;
+
+  @media (max-width: 600px) {
+    flex-direction: column;
+    text-align: center;
+    gap: 16px;
+  }
+}
+
+.coin-badge {
+  width: 104px;
+  height: 104px;
+  border-radius: 50%;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(135deg, #ffd700 0%, #ffb300 60%, #ff8f00 100%);
+  box-shadow: 0 0 28px rgba(255, 193, 7, 0.6);
+  animation: float 3s ease-in-out infinite;
+
+  .coin-icon {
+    font-size: 56px;
+    width: 56px;
+    height: 56px;
+    color: rgba(0, 0, 0, 0.78);
+  }
+}
+
+@keyframes float {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-6px); }
+}
+
+.hero-info {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+
+  .balance-label {
+    font-size: 14px;
+    color: var(--aurora-text-secondary);
+  }
+
+  .balance-row {
+    display: flex;
+    align-items: baseline;
+    gap: 12px;
+
+    .balance {
+      font-size: 44px;
+      font-weight: 800;
+      color: #ffd700;
+      line-height: 1;
+    }
+
+    .balance-cur {
+      font-size: 15px;
+      color: var(--aurora-text-secondary);
+    }
+  }
+
+  .lifetime-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    align-self: flex-start;
+    margin-top: 6px;
+    padding: 6px 14px;
+    border-radius: 20px;
+    font-weight: 600;
+    font-size: 13px;
+    color: #c0c7d1;
+    background: rgba(192, 199, 209, 0.12);
+    border: 1px solid rgba(192, 199, 209, 0.35);
+
+    mat-icon { font-size: 18px; width: 18px; height: 18px; }
+
+    @media (max-width: 600px) { align-self: center; }
+  }
+}
+
+/* ── Redeem card ────────────────────────────────────────────── */
+.redeem-card {
+  padding: 20px !important;
+
+  .redeem-head {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 12px;
+    font-weight: 600;
+
+    .redeem-points {
+      color: var(--aurora-text-secondary);
+      font-size: 13px;
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+
+      &.unlocked { color: var(--color-success); }
+
+      mat-icon { font-size: 18px; width: 18px; height: 18px; }
+    }
+  }
+
+  mat-progress-bar {
+    height: 12px;
+    border-radius: 6px;
+    --mdc-linear-progress-active-indicator-color: #ffd700;
+    --mdc-linear-progress-track-color: rgba(255, 255, 255, 0.12);
+  }
+
+  .progress-foot {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 8px;
+    font-size: 12px;
+    color: var(--aurora-text-secondary);
+  }
+
+  .redeem-btn {
+    width: 100%;
+    margin-top: 18px;
+    height: 46px;
+
+    mat-icon { margin-right: 8px; }
+  }
+}
+
+/* ── Info ───────────────────────────────────────────────────── */
+.info-card {
+  mat-card-header {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding-bottom: 12px;
+  }
+
+  .info-icon { color: var(--aurora-text-secondary); }
+
+  ul {
+    padding-left: 20px;
+    margin: 0;
+
+    li {
+      margin-bottom: 10px;
+      color: var(--aurora-text-secondary);
+      line-height: 1.5;
+
+      &:last-child { margin-bottom: 0; }
+    }
+  }
+}

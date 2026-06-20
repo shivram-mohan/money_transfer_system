@@ -121,6 +121,25 @@
           </div>
         </div>
 
+        <!-- Rewards panel -->
+        <div class="reward-panel" *ngIf="transferResult.reward as reward">
+          <ng-container *ngIf="reward.rewarded; else noReward">
+            <div class="reward-head">
+              <mat-icon>stars</mat-icon>
+              <span>+{{ reward.pointsEarned }} reward points</span>
+              <span class="weekend-tag" *ngIf="reward.weekendBonus">2× weekend</span>
+            </div>
+            <div class="reward-balance">
+              Balance: <strong>{{ reward.pointsBalance | number }}</strong> points
+            </div>
+          </ng-container>
+          <ng-template #noReward>
+            <p class="reward-note" *ngIf="reward.message">
+              <mat-icon>info</mat-icon> {{ reward.message }}
+            </p>
+          </ng-template>
+        </div>
+
         <div class="success-actions">
           <button mat-raised-button (click)="resetForm()">
             <mat-icon>add</mat-icon>

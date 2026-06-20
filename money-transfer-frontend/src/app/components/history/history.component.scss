@@ -202,6 +202,18 @@ mat-chip {
   border-color: var(--color-error-border) !important;
 }
 
+/* Colorful CASHBACK reward chip (gamification exception to the B&W theme) */
+.type-cashback {
+  background: rgba(255, 215, 0, 0.15) !important;
+  color: #ffd700 !important;
+  border: 1px solid rgba(255, 215, 0, 0.45) !important;
+  font-weight: 600;
+}
+
+.cashback-icon {
+  color: #ffd700 !important;
+}
+
 // Mobile List
 .mobile-list {
   display: none;

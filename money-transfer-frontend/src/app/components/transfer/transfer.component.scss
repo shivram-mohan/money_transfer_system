@@ -113,6 +113,54 @@
   }
 }
 
+/* Rewards panel on the success card (colorful gamification) */
+.reward-panel {
+  margin: 0 0 24px;
+  padding: 14px 20px;
+  border-radius: 12px;
+  background: rgba(255, 215, 0, 0.06);
+  border: 1px solid rgba(255, 215, 0, 0.35);
+
+  .reward-head {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    font-weight: 700;
+    color: #ffd700;
+
+    mat-icon { color: #ffd700; }
+
+    .weekend-tag {
+      font-size: 11px;
+      font-weight: 700;
+      color: #1a1200;
+      background: #ffd700;
+      border-radius: 10px;
+      padding: 2px 8px;
+    }
+  }
+
+  .reward-balance {
+    text-align: center;
+    margin-top: 6px;
+    font-size: 13px;
+    color: var(--aurora-text-secondary);
+  }
+
+  .reward-note {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    margin: 0;
+    color: var(--aurora-text-secondary);
+    font-size: 14px;
+
+    mat-icon { font-size: 18px; width: 18px; height: 18px; }
+  }
+}
+
 // Success Card
 .success-card {
   border: 2px solid var(--color-success) !important;
