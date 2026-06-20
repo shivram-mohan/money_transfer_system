@@ -54,8 +54,4 @@ export class AdminDashboardComponent implements OnInit {
   navigateToUserList(): void {
     this.router.navigate(['/admin/users']);
   }
-
-  navigateToCreateUser(): void {
-    this.router.navigate(['/admin/create-user']);
-  }
 }

@@ -28,14 +28,6 @@ export interface User {
   approvedDate?: Date;
 }
 
-export interface CreateUserRequest {
-  username: string;
-  password: string;
-  name: string;
-  email?: string;
-  initialBalance: number;
-}
-
 export interface UserResponse {
   id: number;
   username: string;

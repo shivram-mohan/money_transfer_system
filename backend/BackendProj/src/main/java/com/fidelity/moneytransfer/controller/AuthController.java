@@ -15,6 +15,7 @@ import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -28,6 +29,7 @@ public class AuthController {
     private final UserRepository userRepository;
     private final UserService userService;
     private final OtpService otpService;
+    private final UserDetailsService userDetailsService;
 
     // ─── SIGNUP FLOW (3 steps) ────────────────────────────────────────
 
@@ -171,14 +173,16 @@ public class AuthController {
         String holderName = appUser.getName();
 
         String token = jwtUtil.generateToken(userDetails, role, accountId);
+        String refreshToken = jwtUtil.generateRefreshToken(userDetails);
 
         return ResponseEntity.ok(AuthResponse.builder()
                 .token(token)
+                .refreshToken(refreshToken)
                 .username(request.getUsername())
                 .role(role)
                 .accountId(accountId)
                 .holderName(holderName)
-                .expiresIn(86400000L)
+                .expiresIn(jwtUtil.getAccessTokenExpiration())
                 .build());
     }
 
@@ -263,19 +267,99 @@ public class AuthController {
             }
 
             String token = jwtUtil.generateToken(userDetails, "ADMIN", null);
+            String refreshToken = jwtUtil.generateRefreshToken(userDetails);
 
             return ResponseEntity.ok(AuthResponse.builder()
                     .token(token)
+                    .refreshToken(refreshToken)
                     .username(request.getUsername())
                     .role("ADMIN")
                     .accountId(null)
                     .holderName(request.getUsername())
-                    .expiresIn(86400000L)
+                    .expiresIn(jwtUtil.getAccessTokenExpiration())
                     .build());
 
         } catch (BadCredentialsException e) {
             log.error("Admin login failed for: {}", request.getUsername());
             throw new BadCredentialsException("Invalid admin credentials");
+        }
+    }
+
+    // ─── REFRESH ACCESS TOKEN ────────────────────────────────────────
+
+    /**
+     * Exchange a valid (non-expired) refresh token for a fresh access token.
+     * The refresh token itself is also rotated so an active session can keep
+     * extending up to the refresh token's 7-day lifetime.
+     */
+    @PostMapping("/refresh")
+    public ResponseEntity<AuthResponse> refreshToken(
+            @Valid @RequestBody RefreshTokenRequest request) {
+
+        final String refreshToken = request.getRefreshToken();
+
+        String username;
+        try {
+            username = jwtUtil.extractUsername(refreshToken);
+        } catch (Exception e) {
+            log.error("Invalid refresh token presented");
+            throw new BadCredentialsException("Invalid or expired refresh token");
+        }
+
+        UserDetails userDetails = userDetailsService.loadUserByUsername(username);
+
+        if (!jwtUtil.validateRefreshToken(refreshToken, userDetails)) {
+            log.error("Refresh token validation failed for: {}", username);
+            throw new BadCredentialsException("Invalid or expired refresh token");
+        }
+
+        var appUser = userRepository.findByUsername(username)
+                .orElseThrow(() -> new BadCredentialsException("User not found"));
+
+        String role = userDetails.getAuthorities().stream()
+                .anyMatch(a -> a.getAuthority().equals("ROLE_ADMIN"))
+                ? "ADMIN" : "USER";
+
+        String newAccessToken = jwtUtil.generateToken(
+                userDetails, role, appUser.getAccountId());
+        String newRefreshToken = jwtUtil.generateRefreshToken(userDetails);
+
+        return ResponseEntity.ok(AuthResponse.builder()
+                .token(newAccessToken)
+                .refreshToken(newRefreshToken)
+                .username(username)
+                .role(role)
+                .accountId(appUser.getAccountId())
+                .holderName(appUser.getName())
+                .expiresIn(jwtUtil.getAccessTokenExpiration())
+                .build());
+    }
+
+    // ─── VERIFY PASSWORD (re-auth for sensitive actions) ─────────────
+
+    /**
+     * Re-verifies the current user's login password without issuing a token.
+     * Used to gate sensitive in-app actions such as revealing the balance.
+     */
+    @PostMapping("/verify-password")
+    public ResponseEntity<OtpResponse> verifyPassword(
+            @Valid @RequestBody VerifyPasswordRequest request) {
+
+        try {
+            authenticationManager.authenticate(
+                    new UsernamePasswordAuthenticationToken(
+                            request.getUsername(), request.getPassword()));
+
+            return ResponseEntity.ok(OtpResponse.builder()
+                    .message("Password verified")
+                    .success(true)
+                    .build());
+
+        } catch (BadCredentialsException e) {
+            log.error("Password verification failed for: {}", request.getUsername());
+            // Surface as a 422 with a clear message rather than a 401, so the
+            // client treats it as "wrong password" and not "session expired".
+            throw new IllegalArgumentException("Incorrect password");
         }
     }
 

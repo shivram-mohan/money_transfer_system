@@ -2,15 +2,12 @@
 
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { Observable, from } from 'rxjs';
-import { switchMap } from 'rxjs/operators';
+import { Observable } from 'rxjs';
 import { environment } from '../../environments/environment';
 import {
   UserResponse,
-  CreateUserRequest,
   DeactivateUserRequest
 } from '../models/user.model';
-import { hashPassword } from '../utils/crypto.util';
 
 @Injectable({
   providedIn: 'root'
@@ -26,15 +23,6 @@ export class UserManagementService {
 
   getUserById(userId: number): Observable<UserResponse> {
     return this.http.get<UserResponse>(`${this.apiUrl}/${userId}`);
-  }
-
-  createUser(request: CreateUserRequest): Observable<UserResponse> {
-    // Hash client-side so the password is consistent with the login flow
-    return from(hashPassword(request.password)).pipe(
-      switchMap((hashed) =>
-        this.http.post<UserResponse>(this.apiUrl, { ...request, password: hashed })
-      )
-    );
   }
 
   activateUser(userId: number): Observable<UserResponse> {

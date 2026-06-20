@@ -6,9 +6,9 @@ import { HistoryComponent } from './components/history/history.component';
 import { AdminDashboardComponent } from './components/admin/admin-dashboard/admin-dashboard.component';
 import { AdminLoginComponent } from './components/admin/admin-login/admin-login.component';
 import { UserListComponent } from './components/admin/user-list/user-list.component';
-import { CreateUserComponent } from './components/admin/create-user/create-user.component';
 import { authGuard } from './guards/auth.guard';
 import { adminGuard } from './guards/admin.guard';
+import { userGuard } from './guards/user.guard';
 import { SignupComponent } from './components/signup/signup.component';
 import { ForgotPasswordComponent } from './components/forgot-password/forgot-password.component';
 
@@ -25,17 +25,17 @@ export const routes: Routes = [
   {
     path: 'dashboard',
     component: DashboardComponent,
-    canActivate: [authGuard]
+    canActivate: [authGuard, userGuard]
   },
   {
     path: 'transfer',
     component: TransferComponent,
-    canActivate: [authGuard]
+    canActivate: [authGuard, userGuard]
   },
   {
     path: 'history',
     component: HistoryComponent,
-    canActivate: [authGuard]
+    canActivate: [authGuard, userGuard]
   },
 
   // Admin routes
@@ -47,11 +47,6 @@ export const routes: Routes = [
   {
     path: 'admin/users',
     component: UserListComponent,
-    canActivate: [authGuard, adminGuard]
-  },
-  {
-    path: 'admin/create-user',
-    component: CreateUserComponent,
     canActivate: [authGuard, adminGuard]
   },
 

@@ -1,5 +1,6 @@
 package com.fidelity.moneytransfer.dto;
 
+import jakarta.validation.constraints.NotBlank;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -9,12 +10,8 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class AuthResponse {
-    private String token;
+public class RefreshTokenRequest {
+
+    @NotBlank(message = "Refresh token is required")
     private String refreshToken;
-    private String username;
-    private String role;
-    private Long accountId;
-    private String holderName;
-    private Long expiresIn;
 }

@@ -22,6 +22,7 @@ import { hashPassword } from '../utils/crypto.util';
 
 export interface LoginResponse {
   token: string;
+  refreshToken: string;
   accountId: number;
   holderName: string;
   userId: number;
@@ -40,6 +41,7 @@ export interface AdminLoginRequest {
 })
 export class AuthService {
   private readonly TOKEN_KEY = 'auth_token';
+  private readonly REFRESH_TOKEN_KEY = 'refresh_token';
   private readonly ACCOUNT_ID_KEY = 'account_id';
   private readonly HOLDER_NAME_KEY = 'holder_name';
   private readonly USER_ID_KEY = 'user_id';
@@ -110,20 +112,7 @@ export class AuthService {
         )
       )
     ).pipe(
-      tap((response: LoginResponse) => {
-        if (this.isBrowser) {
-          localStorage.setItem(this.TOKEN_KEY, response.token);
-          localStorage.setItem(
-            this.ACCOUNT_ID_KEY,
-            response.accountId?.toString() || '0'
-          );
-          localStorage.setItem(this.HOLDER_NAME_KEY, response.holderName);
-          localStorage.setItem(this.USER_ID_KEY, '1');
-          localStorage.setItem(this.USERNAME_KEY, response.username);
-          localStorage.setItem(this.USER_ROLE_KEY, response.role);
-        }
-        this.isAuthenticatedSubject.next(true);
-      })
+      tap((response: LoginResponse) => this.persistSession(response))
     );
   }
 
@@ -159,50 +148,95 @@ export class AuthService {
         )
       )
     ).pipe(
-      tap((response: LoginResponse) => {
-        if (this.isBrowser) {
-          localStorage.setItem(this.TOKEN_KEY, response.token);
-          localStorage.setItem(
-            this.ACCOUNT_ID_KEY,
-            response.accountId?.toString() || '0'
-          );
-          localStorage.setItem(this.HOLDER_NAME_KEY, response.holderName);
-          localStorage.setItem(this.USER_ID_KEY, '1');
-          localStorage.setItem(this.USERNAME_KEY, response.username);
-          localStorage.setItem(this.USER_ROLE_KEY, response.role);
-        }
-        this.isAuthenticatedSubject.next(true);
-      })
+      tap((response: LoginResponse) => this.persistSession(response))
+    );
+  }
+
+  // ─── TOKEN REFRESH ─────────────────────────────────────────────
+
+  /**
+   * Exchanges the stored refresh token for a fresh access token. The new
+   * tokens are persisted so subsequent requests use them transparently.
+   */
+  refreshToken(): Observable<LoginResponse> {
+    return this.http.post<LoginResponse>(
+      `${environment.apiUrl}/auth/refresh`,
+      { refreshToken: this.getRefreshToken() }
+    ).pipe(
+      tap((response: LoginResponse) => this.persistSession(response))
+    );
+  }
+
+  // ─── PASSWORD RE-VERIFICATION (sensitive actions) ──────────────
+
+  /**
+   * Re-checks the current user's login password (e.g. before revealing the
+   * balance). Resolves to true when the password is correct.
+   */
+  verifyPassword(password: string): Observable<OtpResponse> {
+    const username = this.getUsername() ?? '';
+    return from(hashPassword(password)).pipe(
+      switchMap((hashed) =>
+        this.http.post<OtpResponse>(
+          `${environment.apiUrl}/auth/verify-password`,
+          { username, password: hashed }
+        )
+      )
     );
   }
 
   // ─── SESSION MANAGEMENT ────────────────────────────────────────
 
+  private persistSession(response: LoginResponse): void {
+    if (this.isBrowser) {
+      sessionStorage.setItem(this.TOKEN_KEY, response.token);
+      sessionStorage.setItem(this.REFRESH_TOKEN_KEY, response.refreshToken);
+      sessionStorage.setItem(
+        this.ACCOUNT_ID_KEY,
+        response.accountId?.toString() || '0'
+      );
+      sessionStorage.setItem(this.HOLDER_NAME_KEY, response.holderName);
+      sessionStorage.setItem(
+        this.USER_ID_KEY,
+        response.userId?.toString() || '1'
+      );
+      sessionStorage.setItem(this.USERNAME_KEY, response.username);
+      sessionStorage.setItem(this.USER_ROLE_KEY, response.role);
+    }
+    this.isAuthenticatedSubject.next(true);
+  }
+
   logout(): void {
     if (this.isBrowser) {
-      localStorage.removeItem(this.TOKEN_KEY);
-      localStorage.removeItem(this.ACCOUNT_ID_KEY);
-      localStorage.removeItem(this.HOLDER_NAME_KEY);
-      localStorage.removeItem(this.USER_ID_KEY);
-      localStorage.removeItem(this.USER_ROLE_KEY);
-      localStorage.removeItem(this.USERNAME_KEY);
+      sessionStorage.removeItem(this.TOKEN_KEY);
+      sessionStorage.removeItem(this.REFRESH_TOKEN_KEY);
+      sessionStorage.removeItem(this.ACCOUNT_ID_KEY);
+      sessionStorage.removeItem(this.HOLDER_NAME_KEY);
+      sessionStorage.removeItem(this.USER_ID_KEY);
+      sessionStorage.removeItem(this.USER_ROLE_KEY);
+      sessionStorage.removeItem(this.USERNAME_KEY);
     }
     this.isAuthenticatedSubject.next(false);
   }
 
   getToken(): string | null {
     if (!this.isBrowser) return null;
-    return localStorage.getItem(this.TOKEN_KEY);
+    return sessionStorage.getItem(this.TOKEN_KEY);
+  }
+
+  getRefreshToken(): string | null {
+    if (!this.isBrowser) return null;
+    return sessionStorage.getItem(this.REFRESH_TOKEN_KEY);
   }
 
   getUsername(): string | null {
     if (!this.isBrowser) return null;
-    return localStorage.getItem(this.USERNAME_KEY);
+    return sessionStorage.getItem(this.USERNAME_KEY);
   }
 
   getCurrentAccountId(): number | null {
     if (!this.isBrowser) return null;
-    const accountId = localStorage.getItem(this.ACCOUNT_ID_KEY);
+    const accountId = sessionStorage.getItem(this.ACCOUNT_ID_KEY);
     const parsed = accountId ? parseInt(accountId, 10) : NaN;
     return Number.isNaN(parsed) || parsed <= 0 ? null : parsed;
   }
@@ -214,25 +248,25 @@ export class AuthService {
   // Called after the user links a bank account post-signup
   setLinkedAccount(accountId: number, holderName: string): void {
     if (this.isBrowser) {
-      localStorage.setItem(this.ACCOUNT_ID_KEY, accountId.toString());
-      localStorage.setItem(this.HOLDER_NAME_KEY, holderName);
+      sessionStorage.setItem(this.ACCOUNT_ID_KEY, accountId.toString());
+      sessionStorage.setItem(this.HOLDER_NAME_KEY, holderName);
     }
   }
 
   getCurrentUserId(): number | null {
     if (!this.isBrowser) return null;
-    const userId = localStorage.getItem(this.USER_ID_KEY);
+    const userId = sessionStorage.getItem(this.USER_ID_KEY);
     return userId ? parseInt(userId, 10) : null;
   }
 
   getHolderName(): string | null {
     if (!this.isBrowser) return null;
-    return localStorage.getItem(this.HOLDER_NAME_KEY);
+    return sessionStorage.getItem(this.HOLDER_NAME_KEY);
   }
 
   getUserRole(): UserRole | null {
     if (!this.isBrowser) return null;
-    return localStorage.getItem(this.USER_ROLE_KEY) as UserRole;
+    return sessionStorage.getItem(this.USER_ROLE_KEY) as UserRole;
   }
 
   isAdmin(): boolean {

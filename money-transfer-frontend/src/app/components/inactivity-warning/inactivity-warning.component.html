@@ -1,0 +1,23 @@
+<!-- src/app/components/inactivity-warning/inactivity-warning.component.html -->
+
+<h2 mat-dialog-title>
+  <mat-icon class="warn-icon">schedule</mat-icon>
+  Are you still there?
+</h2>
+
+<mat-dialog-content>
+  <p class="message">
+    You've been inactive for a while. For your security you'll be logged out in
+  </p>
+  <p class="countdown">{{ countdownLabel }}</p>
+  <p class="sub-message">due to inactivity.</p>
+</mat-dialog-content>
+
+<mat-dialog-actions align="end">
+  <button mat-button color="warn" type="button" (click)="logoutNow()">
+    Logout now
+  </button>
+  <button mat-raised-button color="primary" type="button" (click)="stayLoggedIn()">
+    Stay logged in
+  </button>
+</mat-dialog-actions>

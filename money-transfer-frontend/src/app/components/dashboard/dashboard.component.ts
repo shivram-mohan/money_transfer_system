@@ -11,9 +11,12 @@ import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
+import { MatDialog, MatDialogModule } from '@angular/material/dialog';
+import { MatTooltipModule } from '@angular/material/tooltip';
 import { AuthService } from '../../services/auth.service';
 import { AccountService } from '../../services/account.service';
 import { NavbarComponent } from '../navbar/navbar.component';
+import { PasswordPromptComponent } from '../password-prompt/password-prompt.component';
 
 @Component({
   selector: 'app-dashboard',
@@ -28,6 +31,8 @@ import { NavbarComponent } from '../navbar/navbar.component';
     MatInputModule,
     MatProgressSpinnerModule,
     MatSnackBarModule,
+    MatDialogModule,
+    MatTooltipModule,
     NavbarComponent
   ],
   templateUrl: './dashboard.component.html',
@@ -39,6 +44,9 @@ export class DashboardComponent implements OnInit {
   balance: number = 0;
   isLoading = true;
 
+  // Balance is hidden behind a password prompt until the user reveals it
+  balanceVisible = false;
+
   // Bank linking
   isBankLinked = false;
   isLinking = false;
@@ -49,7 +57,8 @@ export class DashboardComponent implements OnInit {
     private accountService: AccountService,
     private router: Router,
     private fb: FormBuilder,
-    private snackBar: MatSnackBar
+    private snackBar: MatSnackBar,
+    private dialog: MatDialog
   ) {
     this.linkForm = this.fb.group({
       accountNumber: ['', [Validators.required, Validators.min(1)]]
@@ -128,5 +137,29 @@ export class DashboardComponent implements OnInit {
 
   refreshBalance(): void {
     this.loadBalance();
+  }
+
+  // ─── BALANCE VISIBILITY ──────────────────────────────────────────
+
+  toggleBalanceVisibility(): void {
+    if (this.balanceVisible) {
+      this.balanceVisible = false;
+      return;
+    }
+    this.promptForBalanceReveal();
+  }
+
+  private promptForBalanceReveal(): void {
+    const dialogRef = this.dialog.open(PasswordPromptComponent, {
+      width: '400px',
+      disableClose: false,
+      autoFocus: true
+    });
+
+    dialogRef.afterClosed().subscribe((verified: boolean) => {
+      if (verified) {
+        this.balanceVisible = true;
+      }
+    });
   }
 }

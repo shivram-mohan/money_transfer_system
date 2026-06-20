@@ -57,20 +57,31 @@
             <mat-icon class="header-icon">account_balance_wallet</mat-icon>
             <mat-card-title>Current Balance</mat-card-title>
           </div>
-          <button 
-            mat-icon-button 
-            (click)="refreshBalance()" 
-            matTooltip="Refresh balance"
-            [disabled]="isLoading"
-          >
-            <mat-icon [class.spinning]="isLoading">refresh</mat-icon>
-          </button>
+          <div class="header-actions">
+            <button
+              mat-icon-button
+              (click)="toggleBalanceVisibility()"
+              [matTooltip]="balanceVisible ? 'Hide balance' : 'Show balance'"
+              [disabled]="isLoading"
+            >
+              <mat-icon>{{ balanceVisible ? 'visibility' : 'visibility_off' }}</mat-icon>
+            </button>
+            <button
+              mat-icon-button
+              (click)="refreshBalance()"
+              matTooltip="Refresh balance"
+              [disabled]="isLoading"
+            >
+              <mat-icon [class.spinning]="isLoading">refresh</mat-icon>
+            </button>
+          </div>
         </div>
       </mat-card-header>
       <mat-card-content>
         <div class="balance-display" *ngIf="!isLoading">
           <span class="currency">₹</span>
-          <span class="amount">{{ balance | number:'1.2-2' }}</span>
+          <span class="amount" *ngIf="balanceVisible">{{ balance | number:'1.2-2' }}</span>
+          <span class="amount masked" *ngIf="!balanceVisible">••••••</span>
         </div>
         <div class="loading-spinner" *ngIf="isLoading">
           <mat-spinner diameter="50"></mat-spinner>

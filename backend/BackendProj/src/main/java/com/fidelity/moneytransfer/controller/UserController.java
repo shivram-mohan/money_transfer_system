@@ -1,6 +1,5 @@
 package com.fidelity.moneytransfer.controller;
 
-import com.fidelity.moneytransfer.dto.CreateUserRequest;
 import com.fidelity.moneytransfer.dto.DeactivateUserRequest;
 import com.fidelity.moneytransfer.dto.LinkBankRequest;
 import com.fidelity.moneytransfer.dto.LinkBankResponse;
@@ -9,7 +8,6 @@ import com.fidelity.moneytransfer.service.UserService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
@@ -48,17 +46,6 @@ public class UserController {
         log.info("User {} linking bank account {}", username, request.getAccountNumber());
         return ResponseEntity.ok(
                 userService.linkBankAccount(username, request.getAccountNumber()));
-    }
-
-    @PostMapping
-    public ResponseEntity<UserResponseDto> createUser(
-            @Valid @RequestBody CreateUserRequest request,
-            Authentication authentication) {
-        log.info("Admin: Creating user: {}", request.getUsername());
-        String createdBy = authentication.getName();
-        return ResponseEntity
-                .status(HttpStatus.CREATED)
-                .body(userService.createUser(request, createdBy));
     }
 
     @PutMapping("/{id}/activate")

@@ -23,6 +23,7 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 public class SecurityConfig {
 
     private final JwtAuthFilter jwtAuthFilter;
+    private final JwtAuthEntryPoint jwtAuthEntryPoint;
     private final UserDetailsService userDetailsService;
     private final PasswordEncoder passwordEncoder;
 
@@ -37,7 +38,6 @@ public class SecurityConfig {
 
                         // Admin-only endpoints
                         .requestMatchers(HttpMethod.GET, "/api/v1/users").hasRole("ADMIN")
-                        .requestMatchers(HttpMethod.POST, "/api/v1/users").hasRole("ADMIN")
                         .requestMatchers(HttpMethod.PUT, "/api/v1/users/*/activate").hasRole("ADMIN")
                         .requestMatchers(HttpMethod.PUT, "/api/v1/users/deactivate").hasRole("ADMIN")
                         .requestMatchers(HttpMethod.POST, "/api/v1/accounts").hasRole("ADMIN")
@@ -48,6 +48,9 @@ public class SecurityConfig {
                         // Everything else requires authentication
                         .requestMatchers("/api/v1/**").authenticated()
                         .anyRequest().permitAll()
+                )
+                .exceptionHandling(ex -> ex
+                        .authenticationEntryPoint(jwtAuthEntryPoint)
                 )
                 .sessionManagement(session -> session
                         .sessionCreationPolicy(SessionCreationPolicy.STATELESS)

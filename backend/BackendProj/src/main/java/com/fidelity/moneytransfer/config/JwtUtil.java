@@ -17,27 +17,62 @@ import java.util.function.Function;
 @Slf4j
 public class JwtUtil {
 
+    private static final String CLAIM_ROLE = "role";
+    private static final String CLAIM_ACCOUNT_ID = "accountId";
+    private static final String CLAIM_TOKEN_TYPE = "tokenType";
+    private static final String TYPE_ACCESS = "access";
+    private static final String TYPE_REFRESH = "refresh";
+
     @Value("${app.jwt.secret}")
     private String secret;
 
     @Value("${app.jwt.expiration}")
     private Long expiration;
 
-    // Generate token for user
+    @Value("${app.jwt.refresh-expiration}")
+    private Long refreshExpiration;
+
+    // Generate short-lived access token for user
     public String generateToken(UserDetails userDetails,
                                 String role,
                                 Long accountId) {
         Map<String, Object> claims = new HashMap<>();
-        claims.put("role", role);
-        claims.put("accountId", accountId);
-        return createToken(claims, userDetails.getUsername());
+        claims.put(CLAIM_ROLE, role);
+        claims.put(CLAIM_ACCOUNT_ID, accountId);
+        claims.put(CLAIM_TOKEN_TYPE, TYPE_ACCESS);
+        return createToken(claims, userDetails.getUsername(), expiration);
     }
 
-    // Validate token
+    // Generate long-lived refresh token (only identifies the user)
+    public String generateRefreshToken(UserDetails userDetails) {
+        Map<String, Object> claims = new HashMap<>();
+        claims.put(CLAIM_TOKEN_TYPE, TYPE_REFRESH);
+        return createToken(claims, userDetails.getUsername(), refreshExpiration);
+    }
+
+    // Validate an access token against the resolved user
     public boolean validateToken(String token, UserDetails userDetails) {
         final String username = extractUsername(token);
-        return (username.equals(userDetails.getUsername())
-                && !isTokenExpired(token));
+        return username.equals(userDetails.getUsername())
+                && TYPE_ACCESS.equals(extractTokenType(token))
+                && !isTokenExpired(token);
+    }
+
+    // Validate a refresh token against the resolved user
+    public boolean validateRefreshToken(String token, UserDetails userDetails) {
+        final String username = extractUsername(token);
+        return username.equals(userDetails.getUsername())
+                && TYPE_REFRESH.equals(extractTokenType(token))
+                && !isTokenExpired(token);
+    }
+
+    public String extractTokenType(String token) {
+        return extractAllClaims(token).get(CLAIM_TOKEN_TYPE, String.class);
+    }
+
+    // Configured access-token lifetime in milliseconds
+    public Long getAccessTokenExpiration() {
+        return expiration;
     }
 
     // Extract username from token
@@ -79,13 +114,14 @@ public class JwtUtil {
     }
 
     private String createToken(Map<String, Object> claims,
-                               String subject) {
+                               String subject,
+                               Long ttlMillis) {
         return Jwts.builder()
                 .setClaims(claims)
                 .setSubject(subject)
                 .setIssuedAt(new Date(System.currentTimeMillis()))
                 .setExpiration(
-                        new Date(System.currentTimeMillis() + expiration)
+                        new Date(System.currentTimeMillis() + ttlMillis)
                 )
                 .signWith(getSigningKey(), SignatureAlgorithm.HS256)
                 .compact();

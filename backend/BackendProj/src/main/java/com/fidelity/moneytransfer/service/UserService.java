@@ -1,6 +1,5 @@
 package com.fidelity.moneytransfer.service;
 
-import com.fidelity.moneytransfer.dto.CreateUserRequest;
 import com.fidelity.moneytransfer.dto.DeactivateUserRequest;
 import com.fidelity.moneytransfer.dto.LinkBankResponse;
 import com.fidelity.moneytransfer.dto.SetPasswordRequest;
@@ -31,7 +30,6 @@ public class UserService {
 
     private final UserRepository userRepository;
     private final AccountRepository accountRepository;
-    private final AccountService accountService;
     private final PasswordEncoder passwordEncoder;
     private final BankDetailsRepository bankDetailsRepository;
 
@@ -189,45 +187,6 @@ public class UserService {
                 .balance(savedAccount.getBalance())
                 .message("Bank account linked successfully")
                 .build();
-    }
-
-    // ─── ADMIN: CREATE USER DIRECTLY ─────────────────────────────────
-
-    @Transactional
-    public UserResponseDto createUser(CreateUserRequest request, String createdBy) {
-        log.info("Creating new user: {}", request.getUsername());
-
-        if (userRepository.existsByUsername(request.getUsername())) {
-            throw new IllegalArgumentException(
-                    "Username already exists: " + request.getUsername());
-        }
-
-        Account account = Account.builder()
-                .id(accountService.generateUniqueAccountId())
-                .holderName(request.getName())
-                .balance(request.getInitialBalance())
-                .status(AccountStatus.ACTIVE)
-                .version(0)
-                .build();
-        Account savedAccount = accountRepository.save(account);
-
-        AppUser user = AppUser.builder()
-                .username(request.getUsername())
-                .password(passwordEncoder.encode(request.getPassword()))
-                .name(request.getName())
-                .email(request.getEmail())
-                .role("USER")
-                .status("ACTIVE")
-                .accountId(savedAccount.getId())
-                .createdBy(createdBy)
-                .approvedBy(createdBy)
-                .approvedDate(LocalDateTime.now())
-                .build();
-
-        AppUser savedUser = userRepository.save(user);
-        log.info("User created with id: {}", savedUser.getId());
-
-        return mapToUserResponse(savedUser);
     }
 
     // ─── ACTIVATE / DEACTIVATE ───────────────────────────────────────

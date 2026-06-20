@@ -54,6 +54,11 @@
     gap: 12px;
   }
 
+  .header-actions {
+    display: flex;
+    align-items: center;
+  }
+
   .header-icon {
     font-size: 32px;
     height: 32px;
@@ -86,6 +91,10 @@
     .amount {
       font-size: 48px;
       font-weight: 700;
+
+      &.masked {
+        letter-spacing: 6px;
+      }
     }
   }
 

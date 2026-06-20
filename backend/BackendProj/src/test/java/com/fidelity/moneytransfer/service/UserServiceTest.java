@@ -39,9 +39,6 @@ class UserServiceTest {
     private AccountRepository accountRepository;
 
     @Mock
-    private AccountService accountService;
-
-    @Mock
     private PasswordEncoder passwordEncoder;
 
     @Mock
