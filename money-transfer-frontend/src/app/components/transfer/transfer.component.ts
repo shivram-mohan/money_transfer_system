@@ -17,7 +17,9 @@ import { TransferService } from '../../services/transfer.service';
 import { AccountService } from '../../services/account.service';
 import { NavbarComponent } from '../navbar/navbar.component';
 import { TransferRequest } from '../../models/transaction.model';
+import { RewardResult } from '../../models/reward.model';
 import { ConfirmDialogComponent } from '../admin/confirm-dialog/confirm-dialog.component';
+import { RewardDialogComponent } from '../rewards/reward-dialog.component';
 
 @Component({
   selector: 'app-transfer',
@@ -176,7 +178,10 @@ export class TransferComponent implements OnInit {
     this.isLoading = false;
     this.transferSuccess = true;
     this.transferResult = response;
-    
+
+    // Celebrate tier upgrades / nudge when close to the next tier
+    this.maybeShowRewardDialog(response.reward);
+
     // ✅ Show recipient name if available
     this.accountService.getAccount(response.creditedTo).subscribe({
       next: (account) => {
@@ -214,6 +219,27 @@ export class TransferComponent implements OnInit {
     });
   }
 });
+  }
+
+  private maybeShowRewardDialog(reward?: RewardResult | null): void {
+    if (!reward || !reward.rewarded) {
+      return;
+    }
+    if (reward.tierUpgraded) {
+      this.dialog.open(RewardDialogComponent, {
+        width: '420px',
+        data: { variant: 'UPGRADE', tier: reward.tier }
+      });
+    } else if (reward.closeToNextTier && reward.nextTier) {
+      this.dialog.open(RewardDialogComponent, {
+        width: '420px',
+        data: {
+          variant: 'CLOSE',
+          tier: reward.nextTier,
+          pointsToNextTier: reward.pointsToNextTier
+        }
+      });
+    }
   }
 
   resetForm(): void {

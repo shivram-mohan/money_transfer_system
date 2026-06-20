@@ -5,6 +5,8 @@
 
 package com.fidelity.moneytransfer.service;
 
+import com.fidelity.moneytransfer.constants.RewardConstants;
+import com.fidelity.moneytransfer.dto.RewardResult;
 import com.fidelity.moneytransfer.dto.TransferRequest;
 import com.fidelity.moneytransfer.dto.TransferResponse;
 import com.fidelity.moneytransfer.entity.Account;
@@ -31,6 +33,7 @@ public class TransferService {
     private final TransactionLogRepository transactionLogRepository;
     private final BankDetailsRepository bankDetailsRepository;
     private final TransactionLogService transactionLogService;
+    private final RewardService rewardService;
 
     @Transactional
     public TransferResponse transfer(TransferRequest request) {
@@ -79,6 +82,12 @@ public class TransferService {
         }
 
 
+        // Block transfers INTO the corporate cashback account.
+        if (request.getToAccountId() != null
+                && request.getToAccountId() == RewardConstants.CASHBACK_ACCOUNT_ID) {
+            throw new IllegalArgumentException("Transfers to this account are not allowed");
+        }
+
         if (request.getFromAccountId().equals(request.getToAccountId())) {
             throw new IllegalArgumentException("Source and destination accounts must be different");
         } else {
@@ -112,7 +121,22 @@ public class TransferService {
         TransactionLog transactionLog = this.createTransactionLog(request, TransactionStatus.SUCCESS, (String) null);
         this.transactionLogRepository.save(transactionLog);
         log.info("Transfer successful. Transaction ID: {}", transactionLog.getId());
-        return TransferResponse.builder().TransactionId(transactionLog.getId()).status("SUCCESS").message("Transfer completed successfully").debitedFrom(request.getFromAccountId()).creditedTo(request.getToAccountId()).amount(request.getAmount()).build();
+
+        // Process rewards for the (now successful) transfer. Reward failures must
+        // never fail the transfer itself, so they are swallowed and logged.
+        RewardResult reward = processRewardsSafely(request, transactionLog.getId());
+
+        return TransferResponse.builder().TransactionId(transactionLog.getId()).status("SUCCESS").message("Transfer completed successfully").debitedFrom(request.getFromAccountId()).creditedTo(request.getToAccountId()).amount(request.getAmount()).reward(reward).build();
+    }
+
+    private RewardResult processRewardsSafely(TransferRequest request, String transactionId) {
+        try {
+            return this.rewardService.processReward(request, transactionId);
+        } catch (Exception e) {
+            log.error("Reward processing failed for transaction {} (transfer unaffected): {}",
+                    transactionId, e.getMessage(), e);
+            return null;
+        }
     }
 
     /**
@@ -147,11 +171,12 @@ public class TransferService {
                 .build();
     }
 
-    public TransferService(final AccountService accountService, final AccountRepository accountRepository, final TransactionLogRepository transactionLogRepository, final BankDetailsRepository bankDetailsRepository, final TransactionLogService transactionLogService) {
+    public TransferService(final AccountService accountService, final AccountRepository accountRepository, final TransactionLogRepository transactionLogRepository, final BankDetailsRepository bankDetailsRepository, final TransactionLogService transactionLogService, final RewardService rewardService) {
         this.accountService = accountService;
         this.accountRepository = accountRepository;
         this.transactionLogRepository = transactionLogRepository;
         this.bankDetailsRepository = bankDetailsRepository;
         this.transactionLogService = transactionLogService;
+        this.rewardService = rewardService;
     }
 }

@@ -6,22 +6,23 @@
   <component name="ChangeListManager">
     <list default="true" id="9abde197-823a-4056-bf58-1fba2e1bff4f" name="Changes" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/fidelity/moneytransfer/MoneyTransferApplication.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/fidelity/moneytransfer/MoneyTransferApplication.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/java/com/fidelity/moneytransfer/config/DataSeeder.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/fidelity/moneytransfer/config/DataSeeder.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/fidelity/moneytransfer/dto/ResetPasswordRequest.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/fidelity/moneytransfer/dto/ResetPasswordRequest.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/fidelity/moneytransfer/dto/SetPasswordRequest.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/fidelity/moneytransfer/dto/SetPasswordRequest.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/fidelity/moneytransfer/service/PdfService.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/fidelity/moneytransfer/service/PdfService.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/fidelity/moneytransfer/service/UserService.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/fidelity/moneytransfer/service/UserService.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/fidelity/moneytransfer/util/PasswordHasher.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/com/fidelity/moneytransfer/config/SecurityConfig.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/com/fidelity/moneytransfer/config/SecurityConfig.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/fidelity/moneytransfer/dto/TransferResponse.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/fidelity/moneytransfer/dto/TransferResponse.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/fidelity/moneytransfer/entity/AppUser.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/fidelity/moneytransfer/entity/AppUser.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/fidelity/moneytransfer/repository/UserRepository.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/fidelity/moneytransfer/repository/UserRepository.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/fidelity/moneytransfer/service/AccountService.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/fidelity/moneytransfer/service/AccountService.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/fidelity/moneytransfer/service/EmailService.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/fidelity/moneytransfer/service/EmailService.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/fidelity/moneytransfer/service/TransferService.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/fidelity/moneytransfer/service/TransferService.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/target/classes/com/fidelity/moneytransfer/dto/TransferResponse$TransferResponseBuilder.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/com/fidelity/moneytransfer/dto/TransferResponse$TransferResponseBuilder.class" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/target/classes/com/fidelity/moneytransfer/dto/TransferResponse.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/com/fidelity/moneytransfer/dto/TransferResponse.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/com/fidelity/moneytransfer/service/AccountService.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/com/fidelity/moneytransfer/service/AccountService.class" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/target/classes/com/fidelity/moneytransfer/service/TransferService.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/com/fidelity/moneytransfer/service/TransferService.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../../money-transfer-frontend/src/app/components/admin/admin-dashboard/admin-dashboard.component.html" beforeDir="false" afterPath="$PROJECT_DIR$/../../money-transfer-frontend/src/app/components/admin/admin-dashboard/admin-dashboard.component.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../../money-transfer-frontend/src/app/components/dashboard/dashboard.component.html" beforeDir="false" afterPath="$PROJECT_DIR$/../../money-transfer-frontend/src/app/components/dashboard/dashboard.component.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../../money-transfer-frontend/src/app/components/dashboard/dashboard.component.scss" beforeDir="false" afterPath="$PROJECT_DIR$/../../money-transfer-frontend/src/app/components/dashboard/dashboard.component.scss" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../../money-transfer-frontend/src/app/components/inactivity-warning/inactivity-warning.component.scss" beforeDir="false" afterPath="$PROJECT_DIR$/../../money-transfer-frontend/src/app/components/inactivity-warning/inactivity-warning.component.scss" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../../money-transfer-frontend/src/app/components/password-prompt/password-prompt.component.scss" beforeDir="false" afterPath="$PROJECT_DIR$/../../money-transfer-frontend/src/app/components/password-prompt/password-prompt.component.scss" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../../money-transfer-frontend/src/app/services/auth.service.ts" beforeDir="false" afterPath="$PROJECT_DIR$/../../money-transfer-frontend/src/app/services/auth.service.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../money-transfer-frontend/src/app/app.routes.ts" beforeDir="false" afterPath="$PROJECT_DIR$/../../money-transfer-frontend/src/app/app.routes.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../money-transfer-frontend/src/app/components/history/history.component.scss" beforeDir="false" afterPath="$PROJECT_DIR$/../../money-transfer-frontend/src/app/components/history/history.component.scss" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../money-transfer-frontend/src/app/components/transfer/transfer.component.html" beforeDir="false" afterPath="$PROJECT_DIR$/../../money-transfer-frontend/src/app/components/transfer/transfer.component.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../money-transfer-frontend/src/app/components/transfer/transfer.component.scss" beforeDir="false" afterPath="$PROJECT_DIR$/../../money-transfer-frontend/src/app/components/transfer/transfer.component.scss" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../money-transfer-frontend/src/app/components/transfer/transfer.component.ts" beforeDir="false" afterPath="$PROJECT_DIR$/../../money-transfer-frontend/src/app/components/transfer/transfer.component.ts" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -59,7 +60,7 @@
     "RunOnceActivity.OpenProjectViewOnStart": "true",
     "RunOnceActivity.ShowReadmeOnStart": "true",
     "RunOnceActivity.git.unshallow": "true",
-    "git-widget-placeholder": "minimalism",
+    "git-widget-placeholder": "tier__based__rewards",
     "kotlin-language-version-configured": "true",
     "last_opened_file_path": "C:/Users/labuser/Desktop/capstone_project/money_transfer_system/backend/BackendProj/src/test/resources",
     "project.structure.last.edited": "Modules",

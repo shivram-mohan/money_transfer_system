@@ -1,0 +1,317 @@
+// src/app/components/rewards/rewards.component.scss
+// The rewards module is intentionally colorful (gamification); the rest of the
+// app stays black & white.
+
+.rewards-container {
+  max-width: 960px;
+  margin: 0 auto;
+  padding: 24px;
+}
+
+.header-section {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 24px;
+
+  h1 {
+    margin: 0;
+    font-size: 28px;
+    font-weight: 600;
+  }
+}
+
+.loading-spinner {
+  display: flex;
+  justify-content: center;
+  padding: 80px 0;
+}
+
+.rewards-content {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+/* ── Hero badge ─────────────────────────────────────────────── */
+.hero-card {
+  display: flex;
+  align-items: center;
+  gap: 28px;
+  padding: 28px !important;
+
+  @media (max-width: 600px) {
+    flex-direction: column;
+    text-align: center;
+    gap: 16px;
+  }
+}
+
+.tier-badge {
+  width: 110px;
+  height: 110px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  animation: float 3s ease-in-out infinite;
+
+  .tier-icon {
+    font-size: 60px;
+    width: 60px;
+    height: 60px;
+    color: rgba(0, 0, 0, 0.78);
+  }
+}
+
+@keyframes float {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-6px); }
+}
+
+.hero-info {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+
+  .tier-name {
+    font-size: 30px;
+    font-weight: 800;
+    letter-spacing: 0.5px;
+  }
+
+  .points-row {
+    display: flex;
+    align-items: baseline;
+    gap: 8px;
+
+    .points {
+      font-size: 34px;
+      font-weight: 700;
+      color: var(--aurora-text-primary);
+    }
+
+    .points-label {
+      font-size: 14px;
+      color: var(--aurora-text-secondary);
+    }
+  }
+
+  .multiplier-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    align-self: flex-start;
+    padding: 6px 14px;
+    border-radius: 20px;
+    font-weight: 600;
+    font-size: 14px;
+    color: #ffd700;
+    background: rgba(255, 215, 0, 0.12);
+    border: 1px solid rgba(255, 215, 0, 0.4);
+
+    mat-icon {
+      font-size: 18px;
+      width: 18px;
+      height: 18px;
+    }
+
+    @media (max-width: 600px) {
+      align-self: center;
+    }
+  }
+}
+
+/* ── Progress ───────────────────────────────────────────────── */
+.progress-card {
+  padding: 20px !important;
+
+  .progress-header {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 12px;
+    font-weight: 600;
+
+    .progress-points {
+      color: #ffd700;
+    }
+  }
+
+  mat-progress-bar {
+    height: 12px;
+    border-radius: 6px;
+    --mdc-linear-progress-active-indicator-color: #ffd700;
+    --mdc-linear-progress-track-color: rgba(255, 255, 255, 0.12);
+  }
+
+  .progress-foot {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 8px;
+    font-size: 12px;
+    color: var(--aurora-text-secondary);
+  }
+
+  &.max-tier {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    color: #ffd700;
+    font-weight: 600;
+
+    mat-icon { color: #ffd700; }
+  }
+}
+
+/* ── Tier roadmap ───────────────────────────────────────────── */
+.section-title {
+  margin: 12px 0 0;
+  font-size: 20px;
+  font-weight: 600;
+}
+
+.tier-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 16px;
+
+  @media (max-width: 700px) {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+.tier-card {
+  position: relative;
+  text-align: center;
+  padding: 20px 12px !important;
+  transition: transform 0.2s ease;
+
+  &.current {
+    border-width: 2px !important;
+    border-style: solid !important;
+    transform: translateY(-4px);
+  }
+
+  &.locked {
+    opacity: 0.5;
+    filter: grayscale(0.6);
+  }
+
+  .tier-card-badge {
+    width: 56px;
+    height: 56px;
+    border-radius: 50%;
+    margin: 0 auto 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    mat-icon {
+      font-size: 30px;
+      width: 30px;
+      height: 30px;
+      color: rgba(0, 0, 0, 0.78);
+    }
+  }
+
+  .tier-card-name {
+    font-weight: 700;
+    font-size: 16px;
+  }
+
+  .tier-card-mult {
+    font-size: 12px;
+    color: var(--aurora-text-secondary);
+    margin-top: 2px;
+  }
+
+  .tier-status {
+    position: absolute;
+    top: 8px;
+    right: 8px;
+    font-size: 20px;
+    width: 20px;
+    height: 20px;
+
+    &.locked-icon {
+      color: var(--aurora-text-secondary);
+    }
+  }
+}
+
+/* ── Monthly summary ────────────────────────────────────────── */
+.summary-card {
+  mat-card-header {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding-bottom: 12px;
+  }
+
+  .summary-head-icon { color: #ffd700; }
+}
+
+.summary-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 16px;
+
+  @media (max-width: 700px) {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+.summary-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  text-align: center;
+
+  mat-icon {
+    font-size: 28px;
+    width: 28px;
+    height: 28px;
+    color: var(--aurora-text-secondary);
+  }
+
+  .accent-gold { color: #ffd700; }
+  .accent-green { color: var(--color-success); }
+
+  .summary-value {
+    font-size: 20px;
+    font-weight: 700;
+    color: var(--aurora-text-primary);
+  }
+
+  .summary-label {
+    font-size: 12px;
+    color: var(--aurora-text-secondary);
+  }
+}
+
+/* ── Info ───────────────────────────────────────────────────── */
+.info-card {
+  mat-card-header {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding-bottom: 12px;
+  }
+
+  .info-icon { color: var(--aurora-text-secondary); }
+
+  ul {
+    padding-left: 20px;
+    margin: 0;
+
+    li {
+      margin-bottom: 10px;
+      color: var(--aurora-text-secondary);
+      line-height: 1.5;
+
+      &:last-child { margin-bottom: 0; }
+    }
+  }
+}

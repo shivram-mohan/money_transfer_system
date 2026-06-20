@@ -121,6 +121,38 @@
           </div>
         </div>
 
+        <!-- Rewards panel -->
+        <div class="reward-panel" *ngIf="transferResult.reward as reward">
+          <ng-container *ngIf="reward.rewarded; else noReward">
+            <div class="reward-head">
+              <mat-icon>emoji_events</mat-icon>
+              <span>Rewards earned</span>
+            </div>
+            <div class="reward-stats">
+              <div class="reward-stat">
+                <span class="rs-value">+{{ reward.pointsEarned }}</span>
+                <span class="rs-label">points</span>
+              </div>
+              <div class="reward-stat" *ngIf="reward.cashbackAmount > 0">
+                <span class="rs-value cashback">₹{{ reward.cashbackAmount | number:'1.2-2' }}</span>
+                <span class="rs-label">cashback</span>
+              </div>
+              <div class="reward-stat">
+                <span class="rs-value">{{ reward.totalPoints | number }}</span>
+                <span class="rs-label">total · {{ reward.tier }}</span>
+              </div>
+            </div>
+            <p class="reward-next" *ngIf="reward.nextTier">
+              {{ reward.pointsToNextTier | number }} points to {{ reward.nextTier }}
+            </p>
+          </ng-container>
+          <ng-template #noReward>
+            <p class="reward-note" *ngIf="reward.message">
+              <mat-icon>info</mat-icon> {{ reward.message }}
+            </p>
+          </ng-template>
+        </div>
+
         <div class="success-actions">
           <button mat-raised-button (click)="resetForm()">
             <mat-icon>add</mat-icon>

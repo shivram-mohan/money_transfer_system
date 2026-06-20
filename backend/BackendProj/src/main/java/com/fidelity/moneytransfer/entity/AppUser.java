@@ -52,10 +52,36 @@ public class AppUser {
     @Column(name = "approved_date")
     private LocalDateTime approvedDate;
 
+    // ─── Rewards ────────────────────────────────────────────────────
+    // Lifetime reward points; the user's tier is derived from this value.
+    @Column(name = "reward_points")
+    private Long rewardPoints;
+
+    @Column(name = "tier", length = 20)
+    private String tier;
+
+    // Timestamp of the user's most recent (sent) transfer; drives the
+    // 30-day inactivity downgrade.
+    @Column(name = "last_transaction_date")
+    private LocalDateTime lastTransactionDate;
+
+    // Guards against re-sending the pre-downgrade warning every day.
+    @Column(name = "downgrade_warning_sent")
+    private Boolean downgradeWarningSent;
+
     @PrePersist
     public void prePersist() {
         this.createdDate = LocalDateTime.now();
         this.lastModifiedDate = LocalDateTime.now();
+        if (this.rewardPoints == null) {
+            this.rewardPoints = 0L;
+        }
+        if (this.tier == null) {
+            this.tier = com.fidelity.moneytransfer.enums.Tier.BRONZE.name();
+        }
+        if (this.downgradeWarningSent == null) {
+            this.downgradeWarningSent = false;
+        }
     }
 
     @PreUpdate

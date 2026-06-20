@@ -1,0 +1,135 @@
+<!-- src/app/components/rewards/rewards.component.html -->
+
+<app-navbar></app-navbar>
+
+<div class="rewards-container">
+  <div class="header-section">
+    <button mat-icon-button (click)="backToDashboard()" class="back-button">
+      <mat-icon>arrow_back</mat-icon>
+    </button>
+    <h1>My Rewards</h1>
+  </div>
+
+  <div class="loading-spinner" *ngIf="isLoading">
+    <mat-spinner diameter="50"></mat-spinner>
+  </div>
+
+  <div class="rewards-content" *ngIf="!isLoading && profile">
+
+    <!-- Hero tier badge -->
+    <mat-card class="hero-card">
+      <div class="tier-badge"
+           [style.background]="meta(profile.tier).gradient"
+           [style.box-shadow]="meta(profile.tier).glow">
+        <mat-icon class="tier-icon">{{ meta(profile.tier).icon }}</mat-icon>
+      </div>
+      <div class="hero-info">
+        <span class="tier-name" [style.color]="meta(profile.tier).color">
+          {{ meta(profile.tier).label }}
+        </span>
+        <div class="points-row">
+          <span class="points">{{ profile.totalPoints | number }}</span>
+          <span class="points-label">reward points</span>
+        </div>
+        <div class="multiplier-chip">
+          <mat-icon>bolt</mat-icon>
+          {{ profile.multiplier }}x points multiplier
+        </div>
+      </div>
+    </mat-card>
+
+    <!-- Progress to next tier -->
+    <mat-card class="progress-card" *ngIf="profile.nextTier; else maxTier">
+      <div class="progress-header">
+        <span>Progress to {{ meta(profile.nextTier).label }}</span>
+        <span class="progress-points">
+          {{ profile.pointsToNextTier | number }} pts to go
+        </span>
+      </div>
+      <mat-progress-bar mode="determinate"
+                        [value]="profile.progressPercent"></mat-progress-bar>
+      <div class="progress-foot">
+        <span>{{ meta(profile.tier).label }}</span>
+        <span>{{ profile.progressPercent }}%</span>
+        <span>{{ meta(profile.nextTier).label }}</span>
+      </div>
+    </mat-card>
+    <ng-template #maxTier>
+      <mat-card class="progress-card max-tier">
+        <mat-icon>emoji_events</mat-icon>
+        <span>You've reached the top tier. Enjoy the maximum 3x multiplier!</span>
+      </mat-card>
+    </ng-template>
+
+    <!-- Tier roadmap -->
+    <h2 class="section-title">Tiers &amp; Benefits</h2>
+    <div class="tier-grid">
+      <mat-card class="tier-card"
+                *ngFor="let tier of tierOrder"
+                [class.current]="isCurrent(tier)"
+                [class.locked]="!isUnlocked(tier)"
+                [style.border-color]="isCurrent(tier) ? meta(tier).color : ''">
+        <div class="tier-card-badge"
+             [style.background]="meta(tier).gradient"
+             [style.box-shadow]="isUnlocked(tier) ? meta(tier).glow : 'none'">
+          <mat-icon>{{ meta(tier).icon }}</mat-icon>
+        </div>
+        <div class="tier-card-name" [style.color]="meta(tier).color">
+          {{ meta(tier).label }}
+        </div>
+        <div class="tier-card-mult">{{ multiplierFor(tier) }} multiplier</div>
+        <mat-icon class="tier-status" *ngIf="isCurrent(tier)"
+                  [style.color]="meta(tier).color">check_circle</mat-icon>
+        <mat-icon class="tier-status locked-icon" *ngIf="!isUnlocked(tier)">lock</mat-icon>
+      </mat-card>
+    </div>
+
+    <!-- Monthly summary -->
+    <mat-card class="summary-card" *ngIf="summary">
+      <mat-card-header>
+        <mat-icon class="summary-head-icon">calendar_month</mat-icon>
+        <mat-card-title>{{ summary.month }} Summary</mat-card-title>
+      </mat-card-header>
+      <mat-card-content>
+        <div class="summary-grid">
+          <div class="summary-item">
+            <mat-icon>swap_horiz</mat-icon>
+            <span class="summary-value">{{ summary.rewardedTransfers }}</span>
+            <span class="summary-label">Rewarded transfers</span>
+          </div>
+          <div class="summary-item">
+            <mat-icon class="accent-gold">stars</mat-icon>
+            <span class="summary-value">{{ summary.pointsEarned | number }}</span>
+            <span class="summary-label">Points earned</span>
+          </div>
+          <div class="summary-item">
+            <mat-icon class="accent-green">payments</mat-icon>
+            <span class="summary-value">₹{{ summary.cashbackEarned | number:'1.2-2' }}</span>
+            <span class="summary-label">Cashback earned</span>
+          </div>
+          <div class="summary-item">
+            <mat-icon class="accent-green">savings</mat-icon>
+            <span class="summary-value">₹{{ profile.totalCashbackEarned | number:'1.2-2' }}</span>
+            <span class="summary-label">Lifetime cashback</span>
+          </div>
+        </div>
+      </mat-card-content>
+    </mat-card>
+
+    <!-- How it works -->
+    <mat-card class="info-card">
+      <mat-card-header>
+        <mat-icon class="info-icon">info</mat-icon>
+        <mat-card-title>How rewards work</mat-card-title>
+      </mat-card-header>
+      <mat-card-content>
+        <ul>
+          <li>Earn 1 point per ₹100 transferred (over ₹100), times your tier multiplier.</li>
+          <li>Every rewarded transfer also pays guaranteed cashback into your account.</li>
+          <li>Only the first transfer per day to the same recipient is rewarded.</li>
+          <li>Stay active — 30 days without a transfer drops you one tier (we'll warn you first).</li>
+        </ul>
+      </mat-card-content>
+    </mat-card>
+  </div>
+</div>

@@ -20,4 +20,7 @@ public class TransferResponse {
     private Long debitedFrom;
     private Long creditedTo;
     private BigDecimal amount;
+
+    /** Points/cashback/tier outcome for this transfer (null if not applicable). */
+    private RewardResult reward;
 }
