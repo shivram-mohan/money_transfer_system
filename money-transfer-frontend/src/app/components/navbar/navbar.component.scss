@@ -4,8 +4,10 @@
   position: sticky;
   top: 0;
   z-index: 1000;
-  background: var(--aurora-bg-secondary) !important;
-  border-bottom: 1px solid var(--aurora-border);
+  background: var(--glass-bg-strong) !important;
+  backdrop-filter: var(--glass-blur-strong);
+  -webkit-backdrop-filter: var(--glass-blur-strong);
+  border-bottom: 1px solid var(--glass-border);
   box-shadow: 0 2px 20px rgba(0, 0, 0, 0.5);
 }
 
@@ -19,9 +21,9 @@
 .brand {
   display: flex;
   align-items: center;
-  gap: 8px;
-  font-size: 20px;
-  font-weight: 500;
+  gap: var(--space-2);
+  font-size: var(--text-lg);
+  font-weight: var(--font-medium);
   cursor: pointer;
 }
 
@@ -41,7 +43,7 @@
 
 .nav-links {
   display: flex;
-  gap: 8px;
+  gap: var(--space-2);
 
   button {
     display: flex;
@@ -58,14 +60,14 @@
 
 .active-link {
   background-color: rgba(255, 255, 255, 0.12) !important;
-  border-radius: 4px;
+  border-radius: var(--radius-sm);
 }
 
 .user-menu {
   .user-button {
     display: flex;
     align-items: center;
-    gap: 4px;
+    gap: var(--space-1);
 
     mat-icon:first-child {
       font-size: 24px;

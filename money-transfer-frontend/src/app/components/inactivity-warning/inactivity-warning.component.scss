@@ -1,32 +1,33 @@
 // src/app/components/inactivity-warning/inactivity-warning.component.scss
+// Dialog surface styling comes from the global mat-dialog glass override in styles.scss.
 
 h2[mat-dialog-title] {
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: var(--space-2);
 
   .warn-icon {
-    color: var(--aurora-text-primary);
+    color: var(--text-primary);
   }
 }
 
 .message {
   margin: 0;
-  color: var(--aurora-text-secondary);
+  color: var(--text-secondary);
   text-align: center;
 }
 
 .countdown {
-  margin: 12px 0 4px;
+  margin: var(--space-3) 0 var(--space-1);
   text-align: center;
   font-size: 40px;
-  font-weight: 700;
-  color: var(--aurora-text-primary);
+  font-weight: var(--font-bold);
+  color: var(--text-primary);
 }
 
 .sub-message {
   margin: 0;
   text-align: center;
-  color: var(--aurora-text-muted);
+  color: var(--text-muted);
   font-size: 0.875rem;
 }

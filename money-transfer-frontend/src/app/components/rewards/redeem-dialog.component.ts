@@ -66,8 +66,8 @@ export interface RedeemDialogData {
   `,
   styles: [`
     .redeem-title { display: flex; align-items: center; gap: 8px; }
-    .redeem-title mat-icon { color: #ffd700; }
-    .redeem-sub { color: var(--aurora-text-secondary); margin-bottom: 16px; }
+    .redeem-title mat-icon { color: var(--accent-cashback); }
+    .redeem-sub { color: var(--text-secondary); margin-bottom: 16px; }
     .full-width { width: 100%; }
   `]
 })

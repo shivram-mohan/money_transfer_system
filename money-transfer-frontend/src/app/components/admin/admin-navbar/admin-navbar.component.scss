@@ -5,8 +5,10 @@
   top: 0;
   z-index: 1000;
   box-shadow: 0 2px 20px rgba(0, 0, 0, 0.5);
-  background: var(--aurora-bg-secondary) !important;
-  border-bottom: 1px solid var(--aurora-border);
+  background: var(--glass-bg-strong) !important;
+  backdrop-filter: var(--glass-blur-strong);
+  -webkit-backdrop-filter: var(--glass-blur-strong);
+  border-bottom: 1px solid var(--glass-border);
 }
 
 .toolbar-content {
@@ -14,17 +16,17 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 0 8px;
+  padding: 0 var(--space-2);
 }
 
 .brand {
   display: flex;
   align-items: center;
-  gap: 8px;
-  font-size: 20px;
-  font-weight: 500;
+  gap: var(--space-2);
+  font-size: var(--text-lg);
+  font-weight: var(--font-medium);
   cursor: pointer;
-  transition: opacity 0.2s;
+  transition: opacity var(--dur-fast) var(--ease);
 
   &:hover {
     opacity: 0.9;
@@ -47,7 +49,7 @@
 
 .nav-links {
   display: flex;
-  gap: 4px;
+  gap: var(--space-1);
   flex: 1;
   justify-content: center;
 
@@ -55,7 +57,7 @@
     display: flex;
     align-items: center;
     gap: 6px;
-    padding: 0 12px;
+    padding: 0 var(--space-3);
 
     mat-icon {
       font-size: 20px;
@@ -75,7 +77,7 @@
 
 .active-link {
   background-color: rgba(255, 255, 255, 0.12) !important;
-  border-radius: 4px;
+  border-radius: var(--radius-sm);
 
   &::before {
     content: '';
@@ -84,7 +86,7 @@
     left: 0;
     right: 0;
     height: 3px;
-    background-color: white;
+    background-color: var(--white);
     border-radius: 2px 2px 0 0;
   }
 }
@@ -93,7 +95,7 @@
   .user-button {
     display: flex;
     align-items: center;
-    gap: 4px;
+    gap: var(--space-1);
 
     mat-icon:first-child {
       font-size: 24px;
@@ -124,24 +126,24 @@
 // Badge styling
 ::ng-deep {
   .mat-badge-content {
-    background-color: #ffffff;
-    color: #000000;
+    background-color: var(--white);
+    color: var(--black);
     font-size: 10px;
-    font-weight: 600;
+    font-weight: var(--font-semibold);
   }
 }
 
 // Responsive - Mobile
 @media (max-width: 768px) {
   .toolbar-content {
-    padding: 0 4px;
+    padding: 0 var(--space-1);
   }
 
   .nav-links {
     gap: 2px;
 
     button {
-      padding: 0 8px;
+      padding: 0 var(--space-2);
       min-width: auto;
     }
   }
@@ -171,19 +173,19 @@
 
   .mat-mdc-menu-item {
     .mat-icon {
-      margin-right: 12px;
-      color: var(--aurora-text-secondary);
+      margin-right: var(--space-3);
+      color: var(--text-secondary);
     }
   }
 
   .mat-mdc-menu-item:disabled {
     .mat-icon {
-      color: var(--aurora-text-primary);
+      color: var(--text-primary);
     }
 
     span {
-      font-weight: 500;
-      color: var(--aurora-text-primary);
+      font-weight: var(--font-medium);
+      color: var(--text-primary);
     }
   }
 }

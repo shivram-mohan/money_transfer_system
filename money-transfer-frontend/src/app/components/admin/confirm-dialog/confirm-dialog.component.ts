@@ -64,19 +64,23 @@ export interface ConfirmDialogData {
         font-size: 28px;
         height: 28px;
         width: 28px;
-        color: white;
+        color: var(--white);
       }
 
+      /* destructive = red */
       &.warn {
-        background: linear-gradient(135deg, #f87171 0%, #ec4899 100%);
+        background: var(--accent-error);
       }
 
+      /* neutral = white-tinted glass (white icon stays visible) */
       &.primary {
-        background: linear-gradient(135deg, #06b6d4 0%, #8b5cf6 100%);
+        background: rgba(255, 255, 255, 0.18);
+        border: 1px solid var(--glass-border);
       }
 
+      /* positive = green */
       &.accent {
-        background: linear-gradient(135deg, #10b981 0%, #06b6d4 100%);
+        background: var(--accent-success);
       }
     }
 
@@ -90,7 +94,7 @@ export interface ConfirmDialogData {
     mat-dialog-content p {
       text-align: center;
       font-size: 14px;
-      color: var(--aurora-text-secondary, #94a3b8);
+      color: var(--text-secondary);
       line-height: 1.6;
       margin: 0;
     }

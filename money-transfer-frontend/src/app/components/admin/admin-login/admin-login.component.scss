@@ -1,56 +1,38 @@
 // src/app/components/admin/admin-login/admin-login.component.scss
+@use 'glass' as g;
 
 .admin-login-container {
   display: flex;
   justify-content: center;
   align-items: center;
-  height: 100vh;
-  background: var(--aurora-bg-primary);
-  padding: 20px;
+  min-height: 100vh;
+  background: transparent; // global ambient backdrop shows through
+  padding: var(--space-5);
   position: relative;
-  overflow: hidden;
   box-sizing: border-box;
-
-  &::before {
-    content: '';
-    position: absolute;
-    width: 600px;
-    height: 600px;
-    background: radial-gradient(circle, rgba(255, 255, 255, 0.06) 0%, rgba(255, 255, 255, 0.03) 40%, transparent 70%);
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    pointer-events: none;
-    z-index: 0;
-  }
 }
 
 .admin-login-card {
+  @include g.glass('strong');
   max-width: 450px;
   width: 100%;
-  padding: 20px;
+  padding: var(--space-5);
   position: relative;
   z-index: 1;
-  background: var(--aurora-glass-bg) !important;
-  backdrop-filter: var(--aurora-glass-blur);
-  -webkit-backdrop-filter: var(--aurora-glass-blur);
-  border: 1px solid var(--aurora-glass-border) !important;
-  border-radius: 12px;
-  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
 }
 
 .login-title {
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 24px;
-  font-weight: 600;
-  margin-bottom: 8px;
-  color: var(--aurora-pink);
+  font-size: var(--text-xl);
+  font-weight: var(--font-semibold);
+  margin-bottom: var(--space-2);
+  color: var(--text-primary);
 }
 
 .title-icon {
-  margin-right: 10px;
+  margin-right: var(--space-3);
   font-size: 32px;
   height: 32px;
   width: 32px;
@@ -58,30 +40,30 @@
 
 .subtitle {
   text-align: center;
-  color: var(--aurora-text-secondary);
-  font-size: 14px;
-  margin-bottom: 24px;
+  color: var(--text-secondary);
+  font-size: var(--text-sm);
+  margin-bottom: var(--space-5);
   font-style: italic;
 }
 
 mat-card-content {
-  padding-top: 20px;
+  padding-top: var(--space-5);
 }
 
 .full-width {
   width: 100%;
-  margin-bottom: 16px;
+  margin-bottom: var(--space-4);
 }
 
 .login-button {
   height: 48px;
-  font-size: 16px;
-  font-weight: 500;
-  margin-top: 16px;
+  font-size: var(--text-base);
+  font-weight: var(--font-medium);
+  margin-top: var(--space-4);
   position: relative;
 
   mat-icon {
-    margin-right: 8px;
+    margin-right: var(--space-2);
     vertical-align: middle;
   }
 }
@@ -95,16 +77,11 @@ mat-card-content {
 
 @media (max-width: 480px) {
   .admin-login-container {
-    padding: 12px;
-
-    &::before {
-      width: 300px;
-      height: 300px;
-    }
+    padding: var(--space-3);
   }
 
   .admin-login-card {
-    padding: 12px;
+    padding: var(--space-3);
   }
 
   .login-title {
@@ -113,6 +90,6 @@ mat-card-content {
 
   .login-button {
     height: 44px;
-    font-size: 14px;
+    font-size: var(--text-sm);
   }
 }

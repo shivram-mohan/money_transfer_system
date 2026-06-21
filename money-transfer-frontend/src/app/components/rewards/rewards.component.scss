@@ -1,23 +1,24 @@
 // src/app/components/rewards/rewards.component.scss
-// The rewards module is intentionally colorful (gamification); the rest of the
-// app stays black & white.
+// The rewards module is the gamified, yellow=cashback area; the rest of the app
+// stays black & white. Gold gradient/glow come from centralized tokens.
 
 .rewards-container {
   max-width: 760px;
   margin: 0 auto;
-  padding: 24px;
+  padding: var(--space-5);
 }
 
 .header-section {
   display: flex;
   align-items: center;
-  gap: 12px;
-  margin-bottom: 24px;
+  gap: var(--space-3);
+  margin-bottom: var(--space-5);
 
   h1 {
     margin: 0;
-    font-size: 28px;
-    font-weight: 600;
+    font-size: var(--text-xl);
+    font-weight: var(--font-semibold);
+    color: var(--text-primary);
   }
 }
 
@@ -30,22 +31,22 @@
 .rewards-content {
   display: flex;
   flex-direction: column;
-  gap: 20px;
+  gap: var(--space-5);
 }
 
 /* ── Weekend banner ─────────────────────────────────────────── */
 .weekend-banner {
   display: flex;
   align-items: center;
-  gap: 10px;
-  padding: 12px 18px;
-  border-radius: 12px;
-  font-weight: 600;
-  color: #1a1200;
-  background: linear-gradient(135deg, #ffd700 0%, #ff9d2f 100%);
-  box-shadow: 0 0 24px rgba(255, 175, 47, 0.45);
+  gap: var(--space-3);
+  padding: var(--space-3) 18px;
+  border-radius: var(--radius-md);
+  font-weight: var(--font-semibold);
+  color: var(--black);
+  background: var(--accent-cashback-gradient);
+  box-shadow: var(--accent-cashback-glow);
 
-  mat-icon { color: #1a1200; }
+  mat-icon { color: var(--black); }
 }
 
 /* ── Hero balance card ──────────────────────────────────────── */
@@ -58,7 +59,7 @@
   @media (max-width: 600px) {
     flex-direction: column;
     text-align: center;
-    gap: 16px;
+    gap: var(--space-4);
   }
 }
 
@@ -70,8 +71,8 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  background: linear-gradient(135deg, #ffd700 0%, #ffb300 60%, #ff8f00 100%);
-  box-shadow: 0 0 28px rgba(255, 193, 7, 0.6);
+  background: var(--accent-cashback-gradient);
+  box-shadow: var(--accent-cashback-glow);
   animation: float 3s ease-in-out infinite;
 
   .coin-icon {
@@ -79,6 +80,10 @@
     width: 56px;
     height: 56px;
     color: rgba(0, 0, 0, 0.78);
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    animation: none;
   }
 }
 
@@ -91,30 +96,29 @@
   display: flex;
   flex-direction: column;
   gap: 6px;
-
   align-items: center;
 
   .balance-label {
-    font-size: 14px;
-    color: var(--aurora-text-secondary);
+    font-size: var(--text-sm);
+    color: var(--text-secondary);
     align-self: center;
   }
 
   .balance-row {
     display: flex;
     align-items: center;
-    gap: 12px;
+    gap: var(--space-3);
 
     .balance {
-      font-size: 44px;
+      font-size: var(--text-3xl);
       font-weight: 800;
-      color: #ffd700;
+      color: var(--accent-cashback);
       line-height: 1;
     }
 
     .balance-cur {
       font-size: 15px;
-      color: var(--aurora-text-secondary);
+      color: var(--text-secondary);
     }
   }
 
@@ -124,13 +128,13 @@
     gap: 6px;
     align-self: flex-start;
     margin-top: 6px;
-    padding: 6px 14px;
-    border-radius: 20px;
-    font-weight: 600;
+    padding: 6px var(--space-4);
+    border-radius: var(--radius-pill);
+    font-weight: var(--font-semibold);
     font-size: 13px;
-    color: #c0c7d1;
-    background: rgba(192, 199, 209, 0.12);
-    border: 1px solid rgba(192, 199, 209, 0.35);
+    color: var(--text-secondary);
+    background: rgba(255, 255, 255, 0.08);
+    border: 1px solid var(--glass-border);
 
     mat-icon { font-size: 18px; width: 18px; height: 18px; }
 
@@ -140,23 +144,23 @@
 
 /* ── Redeem card ────────────────────────────────────────────── */
 .redeem-card {
-  padding: 20px !important;
+  padding: var(--space-5) !important;
 
   .redeem-head {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    margin-bottom: 12px;
-    font-weight: 600;
+    margin-bottom: var(--space-3);
+    font-weight: var(--font-semibold);
 
     .redeem-points {
-      color: var(--aurora-text-secondary);
+      color: var(--text-secondary);
       font-size: 13px;
       display: inline-flex;
       align-items: center;
-      gap: 4px;
+      gap: var(--space-1);
 
-      &.unlocked { color: var(--color-success); }
+      &.unlocked { color: var(--accent-success); }
 
       mat-icon { font-size: 18px; width: 18px; height: 18px; }
     }
@@ -165,16 +169,16 @@
   mat-progress-bar {
     height: 12px;
     border-radius: 6px;
-    --mdc-linear-progress-active-indicator-color: #ffd700;
+    --mdc-linear-progress-active-indicator-color: var(--accent-cashback);
     --mdc-linear-progress-track-color: rgba(255, 255, 255, 0.12);
   }
 
   .progress-foot {
     display: flex;
     justify-content: space-between;
-    margin-top: 8px;
-    font-size: 12px;
-    color: var(--aurora-text-secondary);
+    margin-top: var(--space-2);
+    font-size: var(--text-xs);
+    color: var(--text-secondary);
   }
 
   .redeem-btn {
@@ -182,7 +186,7 @@
     margin-top: 18px;
     height: 46px;
 
-    mat-icon { margin-right: 8px; }
+    mat-icon { margin-right: var(--space-2); }
   }
 }
 
@@ -191,19 +195,19 @@
   mat-card-header {
     display: flex;
     align-items: center;
-    gap: 12px;
-    padding-bottom: 12px;
+    gap: var(--space-3);
+    padding-bottom: var(--space-3);
   }
 
-  .info-icon { color: var(--aurora-text-secondary); }
+  .info-icon { color: var(--text-secondary); }
 
   ul {
-    padding-left: 20px;
+    padding-left: var(--space-5);
     margin: 0;
 
     li {
-      margin-bottom: 10px;
-      color: var(--aurora-text-secondary);
+      margin-bottom: var(--space-3);
+      color: var(--text-secondary);
       line-height: 1.5;
 
       &:last-child { margin-bottom: 0; }

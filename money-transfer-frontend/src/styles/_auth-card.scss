@@ -1,0 +1,204 @@
+// src/styles/_auth-card.scss
+// Shared layout for the centered glass auth cards (login + forgot-password use the
+// identical `.login-*` markup). Single source of truth — `@include auth-card;`.
+
+@use 'glass' as g;
+
+@mixin auth-card {
+  .login-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    background: transparent; // global ambient backdrop shows through
+    padding: var(--space-5);
+    position: relative;
+    box-sizing: border-box;
+  }
+
+  .login-card {
+    @include g.glass('strong');
+    max-width: 500px;
+    width: 100%;
+    padding: var(--space-5);
+    position: relative;
+    z-index: 1;
+  }
+
+  .login-title {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: var(--text-xl);
+    font-weight: var(--font-semibold);
+    margin-bottom: var(--space-2);
+    color: var(--text-primary);
+  }
+
+  .title-icon {
+    margin-right: var(--space-3);
+    font-size: 32px;
+    height: 32px;
+    width: 32px;
+  }
+
+  mat-card-content {
+    padding-top: var(--space-5);
+  }
+
+  .tab-content {
+    animation: fadeIn 0.3s ease;
+  }
+
+  @keyframes fadeIn {
+    from { opacity: 0; transform: translateY(10px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+
+  .tab-subtitle {
+    text-align: center;
+    color: var(--text-secondary);
+    font-size: var(--text-sm);
+    margin-bottom: var(--space-5);
+  }
+
+  .full-width {
+    width: 100%;
+    margin-bottom: var(--space-4);
+  }
+
+  .login-button {
+    height: 48px;
+    font-size: var(--text-base);
+    font-weight: var(--font-medium);
+    margin-top: var(--space-4);
+    position: relative;
+
+    mat-icon {
+      margin-right: var(--space-2);
+      vertical-align: middle;
+    }
+  }
+
+  .button-spinner {
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+  }
+
+  .forgot-password-link {
+    text-align: right;
+    margin-top: -8px;
+    margin-bottom: var(--space-2);
+
+    .link {
+      color: var(--text-primary);
+      text-decoration: none;
+      font-size: 13px;
+      font-weight: var(--font-semibold);
+      cursor: pointer;
+
+      &:hover { text-decoration: underline; }
+    }
+  }
+
+  .otp-info {
+    display: flex;
+    align-items: center;
+    gap: var(--space-3);
+    padding: var(--space-4);
+    border-radius: var(--radius-md);
+    background: rgba(255, 255, 255, 0.06);
+    border: 1px solid var(--glass-border);
+    margin-bottom: var(--space-5);
+
+    mat-icon {
+      font-size: 28px;
+      width: 28px;
+      height: 28px;
+      color: var(--text-primary);
+    }
+
+    p {
+      margin: 0;
+      font-size: var(--text-sm);
+      color: var(--text-secondary);
+      line-height: 1.5;
+
+      strong { color: var(--text-primary); }
+    }
+  }
+
+  .otp-actions {
+    text-align: center;
+    margin-top: var(--space-4);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: var(--space-3);
+
+    .link {
+      color: var(--text-primary);
+      text-decoration: none;
+      font-weight: var(--font-semibold);
+      font-size: var(--text-sm);
+      cursor: pointer;
+
+      &:hover { text-decoration: underline; }
+    }
+
+    .separator {
+      color: var(--text-secondary);
+      font-size: var(--text-sm);
+    }
+  }
+
+  .card-actions {
+    padding: 0 !important;
+    margin: 0 !important;
+  }
+
+  mat-divider {
+    margin: var(--space-4) 0;
+  }
+
+  .signup-link {
+    text-align: center;
+    padding: var(--space-4) var(--space-5);
+
+    p {
+      color: var(--text-secondary);
+      font-size: var(--text-sm);
+      margin: 0;
+    }
+
+    .link {
+      color: var(--text-primary);
+      text-decoration: none;
+      font-weight: var(--font-semibold);
+
+      &:hover { text-decoration: underline; }
+    }
+  }
+
+  mat-form-field {
+    ::ng-deep .mat-mdc-form-field-subscript-wrapper {
+      margin-top: var(--space-1);
+    }
+  }
+
+  @media (max-width: 600px) {
+    .login-card { max-width: 100%; }
+    .login-title { font-size: var(--text-lg); }
+    .title-icon { font-size: 28px; height: 28px; width: 28px; }
+  }
+
+  @media (max-width: 480px) {
+    .login-container { padding: var(--space-3); }
+    .login-card { padding: var(--space-3); }
+    .login-title { font-size: 18px; }
+    .title-icon { font-size: 24px; height: 24px; width: 24px; }
+    .login-button { height: 44px; font-size: var(--text-sm); }
+  }
+}

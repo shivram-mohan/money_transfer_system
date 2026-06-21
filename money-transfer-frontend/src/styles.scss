@@ -1,9 +1,11 @@
-/* src/styles.scss - Minimalist Monochrome Theme (black & white) */
+/* src/styles.scss — Glassmorphism Design System
+   Palette discipline: black surfaces · white text/borders · green = success ·
+   red = error · yellow = cashback/rewards. All other colour removed. */
 
 @use '@angular/material' as mat;
+@use 'glass' as g;
 
-/* ===== Custom Angular Material Dark Theme (M3 API) ===== */
-/* Palette choices are neutral; all accent colour is overridden below to grayscale. */
+/* ===== Angular Material Dark Theme (M3 API) ===== */
 $mono-theme: mat.define-theme((
   color: (
     theme-type: dark,
@@ -24,328 +26,327 @@ html {
   @include mat.typography-hierarchy($mono-theme);
 }
 
-/* ===== Monochrome CSS Custom Properties =====
-   The legacy --aurora-* names are kept so existing component styles keep working;
-   every value is now a black / white / grey shade only. */
+/* ===== Design Tokens =====
+   Single, centralized source for colour, glass, spacing, radius, type, motion. */
 :root {
-  /* Backgrounds */
-  --aurora-bg-primary: #000000;
-  --aurora-bg-secondary: #0d0d0d;
-  --aurora-bg-card: rgba(255, 255, 255, 0.04);
-  --aurora-bg-card-hover: rgba(255, 255, 255, 0.08);
-  --aurora-bg-elevated: rgba(255, 255, 255, 0.03);
+  /* ── Palette primitives ─────────────────────────────────────── */
+  --black: #000000;
+  --white: #ffffff;
+  --green-500: #22c55e;
+  --red-500: #ef4444;
+  --yellow-400: #ffd700;
 
-  /* Text */
-  --aurora-text-primary: #ffffff;
-  --aurora-text-secondary: #9e9e9e;
-  --aurora-text-muted: #cccccc;
-  --aurora-text-accent: #ffffff;
+  /* ── Base surfaces ──────────────────────────────────────────── */
+  --surface-0: #000000;   /* page base (behind the ambient backdrop) */
+  --surface-1: #0d0d0d;   /* rare opaque raised surface */
 
-  /* Accent colours -> all monochrome */
-  --aurora-teal: #ffffff;
-  --aurora-purple: #ffffff;
-  --aurora-emerald: #ffffff;
-  --aurora-blue: #ffffff;
-  --aurora-pink: #ffffff;
+  /* ── Glass (tiered) ─────────────────────────────────────────── */
+  --glass-bg:        rgba(255, 255, 255, 0.045);  /* base cards */
+  --glass-bg-strong: rgba(255, 255, 255, 0.075);  /* heroes / modals */
+  --glass-bg-solid:  rgba(18, 18, 18, 0.88);      /* dense tables / data */
+  --glass-border:       rgba(255, 255, 255, 0.12);
+  --glass-border-hover: rgba(255, 255, 255, 0.28);
+  --glass-blur:        blur(16px);
+  --glass-blur-strong: blur(24px);
+  --glass-shadow:    0 8px 32px rgba(0, 0, 0, 0.45);
+  --glass-highlight: inset 0 1px 0 rgba(255, 255, 255, 0.08);
 
-  /* "Gradients" -> flat monochrome fills */
-  --aurora-gradient-primary: #ffffff;
-  --aurora-gradient-success: #ffffff;
-  --aurora-gradient-danger: #ffffff;
-  --aurora-gradient-admin: #ffffff;
-  --aurora-gradient-accent: #ffffff;
+  /* ── Text ───────────────────────────────────────────────────── */
+  --text-primary:   #ffffff;
+  --text-secondary: rgba(255, 255, 255, 0.64);
+  --text-muted:     rgba(255, 255, 255, 0.42);
 
-  /* Glassmorphism (kept subtle, monochrome) */
-  --aurora-glass-bg: rgba(255, 255, 255, 0.04);
-  --aurora-glass-border: rgba(255, 255, 255, 0.12);
-  --aurora-glass-blur: blur(10px);
+  /* ── Semantic accents ───────────────────────────────────────── */
+  --accent-success:        var(--green-500);
+  --accent-success-bg:     rgba(34, 197, 94, 0.15);
+  --accent-success-border: rgba(34, 197, 94, 0.40);
+  --accent-error:          var(--red-500);
+  --accent-error-bg:       rgba(239, 68, 68, 0.15);
+  --accent-error-border:   rgba(239, 68, 68, 0.40);
+  --accent-cashback:        var(--yellow-400);
+  --accent-cashback-bg:     rgba(255, 215, 0, 0.15);
+  --accent-cashback-border: rgba(255, 215, 0, 0.45);
+  /* Gamification gold (rewards module) — the one place a gradient/glow is allowed. */
+  --accent-cashback-gradient: linear-gradient(135deg, #ffd700 0%, #ffb300 100%);
+  --accent-cashback-glow:     0 0 28px rgba(255, 215, 0, 0.5);
 
-  /* Borders */
-  --aurora-border: rgba(255, 255, 255, 0.12);
-  --aurora-border-hover: rgba(255, 255, 255, 0.28);
+  /* ── Spacing scale ──────────────────────────────────────────── */
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-5: 24px;
+  --space-6: 32px;
+  --space-7: 48px;
+  --space-8: 64px;
 
-  /* Shadows / Glow -> removed (no coloured glow in monochrome) */
-  --aurora-glow-teal: none;
-  --aurora-glow-purple: none;
-  --aurora-glow-emerald: none;
-  --aurora-glow-pink: none;
+  /* ── Radius scale ───────────────────────────────────────────── */
+  --radius-sm: 8px;
+  --radius-md: 12px;
+  --radius-lg: 16px;
+  --radius-pill: 999px;
 
-  /* ── Semantic status colours ──────────────────────────────────────
-     The ONLY non-monochrome colours in the app: green = success,
-     red = failure. Used wherever a success/failure outcome is shown. */
-  --color-success: #22c55e;
-  --color-success-bg: rgba(34, 197, 94, 0.15);
-  --color-success-border: rgba(34, 197, 94, 0.4);
-  --color-error: #ef4444;
-  --color-error-bg: rgba(239, 68, 68, 0.15);
-  --color-error-border: rgba(239, 68, 68, 0.4);
+  /* ── Typography scale ───────────────────────────────────────── */
+  --text-xs: 12px;
+  --text-sm: 14px;
+  --text-base: 16px;
+  --text-lg: 20px;
+  --text-xl: 24px;
+  --text-2xl: 32px;
+  --text-3xl: 44px;
+  --font-regular: 400;
+  --font-medium: 500;
+  --font-semibold: 600;
+  --font-bold: 700;
+
+  /* ── Motion ─────────────────────────────────────────────────── */
+  --dur-fast: 150ms;
+  --dur-base: 250ms;
+  --ease: cubic-bezier(0.4, 0, 0.2, 1);
 }
 
-/* ===== Global Base Styles ===== */
+/* ===== Base ===== */
 html, body {
   height: 100%;
 }
 
 body {
   margin: 0;
+  min-height: 100vh;
   font-family: 'Inter', sans-serif;
-  background-color: var(--aurora-bg-primary);
-  color: var(--aurora-text-primary);
+  background-color: var(--surface-0);
+  color: var(--text-primary);
 }
 
-/* ===== Scrollbar (Dark) ===== */
-::-webkit-scrollbar {
-  width: 8px;
-  height: 8px;
+/* Ambient monochrome depth — ONE fixed layer behind the whole app so glass blur
+   and transparency are visible. Static (no animation) and non-interactive. */
+body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  background:
+    radial-gradient(60vw 60vw at 12% 8%,  rgba(255, 255, 255, 0.06) 0%, transparent 60%),
+    radial-gradient(48vw 48vw at 88% 18%, rgba(255, 255, 255, 0.05) 0%, transparent 55%),
+    radial-gradient(72vw 72vw at 50% 108%, rgba(255, 255, 255, 0.04) 0%, transparent 60%);
 }
 
-::-webkit-scrollbar-track {
-  background: var(--aurora-bg-secondary);
+/* ===== Accessibility: visible keyboard focus ===== */
+:focus-visible {
+  outline: 2px solid var(--white);
+  outline-offset: 2px;
 }
 
+/* Respect reduced-motion globally (component animations also self-gate). */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+/* ===== Reusable glass utilities (for non-Material surfaces in templates) ===== */
+.glass        { @include g.glass('base'); }
+.glass-strong { @include g.glass('strong'); }
+.glass-solid  { @include g.glass('solid'); }
+
+/* ===== Shared spin animation (refresh icons across pages) ===== */
+.spinning { animation: spin 1s linear infinite; }
+@keyframes spin {
+  from { transform: rotate(0deg); }
+  to   { transform: rotate(360deg); }
+}
+
+/* ===== Scrollbar ===== */
+::-webkit-scrollbar { width: 8px; height: 8px; }
+::-webkit-scrollbar-track { background: var(--surface-1); }
 ::-webkit-scrollbar-thumb {
   background: rgba(255, 255, 255, 0.2);
-  border-radius: 4px;
+  border-radius: var(--radius-sm);
 }
+::-webkit-scrollbar-thumb:hover { background: rgba(255, 255, 255, 0.35); }
 
-::-webkit-scrollbar-thumb:hover {
-  background: rgba(255, 255, 255, 0.35);
-}
-
-/* ===== Snackbar Overrides ===== */
-.success-snackbar {
-  background-color: var(--color-success) !important;
-  color: #ffffff !important;
-}
-
-.error-snackbar {
-  background-color: var(--color-error) !important;
-  color: #ffffff !important;
-}
-
+/* ===== Snackbars ===== */
 .mat-mdc-snack-bar-container {
   &.success-snackbar {
-    --mdc-snackbar-container-color: var(--color-success);
+    --mdc-snackbar-container-color: var(--accent-success);
     --mat-mdc-snack-bar-button-color: #fff;
     --mdc-snackbar-supporting-text-color: #fff;
   }
-
   &.error-snackbar {
-    --mdc-snackbar-container-color: var(--color-error);
+    --mdc-snackbar-container-color: var(--accent-error);
     --mat-mdc-snack-bar-button-color: #fff;
     --mdc-snackbar-supporting-text-color: #fff;
   }
 }
 
-/* ===== Global Material Component Overrides ===== */
+/* ===== Material Component Overrides ===== */
 
-/* -- mat-card: subtle glass -- */
+/* -- mat-card: base glass -- */
 .mat-mdc-card {
-  background: var(--aurora-glass-bg) !important;
-  backdrop-filter: var(--aurora-glass-blur);
-  -webkit-backdrop-filter: var(--aurora-glass-blur);
-  border: 1px solid var(--aurora-glass-border) !important;
-  border-radius: 12px !important;
-  color: var(--aurora-text-primary);
-  box-shadow: 0 4px 24px rgba(0, 0, 0, 0.4) !important;
+  @include g.glass('base');
+  color: var(--text-primary);
 }
 
-/* -- mat-toolbar -- */
+/* -- mat-toolbar: translucent glass bar -- */
 .mat-toolbar {
-  background: var(--aurora-bg-secondary) !important;
-  color: var(--aurora-text-primary) !important;
-  border-bottom: 1px solid var(--aurora-border);
+  background: var(--glass-bg-strong) !important;
+  backdrop-filter: var(--glass-blur-strong);
+  -webkit-backdrop-filter: var(--glass-blur-strong);
+  color: var(--text-primary) !important;
+  border-bottom: 1px solid var(--glass-border);
 }
 
 /* -- mat-form-field -- */
 .mat-mdc-form-field {
   --mdc-filled-text-field-container-color: rgba(255, 255, 255, 0.05);
-  --mdc-filled-text-field-label-text-color: var(--aurora-text-secondary);
-  --mdc-filled-text-field-input-text-color: var(--aurora-text-primary);
+  --mdc-filled-text-field-label-text-color: var(--text-secondary);
+  --mdc-filled-text-field-input-text-color: var(--text-primary);
   --mdc-filled-text-field-focus-active-indicator-color: #ffffff;
   --mdc-filled-text-field-focus-label-text-color: #ffffff;
-  --mdc-filled-text-field-hover-active-indicator-color: var(--aurora-text-muted);
-  --mdc-outlined-text-field-outline-color: var(--aurora-border);
+  --mdc-filled-text-field-hover-active-indicator-color: var(--text-muted);
+  --mdc-outlined-text-field-outline-color: var(--glass-border);
   --mdc-outlined-text-field-focus-outline-color: #ffffff;
-  --mdc-outlined-text-field-hover-outline-color: var(--aurora-text-muted);
-  --mdc-outlined-text-field-label-text-color: var(--aurora-text-secondary);
-  --mdc-outlined-text-field-input-text-color: var(--aurora-text-primary);
+  --mdc-outlined-text-field-hover-outline-color: var(--text-muted);
+  --mdc-outlined-text-field-label-text-color: var(--text-secondary);
+  --mdc-outlined-text-field-input-text-color: var(--text-primary);
   --mdc-outlined-text-field-focus-label-text-color: #ffffff;
   --mdc-outlined-text-field-caret-color: #ffffff;
   --mat-mdc-form-field-focus-overlay-opacity: 0;
 }
 
-.mat-mdc-form-field .mat-mdc-form-field-hint {
-  color: var(--aurora-text-muted);
-}
+.mat-mdc-form-field .mat-mdc-form-field-hint { color: var(--text-muted); }
 
-/* -- form validation errors: red (failure) -- */
+/* -- form validation errors: red -- */
 .mat-mdc-form-field-error,
 .mat-mdc-form-field.mat-form-field-invalid {
-  --mdc-outlined-text-field-error-outline-color: var(--color-error);
-  --mdc-outlined-text-field-error-focus-outline-color: var(--color-error);
-  --mdc-outlined-text-field-error-hover-outline-color: var(--color-error);
-  --mdc-outlined-text-field-error-label-text-color: var(--color-error);
-  --mdc-outlined-text-field-error-caret-color: var(--color-error);
-  color: var(--color-error);
+  --mdc-outlined-text-field-error-outline-color: var(--accent-error);
+  --mdc-outlined-text-field-error-focus-outline-color: var(--accent-error);
+  --mdc-outlined-text-field-error-hover-outline-color: var(--accent-error);
+  --mdc-outlined-text-field-error-label-text-color: var(--accent-error);
+  --mdc-outlined-text-field-error-caret-color: var(--accent-error);
+  color: var(--accent-error);
 }
 
 /* -- mat-table -- */
-.mat-mdc-table {
-  background: transparent !important;
-}
-
-.mat-mdc-header-row {
-  background: rgba(255, 255, 255, 0.05);
-}
-
+.mat-mdc-table { background: transparent !important; }
+.mat-mdc-header-row { background: rgba(255, 255, 255, 0.05); }
 .mat-mdc-header-cell {
-  color: var(--aurora-text-secondary) !important;
-  border-bottom-color: var(--aurora-border) !important;
+  color: var(--text-secondary) !important;
+  border-bottom-color: var(--glass-border) !important;
 }
-
 .mat-mdc-cell {
-  color: var(--aurora-text-primary) !important;
-  border-bottom-color: var(--aurora-border) !important;
+  color: var(--text-primary) !important;
+  border-bottom-color: var(--glass-border) !important;
 }
+.mat-mdc-row:hover { background: rgba(255, 255, 255, 0.04) !important; }
 
-.mat-mdc-row:hover {
-  background: rgba(255, 255, 255, 0.04) !important;
-}
-
-/* -- mat-button (primary): white fill, black text -- */
+/* -- buttons: white-fill primary / outlined warn -- */
 .mat-mdc-raised-button.mat-primary,
 .mat-mdc-unelevated-button.mat-primary {
-  background: #ffffff !important;
-  color: #000000 !important;
+  background: var(--white) !important;
+  color: var(--black) !important;
   border: none;
-  transition: opacity 0.2s ease, transform 0.2s ease;
+  transition: opacity var(--dur-base) var(--ease), transform var(--dur-base) var(--ease);
 
-  &:hover:not(:disabled) {
-    opacity: 0.85;
-    transform: translateY(-1px);
-  }
+  &:hover:not(:disabled) { opacity: 0.85; transform: translateY(-1px); }
 }
 
-/* -- mat-button (warn): outlined white on dark -- */
 .mat-mdc-raised-button.mat-warn,
 .mat-mdc-unelevated-button.mat-warn {
   background: #1a1a1a !important;
-  color: #ffffff !important;
-  border: 1px solid #ffffff !important;
-  transition: background 0.2s ease, transform 0.2s ease;
+  color: var(--white) !important;
+  border: 1px solid var(--white) !important;
+  transition: background var(--dur-base) var(--ease), transform var(--dur-base) var(--ease);
 
-  &:hover:not(:disabled) {
-    background: #2a2a2a !important;
-    transform: translateY(-1px);
-  }
+  &:hover:not(:disabled) { background: #2a2a2a !important; transform: translateY(-1px); }
 }
 
 .mat-mdc-outlined-button,
 .mat-mdc-stroked-button {
-  border-color: var(--aurora-border) !important;
-  color: var(--aurora-text-primary) !important;
+  border-color: var(--glass-border) !important;
+  color: var(--text-primary) !important;
 
   &:hover {
-    border-color: var(--aurora-border-hover) !important;
+    border-color: var(--glass-border-hover) !important;
     background: rgba(255, 255, 255, 0.05) !important;
   }
 
-  &.mat-primary {
-    border-color: rgba(255, 255, 255, 0.5) !important;
-    color: #ffffff !important;
-
-    &:hover {
-      background: rgba(255, 255, 255, 0.1) !important;
-    }
-  }
-
+  &.mat-primary,
   &.mat-warn {
     border-color: rgba(255, 255, 255, 0.5) !important;
-    color: #ffffff !important;
-
-    &:hover {
-      background: rgba(255, 255, 255, 0.1) !important;
-    }
+    color: var(--white) !important;
+    &:hover { background: rgba(255, 255, 255, 0.1) !important; }
   }
 }
 
 .mat-mdc-icon-button {
-  color: var(--aurora-text-secondary) !important;
-
+  color: var(--text-secondary) !important;
   &:hover {
-    color: var(--aurora-text-primary) !important;
+    color: var(--text-primary) !important;
     background: rgba(255, 255, 255, 0.05) !important;
   }
 }
 
 .mat-mdc-button {
-  color: var(--aurora-text-primary) !important;
-
-  &:hover {
-    background: rgba(255, 255, 255, 0.05) !important;
-  }
+  color: var(--text-primary) !important;
+  &:hover { background: rgba(255, 255, 255, 0.05) !important; }
 }
 
-/* -- mat-menu -- */
+/* -- mat-menu: glass -- */
 .mat-mdc-menu-panel {
-  background: var(--aurora-bg-secondary) !important;
-  border: 1px solid var(--aurora-border) !important;
-  backdrop-filter: var(--aurora-glass-blur);
-  -webkit-backdrop-filter: var(--aurora-glass-blur);
+  background: var(--glass-bg-solid) !important;
+  border: 1px solid var(--glass-border) !important;
+  backdrop-filter: var(--glass-blur);
+  -webkit-backdrop-filter: var(--glass-blur);
 }
-
 .mat-mdc-menu-item {
-  color: var(--aurora-text-primary) !important;
-
-  .mat-icon {
-    color: var(--aurora-text-secondary) !important;
-  }
-
-  &:hover {
-    background: rgba(255, 255, 255, 0.05) !important;
-  }
+  color: var(--text-primary) !important;
+  .mat-icon { color: var(--text-secondary) !important; }
+  &:hover { background: rgba(255, 255, 255, 0.05) !important; }
 }
 
 /* -- mat-select -- */
 .mat-mdc-select {
-  --mat-select-trigger-text-color: var(--aurora-text-primary);
-  --mat-select-enabled-arrow-color: var(--aurora-text-secondary);
+  --mat-select-trigger-text-color: var(--text-primary);
+  --mat-select-enabled-arrow-color: var(--text-secondary);
 }
-
 .mat-mdc-select-panel {
-  background: var(--aurora-bg-secondary) !important;
-  border: 1px solid var(--aurora-border);
+  background: var(--glass-bg-solid) !important;
+  border: 1px solid var(--glass-border);
+  backdrop-filter: var(--glass-blur);
+  -webkit-backdrop-filter: var(--glass-blur);
 }
-
 .mat-mdc-option {
-  color: var(--aurora-text-primary) !important;
-
-  &:hover {
-    background: rgba(255, 255, 255, 0.05) !important;
-  }
-
+  color: var(--text-primary) !important;
+  &:hover { background: rgba(255, 255, 255, 0.05) !important; }
   &.mdc-list-item--selected,
-  &.mat-mdc-option-active {
-    background: rgba(255, 255, 255, 0.1) !important;
-  }
+  &.mat-mdc-option-active { background: rgba(255, 255, 255, 0.1) !important; }
 }
 
 /* -- mat-datepicker -- */
 .mat-datepicker-content {
-  background: var(--aurora-bg-secondary) !important;
-  color: var(--aurora-text-primary) !important;
-  border: 1px solid var(--aurora-border);
+  background: var(--glass-bg-solid) !important;
+  color: var(--text-primary) !important;
+  border: 1px solid var(--glass-border);
+  backdrop-filter: var(--glass-blur);
+  -webkit-backdrop-filter: var(--glass-blur);
 }
 
-/* -- mat-dialog -- */
+/* -- mat-dialog: strong glass -- */
 .mat-mdc-dialog-container {
-  --mdc-dialog-container-color: var(--aurora-bg-secondary);
+  --mdc-dialog-container-color: transparent;
 }
-
 .mat-mdc-dialog-surface {
-  background: var(--aurora-bg-secondary) !important;
-  border: 1px solid var(--aurora-border) !important;
+  background: var(--glass-bg-solid) !important;
+  border: 1px solid var(--glass-border) !important;
+  border-radius: var(--radius-lg) !important;
+  backdrop-filter: var(--glass-blur-strong);
+  -webkit-backdrop-filter: var(--glass-blur-strong);
+  box-shadow: var(--glass-shadow), var(--glass-highlight) !important;
 }
 
 /* -- mat-tab-group -- */
@@ -353,7 +354,7 @@ body {
   --mat-tab-header-active-label-text-color: #ffffff;
   --mat-tab-header-active-focus-label-text-color: #ffffff;
   --mat-tab-header-active-hover-label-text-color: #ffffff;
-  --mat-tab-header-inactive-label-text-color: var(--aurora-text-secondary);
+  --mat-tab-header-inactive-label-text-color: var(--text-secondary);
   --mat-tab-header-active-focus-indicator-color: #ffffff;
   --mat-tab-header-active-hover-indicator-color: #ffffff;
   --mat-tab-header-active-ripple-color: #ffffff;
@@ -362,9 +363,7 @@ body {
 }
 
 /* -- mat-chip -- */
-.mat-mdc-chip {
-  border: 1px solid var(--aurora-border) !important;
-}
+.mat-mdc-chip { border: 1px solid var(--glass-border) !important; }
 
 /* -- mat-progress-spinner -- */
 .mat-mdc-progress-spinner {
@@ -374,19 +373,12 @@ body {
 /* -- mat-paginator -- */
 .mat-mdc-paginator {
   background: transparent !important;
-  color: var(--aurora-text-secondary) !important;
+  color: var(--text-secondary) !important;
 }
 
 /* -- mat-divider -- */
-.mat-divider {
-  border-top-color: var(--aurora-border) !important;
-}
+.mat-divider { border-top-color: var(--glass-border) !important; }
 
-/* -- mat-card subtitle/title helpers -- */
-.mat-mdc-card-title {
-  color: var(--aurora-text-primary) !important;
-}
-
-.mat-mdc-card-subtitle {
-  color: var(--aurora-text-secondary) !important;
-}
+/* -- mat-card title/subtitle -- */
+.mat-mdc-card-title { color: var(--text-primary) !important; }
+.mat-mdc-card-subtitle { color: var(--text-secondary) !important; }

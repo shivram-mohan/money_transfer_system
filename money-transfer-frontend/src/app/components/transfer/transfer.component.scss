@@ -1,67 +1,67 @@
 // src/app/components/transfer/transfer.component.scss
+@use 'glass' as g;
 
 .transfer-container {
-  padding: 24px;
+  padding: var(--space-5);
   max-width: 900px;
   margin: 0 auto;
-  background-color: var(--aurora-bg-primary);
+  background: transparent; // global ambient backdrop shows through
   min-height: calc(100vh - 64px);
 }
 
 .header-section {
   display: flex;
   align-items: center;
-  gap: 16px;
-  margin-bottom: 24px;
+  gap: var(--space-4);
+  margin-bottom: var(--space-5);
 
   .back-button {
     mat-icon {
-      color: var(--aurora-teal);
+      color: var(--text-primary);
     }
   }
 
   h1 {
-    font-size: 28px;
-    font-weight: 600;
-    color: var(--aurora-text-primary);
+    font-size: var(--text-xl);
+    font-weight: var(--font-semibold);
+    color: var(--text-primary);
     margin: 0;
   }
 }
 
 .transfer-content {
   display: grid;
-  gap: 24px;
+  gap: var(--space-5);
 }
 
 // Account Info Card
 .account-info-card {
-  background: var(--aurora-bg-secondary) !important;
-  color: var(--aurora-text-primary);
-  border: 1px solid var(--aurora-border) !important;
+  @include g.glass('base');
+  color: var(--text-primary);
 
   .info-row {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding: 12px 0;
+    padding: var(--space-3) 0;
 
     &:not(:last-child) {
-      border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+      border-bottom: 1px solid var(--glass-border);
     }
 
     .label {
-      font-size: 14px;
+      font-size: var(--text-sm);
       opacity: 0.9;
     }
 
     .value {
-      font-size: 16px;
-      font-weight: 500;
+      font-size: var(--text-base);
+      font-weight: var(--font-medium);
     }
 
     .balance-amount {
-      font-size: 20px;
-      font-weight: 600;
+      font-size: var(--text-lg);
+      font-weight: var(--font-semibold);
     }
   }
 }
@@ -71,73 +71,73 @@
   mat-card-header {
     display: flex;
     align-items: center;
-    gap: 12px;
-    padding-bottom: 16px;
+    gap: var(--space-3);
+    padding-bottom: var(--space-4);
   }
 
   .card-icon {
-    color: var(--aurora-teal);
+    color: var(--text-primary);
     font-size: 28px;
     height: 28px;
     width: 28px;
   }
 
   mat-card-title {
-    font-size: 20px;
-    font-weight: 500;
+    font-size: var(--text-lg);
+    font-weight: var(--font-medium);
   }
 
   .full-width {
     width: 100%;
-    margin-bottom: 20px;
+    margin-bottom: var(--space-5);
   }
 
   .form-actions {
     display: flex;
-    gap: 16px;
+    gap: var(--space-4);
     justify-content: flex-end;
-    margin-top: 24px;
+    margin-top: var(--space-5);
 
     button {
       min-width: 120px;
       height: 44px;
 
       mat-icon {
-        margin-right: 8px;
+        margin-right: var(--space-2);
       }
     }
   }
 
   .button-spinner {
-    margin-right: 8px;
+    margin-right: var(--space-2);
   }
 }
 
-/* Rewards panel on the success card (colorful gamification) */
+/* Rewards panel on the success card — yellow = cashback */
 .reward-panel {
-  margin: 0 0 24px;
-  padding: 14px 20px;
-  border-radius: 12px;
-  background: rgba(255, 215, 0, 0.06);
-  border: 1px solid rgba(255, 215, 0, 0.35);
+  margin: 0 0 var(--space-5);
+  padding: 14px var(--space-5);
+  border-radius: var(--radius-md);
+  background: var(--accent-cashback-bg);
+  border: 1px solid var(--accent-cashback-border);
 
   .reward-head {
     display: flex;
     align-items: center;
     justify-content: center;
-    gap: 8px;
-    font-weight: 700;
-    color: #ffd700;
+    gap: var(--space-2);
+    font-weight: var(--font-bold);
+    color: var(--accent-cashback);
 
-    mat-icon { color: #ffd700; }
+    mat-icon { color: var(--accent-cashback); }
 
     .weekend-tag {
       font-size: 11px;
-      font-weight: 700;
-      color: #1a1200;
-      background: #ffd700;
+      font-weight: var(--font-bold);
+      color: var(--black);
+      background: var(--accent-cashback);
       border-radius: 10px;
-      padding: 2px 8px;
+      padding: 2px var(--space-2);
     }
   }
 
@@ -145,7 +145,7 @@
     text-align: center;
     margin-top: 6px;
     font-size: 13px;
-    color: var(--aurora-text-secondary);
+    color: var(--text-secondary);
   }
 
   .reward-note {
@@ -154,8 +154,8 @@
     justify-content: center;
     gap: 6px;
     margin: 0;
-    color: var(--aurora-text-secondary);
-    font-size: 14px;
+    color: var(--text-secondary);
+    font-size: var(--text-sm);
 
     mat-icon { font-size: 18px; width: 18px; height: 18px; }
   }
@@ -163,11 +163,11 @@
 
 // Success Card
 .success-card {
-  border: 2px solid var(--color-success) !important;
+  border: 2px solid var(--accent-success) !important;
 
   mat-card-content {
     text-align: center;
-    padding: 32px 24px;
+    padding: var(--space-6) var(--space-5);
   }
 
   .success-icon {
@@ -175,54 +175,54 @@
       font-size: 80px;
       height: 80px;
       width: 80px;
-      color: var(--color-success);
-      margin-bottom: 16px;
+      color: var(--accent-success);
+      margin-bottom: var(--space-4);
     }
   }
 
   h2 {
-    font-size: 24px;
-    font-weight: 600;
-    color: var(--color-success);
-    margin-bottom: 8px;
+    font-size: var(--text-xl);
+    font-weight: var(--font-semibold);
+    color: var(--accent-success);
+    margin-bottom: var(--space-2);
   }
 
   .success-message {
-    font-size: 16px;
-    color: var(--aurora-text-secondary);
-    margin-bottom: 32px;
+    font-size: var(--text-base);
+    color: var(--text-secondary);
+    margin-bottom: var(--space-6);
   }
 
   .transaction-details {
     background-color: rgba(255, 255, 255, 0.05);
-    border-radius: 8px;
-    padding: 20px;
-    margin-bottom: 24px;
+    border-radius: var(--radius-sm);
+    padding: var(--space-5);
+    margin-bottom: var(--space-5);
     text-align: left;
 
     .detail-row {
       display: flex;
       justify-content: space-between;
-      padding: 12px 0;
+      padding: var(--space-3) 0;
 
       &:not(:last-child) {
-        border-bottom: 1px solid var(--aurora-border);
+        border-bottom: 1px solid var(--glass-border);
       }
 
       .label {
-        font-size: 14px;
-        color: var(--aurora-text-secondary);
+        font-size: var(--text-sm);
+        color: var(--text-secondary);
       }
 
       .value {
-        font-size: 14px;
-        font-weight: 500;
-        color: var(--aurora-text-primary);
+        font-size: var(--text-sm);
+        font-weight: var(--font-medium);
+        color: var(--text-primary);
 
         &.amount {
-          font-size: 18px;
-          font-weight: 600;
-          color: var(--color-success);
+          font-size: var(--text-base);
+          font-weight: var(--font-semibold);
+          color: var(--accent-success);
         }
       }
     }
@@ -230,14 +230,14 @@
 
   .success-actions {
     display: flex;
-    gap: 16px;
+    gap: var(--space-4);
     justify-content: center;
 
     button {
       min-width: 140px;
 
       mat-icon {
-        margin-right: 8px;
+        margin-right: var(--space-2);
       }
     }
   }
@@ -248,29 +248,29 @@
   mat-card-header {
     display: flex;
     align-items: center;
-    gap: 12px;
-    padding-bottom: 16px;
+    gap: var(--space-3);
+    padding-bottom: var(--space-4);
   }
 
   .info-icon {
-    color: var(--aurora-text-primary);
+    color: var(--text-primary);
     font-size: 28px;
     height: 28px;
     width: 28px;
   }
 
   mat-card-title {
-    font-size: 18px;
-    font-weight: 500;
+    font-size: var(--text-lg);
+    font-weight: var(--font-medium);
   }
 
   ul {
-    padding-left: 24px;
+    padding-left: var(--space-5);
     margin: 0;
 
     li {
-      margin-bottom: 12px;
-      color: var(--aurora-text-secondary);
+      margin-bottom: var(--space-3);
+      color: var(--text-secondary);
       line-height: 1.6;
 
       &:last-child {
@@ -283,11 +283,11 @@
 // Responsive
 @media (max-width: 768px) {
   .transfer-container {
-    padding: 16px;
+    padding: var(--space-4);
   }
 
   .header-section h1 {
-    font-size: 22px;
+    font-size: var(--text-lg);
   }
 
   .form-actions {
@@ -309,16 +309,16 @@
 
 @media (max-width: 480px) {
   .transfer-container {
-    padding: 12px;
+    padding: var(--space-3);
   }
 
   .header-section h1 {
-    font-size: 20px;
+    font-size: var(--text-lg);
   }
 
   .success-card {
     mat-card-content {
-      padding: 20px 12px;
+      padding: var(--space-5) var(--space-3);
     }
 
     .success-icon mat-icon {
@@ -328,11 +328,11 @@
     }
 
     h2 {
-      font-size: 20px;
+      font-size: var(--text-lg);
     }
 
     .transaction-details {
-      padding: 12px;
+      padding: var(--space-3);
     }
   }
 }
