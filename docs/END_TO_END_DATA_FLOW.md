@@ -853,4 +853,230 @@ A. `GlobalExceptionHandler` (`@RestControllerAdvice`) maps each exception to an 
 A. `RewardSchedulerService`: monthly summary email at `0 0 8 1 * *` (08:00 on the 1st), and a daily inactivity sweep at `0 0 9 * * *` (warn at 20 days idle, downgrade one tier at 30 days idle).
 
 **Q20. Does the app use localStorage or cookies for the session?**
-A. Neither — tokens and profile fields are kept in `sessionStorage` (cleared on tab close or logout); auth is bearer-token, not cookie-based.
+A. For the **session/auth**, neither — tokens and profile fields are kept in `sessionStorage` (cleared on tab close or logout); auth is bearer-token, not cookie-based. `localStorage` is used only for the non-sensitive **UI theme preference** (`app-theme`), never for credentials (see §21).
+
+---
+
+# 19. Complete Functionality Inventory (what is implemented, and how)
+
+> Every item below exists in the codebase. "How" names the concrete classes/methods/tables.
+
+## A. Authentication & onboarding
+
+| Functionality | How it is implemented |
+| ------------- | --------------------- |
+| **3-step OTP signup** | `SignupComponent` → `AuthService` → `AuthController` (`/auth/signup/verify-account` → `/verify-otp` → `/set-password`). Step 1 checks username/email uniqueness (`UserRepository.existsByUsername/existsByEmailIgnoreCase`) and sends an OTP; step 2 verifies it; step 3 `UserService.completeSignup` inserts the `users` row (BCrypt password, status `ACTIVE`, no bank yet). |
+| **Auto-login after signup** | `AuthController.setPassword` issues JWTs via `JwtUtil` and returns `AuthResponse`; the frontend persists the session and routes to `/dashboard`. |
+| **2-step OTP login** | `LoginComponent` → `/auth/login` (validates credentials via `AuthenticationManager`, sends OTP) → `/auth/login/verify-otp` (re-auth + `OtpService.verifyOtp` + `JwtUtil.generateToken/generateRefreshToken`). |
+| **Admin login (no OTP)** | `AdminLoginComponent` → `/auth/admin/login`; authenticates, asserts `ROLE_ADMIN`, returns JWT with `accountId = null`. |
+| **Forgot / reset password** | `ForgotPasswordComponent` → `/auth/forgot-password` (`UserService.getUserForPasswordReset` + OTP `RESET`) → `/auth/reset-password` (verify OTP, `UserService.resetPassword` re-encodes password). |
+| **Token refresh (rotation)** | `authInterceptor` on HTTP 401 → `/auth/refresh`; `AuthController.refreshToken` validates the refresh token (`JwtUtil.validateRefreshToken`) and returns a new access **and** refresh token. |
+| **Re-auth for sensitive actions** | `PasswordPromptComponent` → `AuthService.verifyPassword` → `/auth/verify-password` (re-checks password without issuing a token); gates balance reveal on the dashboard. |
+| **Bank-account linking** | `DashboardComponent.linkBankAccount` → `/users/link-bank` → `UserService.linkBankAccount`: requires a matching `bank_details` row (by `account_number` **and** email), not already `registered`; creates the `accounts` row seeded from the bank balance and stamps `users.account_id`. |
+| **Idle auto-logout** | `InactivityService` (client-only): warns at 8 min via `InactivityWarningComponent` (live countdown), logs out at 10 min; `mousemove/keydown/scroll/touch/click` reset the timer. Started/stopped by `AppComponent` based on `AuthService.isAuthenticated$`. |
+
+## B. Money transfer & accounts
+
+| Functionality | How |
+| ------------- | --- |
+| **Pre-transfer receiver confirmation** | `TransferComponent.onSubmit` looks up `GET /accounts/{toId}` and shows the holder name in `ConfirmDialogComponent` before sending. |
+| **Idempotent transfer** | Client generates `idempotencyKey` (`TransferService.generateIdempotencyKey`); `TransferService.checkIdempotency` rejects replays via `transaction_logs.idempotency_key` (unique) → `DuplicateTransferException` (409). |
+| **Validation & execution** | `TransferService.validateTransfer` (positive amount, CASHBACK-account guard, no self-transfer, both accounts active, sufficient balance) then `executeTransfer` (`Account.debit/credit`, save, `syncBankDetailsBalance`, SUCCESS `transaction_logs` row). All in one `@Transactional`. |
+| **Failed-attempt logging** | On any exception, `TransactionLogService.logFailedTransfer` writes a FAILED row in a **separate** `REQUIRES_NEW` transaction (survives rollback; `idempotency_key = null` so retry is possible). |
+| **Failed rows hidden from receiver** | `TransactionLogRepository.findVisibleByAccountId` returns rows where the account is sender, or is receiver **and** `status <> FAILED`. |
+| **Optimistic concurrency** | `Account.version` (`@Version`) guards concurrent balance writes. |
+| **Balance reveal gating** | `DashboardComponent` keeps balance hidden until `PasswordPromptComponent` re-verifies the password. |
+| **Admin account ops** | `AccountController`/`AccountService`: list all, create (random 10-digit id via `generateUniqueAccountId`), activate, deactivate (LOCKED). |
+
+## C. Transaction history & statements
+
+| Functionality | How |
+| ------------- | --- |
+| **Full / ranged history** | `HistoryComponent` → `AccountService` → `/accounts/{id}/transactions` and `/transactions/last-week|last-month|last-year` and `/transactions/filter?startDate&endDate` (`AccountService.getFilteredTransactionHistory`). |
+| **Holder-name enrichment & CASHBACK masking** | `AccountService` populates the `@Transient` holder-name fields and replaces the corporate CASHBACK id with the label `"CASHBACK"` (`maskCashbackAccount`). |
+| **PDF statement** | `/accounts/{id}/statement/pdf` → `PdfService.generateTransactionStatement` returns a `byte[]` with `Content-Disposition: attachment`. |
+
+## D. Rewards & gamification (detailed)
+
+| Functionality | How |
+| ------------- | --- |
+| **Earning eligibility** | `RewardService.processReward` (joins the transfer tx): amount > ₹100, sender ≠ receiver/not self, sender is a registered user (`UserRepository.findByAccountId`), and it's the **first transfer today for this directed (from→to) pair** (`RewardLedgerRepository.existsByFromAccountIdAndToAccountIdAndRewardDate`). |
+| **Points formula** | `basePoints = floor(amount / 100)`; `pointsEarned = floor(basePoints × tier.multiplier)`. |
+| **Tiers & multipliers** | `enum Tier`: BRONZE 0+ (×1.0), SILVER 500+ (×1.5), GOLD 2000+ (×2.0), PLATINUM 5000+ (×3.0). Tier is derived from lifetime `users.reward_points` via `Tier.fromPoints` (single source of truth). |
+| **Guaranteed cashback** | `RewardService.payCashback`: a random amount in `[1, pointsEarned]` (`ThreadLocalRandom`) is moved from the corporate **CASHBACK** account (id `9999999999`, ₹1B float seeded by `DataSeeder`) to the receiver and logged as a SUCCESS `transaction_logs` row (`idempotency_key = "cashback-<txnId>"`). Skipped (points still granted) if the float is missing/exhausted. |
+| **CASHBACK account protection** | Transfers **into** it are blocked (`validateTransfer`); its id is masked in all history (`AccountService.maskCashbackAccount`). |
+| **Reward audit ledger** | Every rewarded transfer inserts a `reward_ledger` row (points, cashback, `reward_date`) used for the daily-limit check and summaries. |
+| **Tier upgrade / nudge UX** | `TransferResponse.reward` (`RewardResult`) carries `tierUpgraded`, `closeToNextTier`, progress; `TransferComponent` shows `RewardDialogComponent` to celebrate upgrades / nudge when close. |
+| **Rewards profile page** | `RewardsComponent` → `/rewards/me` → `RewardService.getProfile` → `RewardProfileResponse` (points, tier, multiplier, `progressPercent`, next tier, lifetime cashback). Tier badges are the only colourful UI (`TIER_META`). |
+| **Monthly summary** | `/rewards/me/summary?month=yyyy-MM` → `RewardService.getMonthlySummary` aggregates `reward_ledger` (`sumPointsEarned`, `sumCashback`, `countByUserIdAndCreatedOnBetween`). |
+| **Monthly summary email (scheduled)** | `RewardSchedulerService.sendMonthlySummaries` — cron `0 0 8 1 * *` (08:00 on the 1st) emails last month's summary to every active, bank-linked user with an email. |
+| **Inactivity downgrade (scheduled)** | `RewardSchedulerService.runInactivitySweep` — cron `0 0 9 * * *` (daily 09:00). If `users.last_transaction_date` is **≥ 30 days** old → downgrade one tier (`Tier.previous()`, points reset to that tier's `minPoints`), restart the clock, send a downgrade email. At **20 days** idle (30 − 10 lead) → send a one-time warning email (guarded by `downgrade_warning_sent`). BRONZE/never-transacted users are skipped. Each user is processed defensively so one failure doesn't abort the batch. |
+| **Reward standing maintenance** | On each rewarded transfer, `users.reward_points`, `tier`, `last_transaction_date` are updated and `downgrade_warning_sent` reset to false. |
+
+## E. Admin & user management
+
+| Functionality | How |
+| ------------- | --- |
+| **List/admin users** | `UserListComponent`/`AdminDashboardComponent` → `UserManagementService` → `/users`, `/users/{id}`. Dashboard computes total/active/inactive counts client-side. |
+| **Activate / deactivate user** | `/users/{id}/activate`, `/users/deactivate` → `UserService`; status change **cascades** to the linked `accounts` status (ACTIVE ↔ LOCKED). |
+
+## F. Email notifications
+
+| Functionality | How |
+| ------------- | --- |
+| **OTP emails** | `EmailService.sendOtpEmail` (`@Async("otpMailExecutor")`) — purpose-specific body for SIGNUP/LOGIN/RESET; OTP persisted **before** dispatch so the API responds immediately. |
+| **Rewards emails** | `sendMonthlySummaryEmail`, `sendDowngradeWarningEmail`, `sendDowngradeEmail` (all `@Async`). Failures are caught & logged, never propagated. |
+| **Transport** | Spring `JavaMailSender`, Gmail SMTP `smtp.gmail.com:587` STARTTLS, 5s timeouts; dedicated pool `AsyncConfig.otpMailExecutor` (core 2 / max 5 / queue 100). |
+
+## G. Platform / cross-cutting
+
+| Functionality | How |
+| ------------- | --- |
+| **Light/Dark theme toggle (app-wide)** | `ThemeService` (signal + `localStorage['app-theme']`) toggles a `dark-theme` class on `<html>`; `styles.scss` flips all `--aurora-*` variables + Material colors. A floating button in `AppComponent` is shown on every screen. |
+| **Global error handling** | `GlobalExceptionHandler` (`@RestControllerAdvice`) → uniform `ErrorResponse {errorCode,message,timestamp,path}` (ACC-404/403, TRX-400/409, VAL-422, AUTH-401, SYS-500). |
+| **Service logging (AOP)** | `LoggingAspect` `@Around` `service.*.*(..)` logs entry/exit/args/result/timing for every service method. |
+| **Startup seeding/migration** | `DataSeeder` (`CommandLineRunner`): seeds admin user, 5 `bank_details` records, the CASHBACK account; backfills reward columns; migrates the `otp_tokens` table. |
+| **CORS / stateless security** | `CorsConfig` (origin `localhost:4200`) + `SecurityConfig` (`STATELESS`, role rules, JWT filter). |
+
+---
+
+# 20. End-to-End Data Flow (Frontend ↔ Backend ↔ Database)
+
+## 20.1 The layered pipeline
+
+```text
+[Angular component]                        templates bind to component state; forms (ReactiveForms) collect input
+   │  calls a typed service method (Observable)
+[Angular service]  (auth/account/transfer/reward/user-management)
+   │  HttpClient builds the request to environment.apiUrl = http://localhost:8080/api/v1
+[authInterceptor]  attaches "Authorization: Bearer <accessToken>" (from sessionStorage)
+   │  (on 401 → single shared /auth/refresh → retry; see §21)
+══════════════════════ network (JSON over HTTP) ══════════════════════
+[CorsFilter]          CorsConfig validates origin/headers/method
+[JwtAuthFilter]       parses Bearer token → JwtUtil.extractUsername → CustomUserDetailsService.loadUserByUsername
+   │                  → JwtUtil.validateToken → SecurityContextHolder.setAuthentication
+[SecurityConfig]      authorizeHttpRequests: permitAll / authenticated / hasRole('ADMIN')
+[@RestController]     Jackson deserializes JSON → request DTO; @Valid runs Bean Validation
+[@Service]            business logic, @Transactional boundary
+[Spring Data JPA]     repository methods / JPQL → Hibernate
+[MySQL]               SQL executes; rows mapped back to @Entity objects
+   │  service maps entity → response DTO
+[@RestController]     Jackson serializes DTO → JSON, ResponseEntity (status + body)
+══════════════════════ network ══════════════════════
+[Angular service]     Observable emits typed response
+[Angular component]   updates state / navigates / shows MatSnackBar; (errors → component error handler)
+```
+
+* **Serialization:** JSON both ways via Jackson (backend) and `HttpClient` generic typing (frontend). DTOs are the contract — entities are never exposed directly except `TransactionLog` (which carries `@Transient` display fields).
+* **Validation lives at the edge:** Jakarta Bean Validation annotations on request DTOs (`@NotNull`, `@Positive`, `@DecimalMin/Max`, `@Email`); failures become `MethodArgumentNotValidException` → 422 before any service code runs.
+* **Transaction boundary:** opened at the `@Service` method (`@Transactional`), committed/rolled back around the repository calls; the DB sees a single unit of work (except the deliberate `REQUIRES_NEW` failed-transfer log).
+
+## 20.2 Concrete trace — money transfer (write path)
+
+```text
+TransferComponent.executeTransfer
+  → TransferService.transfer(TransferRequest)            [HttpClient POST /transfers]
+  → authInterceptor adds Bearer token
+  → JwtAuthFilter authenticates → SecurityConfig allows (authenticated)
+  → TransferController.transfer (@Valid TransferRequest)
+  → TransferService.transfer [@Transactional]
+       checkIdempotency      → SELECT transaction_logs WHERE idempotency_key=?
+       validateTransfer      → SELECT accounts (×2)  [AccountService.getAccountById]
+       executeTransfer       → UPDATE accounts (debit), UPDATE accounts (credit)
+                             → UPDATE bank_details (×, syncBankDetailsBalance)
+                             → INSERT transaction_logs (SUCCESS)
+       processReward         → SELECT reward_ledger (dup check) → UPDATE accounts (CASHBACK, receiver)
+                             → INSERT transaction_logs (cashback SUCCESS)
+                             → UPDATE users (points/tier) → INSERT reward_ledger
+  ← COMMIT → TransferResponse{...,reward} → JSON
+  → component: snackbar + RewardDialog + reload balance
+  (exception path → ROLLBACK; TransactionLogService.logFailedTransfer INSERT (REQUIRES_NEW) → 4xx ErrorResponse)
+```
+
+## 20.3 Concrete trace — rewards profile (read path)
+
+```text
+RewardsComponent.loadRewards → RewardService.getMyRewards [GET /rewards/me]
+  → JwtAuthFilter resolves principal → Authentication.getName() = username
+  → RewardController.myRewards → RewardService.getProfile(username) [@Transactional(readOnly=true)]
+       SELECT users WHERE username=?  → SELECT SUM(cashback) FROM reward_ledger ...
+  ← RewardProfileResponse → JSON → component renders tier badges/progress
+```
+
+## 20.4 Non-HTTP flows
+
+* **Scheduled jobs (no frontend):** `@EnableScheduling` → `RewardSchedulerService` cron jobs read `users`/`reward_ledger`, write `users`, and call `EmailService` → SMTP.
+* **Async email:** controllers/services call `EmailService` `@Async` methods that run on `otpMailExecutor` threads and talk to Gmail SMTP — fully off the request thread.
+* **Startup:** `DataSeeder` (`CommandLineRunner`) runs once after context load, using `JdbcTemplate` (migration DDL) and repositories (seed rows).
+* **Schema:** no hand-written DDL is applied at runtime — Hibernate `ddl-auto: update` reconciles the MySQL schema to the `@Entity` classes on boot.
+
+## 20.5 Direction-of-trust summary
+
+* The **frontend is never trusted** for authorization or balance rules — it only improves UX (e.g. it does **not** block an over-balance transfer; the backend rejects it and logs a FAILED row).
+* The **backend is the source of truth**; the **database** holds durable state; **JWT** carries identity/role between them on every call.
+
+---
+
+# 21. Client-Side Storage, Auth Guards & JWT
+
+## 21.1 What is stored where
+
+### sessionStorage (auth/session) — `AuthService.persistSession`
+Cleared on tab close and on `logout()`. Keys:
+
+| Key | Holds | Set by | Used by |
+| --- | ----- | ------ | ------- |
+| `auth_token` | JWT access token | login/admin-login/signup/refresh | `authInterceptor` (Bearer), `authGuard` |
+| `refresh_token` | JWT refresh token | same | `authInterceptor` refresh |
+| `account_id` | linked account id (or absent) | login/refresh/`setLinkedAccount` | dashboard/transfer/history |
+| `holder_name` | display name | login/refresh/link-bank | navbars, greetings |
+| `user_id` | user id | login (defaults `'1'`) | misc |
+| `user_role` | `USER`/`ADMIN` | login | `isAdmin()`, guards |
+| `username` | username | login | `verify-password` |
+
+### localStorage (preferences only)
+| Key | Holds | Set by |
+| --- | ----- | ------ |
+| `app-theme` | `light` \| `dark` UI theme | `ThemeService` |
+
+> **No credentials or tokens are ever placed in `localStorage`** — only the non-sensitive theme choice (so it persists across tabs/restarts).
+
+### Cookies
+**Not used.** Auth is bearer-token in `sessionStorage`; the server is stateless (no `JSESSIONID`, no auth cookie). CSRF is therefore disabled by design.
+
+### In-memory (not persisted)
+`AuthService.isAuthenticatedSubject` (`BehaviorSubject<boolean>`) drives reactive UI (e.g. starting/stopping `InactivityService`); the `authInterceptor` keeps a module-level `isRefreshing` flag + `refreshedToken$` `BehaviorSubject` to coalesce concurrent refreshes.
+
+## 21.2 Route guards (`guards/`, functional `CanActivateFn`)
+
+| Guard | Rule | On failure | Applied to |
+| ----- | ---- | ---------- | ---------- |
+| `authGuard` | `AuthService.isAuthenticated()` (access token present) | redirect `/login` | `/dashboard`, `/transfer`, `/history`, `/rewards`, `/admin`, `/admin/users` |
+| `userGuard` | block admins from user screens (`!isAdmin()`) | redirect `/admin` | `/dashboard`, `/transfer`, `/history`, `/rewards` |
+| `adminGuard` | `isAdmin()` (role from token-derived session) | redirect `/dashboard` | `/admin`, `/admin/users` |
+
+Routes are declared in `app.routes.ts`; protected routes list `canActivate: [authGuard, userGuard]` or `[authGuard, adminGuard]`. Public routes: `/login`, `/signup`, `/forgot-password`, `/admin/login`. Unknown paths (`**`) redirect to `/login`.
+
+> Guards are **UX gating only** — the real enforcement is server-side (`SecurityConfig` + `JwtAuthFilter`). A tampered client cannot bypass `hasRole('ADMIN')` checks on the API.
+
+## 21.3 HTTP interceptor (`authInterceptor`)
+
+1. Reads `auth_token` and attaches `Authorization: Bearer <token>` to every outgoing request.
+2. On **HTTP 401** for a non-auth endpoint *with* a refresh token: calls `AuthService.refreshToken()` **once** (shared across concurrent 401s via `isRefreshing` + `refreshedToken$`), then retries the original request with the new token.
+3. If refresh fails: `AuthService.logout()` + navigate `/login`.
+4. Auth endpoints (`/auth/login`, `/auth/refresh`, `/auth/signup`, …) are excluded from the refresh cycle (`isAuthEndpoint`).
+
+## 21.4 JWT implementation (`config/JwtUtil`, `JwtAuthFilter`, `JwtAuthEntryPoint`)
+
+* **Creation:** `JwtUtil.createToken` signs with `Keys.hmacShaKeyFor(secret.getBytes())`, algorithm **HS256**.
+* **Access token claims:** `sub` = username, `role` (`USER`/`ADMIN`), `accountId` (nullable), `tokenType = access`, `iat`, `exp`. Lifetime `app.jwt.expiration = 600000 ms` (10 min).
+* **Refresh token claims:** `sub` + `tokenType = refresh`, `iat`, `exp`. Lifetime `app.jwt.refresh-expiration = 604800000 ms` (7 days). Issued on login/admin-login/signup and **rotated** on every `/auth/refresh`.
+* **Validation per request:** `JwtAuthFilter` (a `OncePerRequestFilter`) reads the Bearer header, `extractUsername`, loads the user (`CustomUserDetailsService` — also rejects non-`ACTIVE` users), and `validateToken` (subject match + `tokenType=access` + not expired) before placing an `Authentication` in the `SecurityContextHolder`. Failures are swallowed so the request proceeds unauthenticated and is then rejected by authorization rules.
+* **Unauthorized response:** `JwtAuthEntryPoint` returns HTTP 401 with `{"errorCode":"AUTH-401","message":"Authentication required or token expired"}` — the signal the interceptor uses to refresh-and-retry.
+* **Server statelessness:** `SecurityConfig` sets `SessionCreationPolicy.STATELESS`; no server session is created — identity comes solely from the JWT on each call.
+
+## 21.5 Known trade-offs (storage/JWT)
+
+* Tokens in `sessionStorage` are readable by JS, so they are exposed to XSS (mitigated by Angular's default escaping; no `httpOnly` cookie is used).
+* No server-side token revocation/blacklist — a stolen access token is valid until expiry (≤10 min); refresh tokens are validated by signature+expiry only.
+* JWT secret and admin/SMTP credentials live in `application.yaml` (should move to environment/secret management for production).
