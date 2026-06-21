@@ -4,7 +4,7 @@ spring:
   datasource:
     url: jdbc:mysql://localhost:3306/money_transfer_db?createDatabaseIfNotExist=true
     username: root
-    password: YourRootPassword123!
+    password: simplepass
     driver-class-name: com.mysql.cj.jdbc.Driver
   jpa:
     hibernate:

@@ -13,7 +13,6 @@ import {
   OtpResponse,
   LoginOtpRequest,
   LoginVerifyRequest,
-  UserResponse,
   ForgotPasswordRequest,
   ResetPasswordRequest
 } from '../models/user.model';
@@ -77,11 +76,15 @@ export class AuthService {
     );
   }
 
-  setPassword(request: SetPasswordRequest): Observable<UserResponse> {
-    // Password is sent as-is over HTTPS; the backend bcrypt-encodes it for storage
-    return this.http.post<UserResponse>(
+  setPassword(request: SetPasswordRequest): Observable<LoginResponse> {
+    // Password is sent as-is over HTTPS; the backend bcrypt-encodes it for storage.
+    // The email was already OTP-verified, so the backend logs the user in and
+    // returns tokens here, letting the client go straight to the dashboard.
+    return this.http.post<LoginResponse>(
       `${environment.apiUrl}/auth/signup/set-password`,
       request
+    ).pipe(
+      tap((response: LoginResponse) => this.persistSession(response))
     );
   }
 

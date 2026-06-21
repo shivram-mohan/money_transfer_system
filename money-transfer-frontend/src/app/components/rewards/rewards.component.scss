@@ -92,14 +92,17 @@
   flex-direction: column;
   gap: 6px;
 
+  align-items: center;
+
   .balance-label {
     font-size: 14px;
     color: var(--aurora-text-secondary);
+    align-self: center;
   }
 
   .balance-row {
     display: flex;
-    align-items: baseline;
+    align-items: center;
     gap: 12px;
 
     .balance {

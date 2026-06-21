@@ -163,12 +163,14 @@ export class SignupComponent {
       }).subscribe({
         next: () => {
           this.isLoading = false;
+          // Backend auto-logs-in on signup and the session is now persisted,
+          // so take the user straight to their dashboard.
           this.snackBar.open(
-            'Account created successfully! You can now login.',
+            'Account created successfully! Welcome aboard.',
             'Close',
             { duration: 5000, panelClass: ['success-snackbar'] }
           );
-          setTimeout(() => this.router.navigate(['/login']), 2000);
+          this.router.navigate(['/dashboard']);
         },
         error: (error) => {
           this.isLoading = false;

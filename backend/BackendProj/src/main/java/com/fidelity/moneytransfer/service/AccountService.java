@@ -67,9 +67,10 @@ public class AccountService {
         // Verify account exists
         getAccountById(accountId);
 
-        // Get transactions, newest first
+        // Get visible transactions, newest first. Failed transfers are shown to
+        // the sender only, never to the would-be receiver (see repository).
         List<TransactionLog> transactions = transactionLogRepository
-                .findByFromAccountIdOrToAccountIdOrderByCreatedOnDesc(accountId, accountId);
+                .findVisibleByAccountId(accountId);
 
         // ✅ NEW - Populate account holder names
         transactions.forEach(txn -> {

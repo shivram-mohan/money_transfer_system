@@ -18,8 +18,23 @@ import org.springframework.stereotype.Repository;
 @Repository
 public interface TransactionLogRepository extends JpaRepository<TransactionLog, String> {
     Optional<TransactionLog> findByIdempotencyKey(String idempotencyKey);
+
+    /*
+     * Visibility rule: a transaction appears in an account's history when the
+     * account is the sender, OR it is the receiver of a NON-FAILED transaction.
+     * A failed transfer (e.g. insufficient balance) only ever debits/affects the
+     * sender, so it must surface in the sender's log but never in the would-be
+     * receiver's history.
+     */
     @Query("SELECT t FROM TransactionLog t WHERE " +
-            "(t.fromAccountId = :accountId OR t.toAccountId = :accountId) " +
+            "(t.fromAccountId = :accountId " +
+            "OR (t.toAccountId = :accountId AND t.status <> com.fidelity.moneytransfer.enums.TransactionStatus.FAILED)) " +
+            "ORDER BY t.createdOn DESC")
+    List<TransactionLog> findVisibleByAccountId(@Param("accountId") Long accountId);
+
+    @Query("SELECT t FROM TransactionLog t WHERE " +
+            "(t.fromAccountId = :accountId " +
+            "OR (t.toAccountId = :accountId AND t.status <> com.fidelity.moneytransfer.enums.TransactionStatus.FAILED)) " +
             "AND t.createdOn BETWEEN :startDate AND :endDate " +
             "ORDER BY t.createdOn DESC")
     List<TransactionLog> findByAccountIdAndDateRange(
@@ -27,5 +42,4 @@ public interface TransactionLogRepository extends JpaRepository<TransactionLog, 
             @Param("startDate") LocalDateTime startDate,
             @Param("endDate") LocalDateTime endDate
     );
-    List<TransactionLog> findByFromAccountIdOrToAccountIdOrderByCreatedOnDesc(Long fromAccountId, Long toAccountId);
 }
