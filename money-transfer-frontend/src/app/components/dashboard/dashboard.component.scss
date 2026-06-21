@@ -65,14 +65,14 @@
   }
 
   mat-card-title {
-    color: white !important;
+    color: var(--aurora-text-primary) !important;
     font-size: 18px;
     font-weight: 500;
     margin: 0;
   }
 
   button {
-    color: white;
+    color: var(--aurora-text-primary);
   }
 
   .balance-display {

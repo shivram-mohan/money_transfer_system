@@ -60,7 +60,7 @@
       font-size: 32px;
       height: 32px;
       width: 32px;
-      color: white;
+      color: var(--aurora-text-primary);
     }
   }
 
@@ -81,23 +81,11 @@
     }
   }
 
-  &.total-users .stat-icon {
-    background: rgba(255, 255, 255, 0.18);
-    border: 1px solid var(--aurora-border);
-  }
-
-  &.active-users .stat-icon {
-    background: rgba(255, 255, 255, 0.14);
-    border: 1px solid var(--aurora-border);
-  }
-
-  &.pending-users .stat-icon {
-    background: rgba(255, 255, 255, 0.10);
-    border: 1px solid var(--aurora-border);
-  }
-
+  &.total-users .stat-icon,
+  &.active-users .stat-icon,
+  &.pending-users .stat-icon,
   &.inactive-users .stat-icon {
-    background: rgba(255, 255, 255, 0.06);
+    background: var(--aurora-badge-bg);
     border: 1px solid var(--aurora-border);
   }
 }
@@ -148,7 +136,7 @@
       font-size: 40px;
       height: 40px;
       width: 40px;
-      color: white;
+      color: var(--aurora-text-primary);
     }
 
     .action-img {

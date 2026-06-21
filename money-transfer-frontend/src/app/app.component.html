@@ -1,3 +1,14 @@
 <!-- src/app/app.component.html -->
 
 <router-outlet></router-outlet>
+
+<!-- App-wide theme toggle: visible on every screen, including auth pages -->
+<button
+  type="button"
+  class="theme-toggle-fab"
+  (click)="toggleTheme()"
+  [matTooltip]="themeService.isDark() ? 'Switch to light theme' : 'Switch to dark theme'"
+  matTooltipPosition="left"
+  aria-label="Toggle theme">
+  <mat-icon>{{ themeService.isDark() ? 'light_mode' : 'dark_mode' }}</mat-icon>
+</button>
