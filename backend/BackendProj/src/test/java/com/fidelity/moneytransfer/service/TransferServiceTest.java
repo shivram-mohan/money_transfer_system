@@ -41,6 +41,12 @@ class TransferServiceTest {
     @Mock
     private BankDetailsRepository bankDetailsRepository;
 
+    @Mock
+    private TransactionLogService transactionLogService;
+
+    @Mock
+    private RewardService rewardService;
+
     @InjectMocks
     private TransferService transferService;
 

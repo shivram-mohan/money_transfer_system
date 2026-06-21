@@ -89,16 +89,33 @@ public class AuthController {
 
     /**
      * Step 3: User sets password. Account is created and activated immediately.
+     * Because the email was already OTP-verified in steps 1-2, we log the user
+     * in right away and return JWT tokens so the client can land straight on the
+     * dashboard instead of bouncing back to the login screen.
      */
     @PostMapping("/signup/set-password")
-    public ResponseEntity<UserResponseDto> setPassword(
+    public ResponseEntity<AuthResponse> setPassword(
             @Valid @RequestBody SetPasswordRequest request) {
 
         log.info("Signup step 3 - setting password for: {}", request.getUsername());
 
         UserResponseDto user = userService.completeSignup(request);
 
-        return ResponseEntity.status(HttpStatus.CREATED).body(user);
+        // Auto-login the freshly created account. No bank is linked yet, so the
+        // token carries a null accountId (the dashboard handles the link step).
+        UserDetails userDetails = userDetailsService.loadUserByUsername(user.getUsername());
+        String token = jwtUtil.generateToken(userDetails, "USER", user.getAccountId());
+        String refreshToken = jwtUtil.generateRefreshToken(userDetails);
+
+        return ResponseEntity.status(HttpStatus.CREATED).body(AuthResponse.builder()
+                .token(token)
+                .refreshToken(refreshToken)
+                .username(user.getUsername())
+                .role("USER")
+                .accountId(user.getAccountId())
+                .holderName(user.getName())
+                .expiresIn(jwtUtil.getAccessTokenExpiration())
+                .build());
     }
 
     // ─── USER LOGIN FLOW (2 steps) ───────────────────────────────────
