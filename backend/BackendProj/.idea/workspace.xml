@@ -6,6 +6,25 @@
   <component name="ChangeListManager">
     <list default="true" id="9abde197-823a-4056-bf58-1fba2e1bff4f" name="Changes" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/pom.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/test/resources/application-test.yaml" beforeDir="false" afterPath="$PROJECT_DIR$/src/test/resources/application-test.yaml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/com/fidelity/moneytransfer/config/GlobalExceptionHandler.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/com/fidelity/moneytransfer/config/GlobalExceptionHandler.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/com/fidelity/moneytransfer/config/SecurityConfig.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/com/fidelity/moneytransfer/config/SecurityConfig.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/com/fidelity/moneytransfer/controller/AccountController.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/com/fidelity/moneytransfer/controller/AccountController.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/com/fidelity/moneytransfer/dto/AccountResponse$AccountResponseBuilder.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/com/fidelity/moneytransfer/dto/AccountResponse$AccountResponseBuilder.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/com/fidelity/moneytransfer/dto/AccountResponse.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/com/fidelity/moneytransfer/dto/AccountResponse.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/com/fidelity/moneytransfer/dto/ErrorResponse$ErrorResponseBuilder.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/com/fidelity/moneytransfer/dto/ErrorResponse$ErrorResponseBuilder.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/com/fidelity/moneytransfer/dto/ErrorResponse.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/com/fidelity/moneytransfer/dto/ErrorResponse.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/com/fidelity/moneytransfer/dto/TransferRequest$TransferRequestBuilder.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/com/fidelity/moneytransfer/dto/TransferRequest$TransferRequestBuilder.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/com/fidelity/moneytransfer/dto/TransferRequest.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/com/fidelity/moneytransfer/dto/TransferRequest.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/com/fidelity/moneytransfer/dto/TransferResponse$TransferResponseBuilder.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/com/fidelity/moneytransfer/dto/TransferResponse$TransferResponseBuilder.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/com/fidelity/moneytransfer/dto/TransferResponse.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/com/fidelity/moneytransfer/dto/TransferResponse.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/com/fidelity/moneytransfer/entity/Account$AccountBuilder.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/com/fidelity/moneytransfer/entity/Account$AccountBuilder.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/com/fidelity/moneytransfer/entity/Account.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/com/fidelity/moneytransfer/entity/Account.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/com/fidelity/moneytransfer/entity/TransactionLog$TransactionLogBuilder.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/com/fidelity/moneytransfer/entity/TransactionLog$TransactionLogBuilder.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/com/fidelity/moneytransfer/entity/TransactionLog.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/com/fidelity/moneytransfer/entity/TransactionLog.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/com/fidelity/moneytransfer/service/AccountService.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/com/fidelity/moneytransfer/service/AccountService.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/com/fidelity/moneytransfer/service/TransferService.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/com/fidelity/moneytransfer/service/TransferService.class" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -37,34 +56,43 @@
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
-  <component name="PropertiesComponent">{
-  &quot;keyToString&quot;: {
-    &quot;Application.MTS.executor&quot;: &quot;Run&quot;,
-    &quot;RunOnceActivity.OpenProjectViewOnStart&quot;: &quot;true&quot;,
-    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
-    &quot;RunOnceActivity.git.unshallow&quot;: &quot;true&quot;,
-    &quot;git-widget-placeholder&quot;: &quot;tier__based__rewards&quot;,
-    &quot;kotlin-language-version-configured&quot;: &quot;true&quot;,
-    &quot;last_opened_file_path&quot;: &quot;C:/Users/labuser/Desktop/capstone_project/money_transfer_system/backend/BackendProj/src/test/resources&quot;,
-    &quot;project.structure.last.edited&quot;: &quot;Modules&quot;,
-    &quot;project.structure.proportion&quot;: &quot;0.15&quot;,
-    &quot;project.structure.side.proportion&quot;: &quot;0.2&quot;
+  <component name="PropertiesComponent"><![CDATA[{
+  "keyToString": {
+    "Application.MTS.executor": "Run",
+    "JUnit.java in money-transfer-system.executor": "Coverage",
+    "RunOnceActivity.OpenProjectViewOnStart": "true",
+    "RunOnceActivity.ShowReadmeOnStart": "true",
+    "RunOnceActivity.git.unshallow": "true",
+    "git-widget-placeholder": "tier__based__rewards",
+    "kotlin-language-version-configured": "true",
+    "last_opened_file_path": "C:/Users/labuser/Desktop/capstone_project/money_transfer_system/backend/BackendProj/src/test/resources",
+    "project.structure.last.edited": "Modules",
+    "project.structure.proportion": "0.15",
+    "project.structure.side.proportion": "0.2"
   },
-  &quot;keyToStringList&quot;: {
-    &quot;com.intellij.ide.scratch.ScratchImplUtil$2/New Scratch File&quot;: [
-      &quot;yaml&quot;
+  "keyToStringList": {
+    "com.intellij.ide.scratch.ScratchImplUtil$2/New Scratch File": [
+      "yaml"
     ]
   }
-}</component>
+}]]></component>
   <component name="RecentsManager">
     <key name="CopyFile.RECENT_KEYS">
       <recent name="C:\Users\labuser\Desktop\capstone_project\money_transfer_system\backend\BackendProj\src\test\resources" />
     </key>
   </component>
-  <component name="RunManager">
+  <component name="RunManager" selected="Application.MTS">
     <configuration name="MTS" type="Application" factoryName="Application">
       <option name="MAIN_CLASS_NAME" value="com.fidelity.moneytransfer.MoneyTransferApplication" />
       <module name="money-transfer-system" />
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="java in money-transfer-system" type="JUnit" factoryName="JUnit" temporary="true" nameIsGenerated="true">
+      <module name="money-transfer-system" />
+      <option name="TEST_OBJECT" value="directory" />
+      <dir value="$PROJECT_DIR$/src/test/java" />
       <method v="2">
         <option name="Make" enabled="true" />
       </method>
@@ -82,6 +110,11 @@
         <option name="Make" enabled="true" />
       </method>
     </configuration>
+    <recent_temporary>
+      <list>
+        <item itemvalue="JUnit.java in money-transfer-system" />
+      </list>
+    </recent_temporary>
   </component>
   <component name="SharedIndexes">
     <attachedChunks>
@@ -111,5 +144,8 @@
         </entry>
       </map>
     </option>
+  </component>
+  <component name="com.intellij.coverage.CoverageDataManagerImpl">
+    <SUITE FILE_PATH="coverage/BackendProj$java_in_money_transfer_system.ic" NAME="java in money-transfer-system Coverage Results" MODIFIED="1782134782887" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="idea" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="true" />
   </component>
 </project>
