@@ -1,0 +1,161 @@
+@startuml
+' ============================================================
+'  Money Transfer System — Detailed Architecture
+'  Branch: g_c  |  Paste into https://www.planttext.com
+'  (native PlantUML component diagram, no external includes)
+' ============================================================
+title Money Transfer System — Detailed Architecture (branch g_c)
+
+skinparam shadowing false
+skinparam defaultFontName Helvetica
+skinparam componentStyle rectangle
+skinparam package {
+  BackgroundColor #F7FAFF
+  BorderColor #3B6DB3
+}
+skinparam component {
+  BackgroundColor #EAF2FF
+  BorderColor #3B6DB3
+}
+skinparam database {
+  BackgroundColor #FFF6E0
+  BorderColor #C08A2A
+}
+skinparam node {
+  BackgroundColor #FBEAEA
+  BorderColor #B3563B
+}
+
+' ============================== CLIENT ==============================
+package "Client — Angular 21 SPA (Angular Material, SSR-capable)" as CLIENT {
+  component "UI Components\nlogin · signup · dashboard · transfer\nhistory · rewards · admin · forgot-password" as UI
+  component "Route Guards\nauth · user · admin" as GUARDS
+  component "Feature Services\nauth · account · transfer\nreward · inactivity" as NGSVC
+  component "CryptoService\n(Web Crypto — balance decrypt)" as NGCRYPTO
+  component "authInterceptor\nattaches Bearer JWT · auto-refresh on 401" as INTERCEPT
+}
+
+' ============================== BACKEND ==============================
+package "Spring Boot 3.2 REST API   ( /api/v1  :8080 )" as API {
+
+  package "Security Filter Chain (stateless)" as SEC {
+    component "CorsFilter" as CORS
+    component "JwtAuthFilter\nvalidate access token" as JWTF
+    component "JwtAuthEntryPoint\n401 AUTH-401 JSON" as ENTRY
+    component "SecurityConfig\nroute authorization rules" as SECCFG
+  }
+
+  package "Controllers (@RestController)" as CTRL {
+    component "AuthController" as AC
+    component "UserController" as UC
+    component "AccountController" as ACC
+    component "TransferController" as TC
+    component "RewardController" as RC
+  }
+
+  package "Services (business logic, @Transactional)" as BIZ {
+    component "UserService" as US
+    component "AccountService" as ACS
+    component "TransferService" as TS
+    component "RewardService" as RS
+    component "OtpService" as OS
+    component "EmailService\n@Async otpMailExecutor" as ES
+    component "PdfService\n(iText 7)" as PS
+    component "TransactionLogService\nREQUIRES_NEW" as TLS
+    component "AesCryptoService\nAES/CBC balance encryption" as AES
+  }
+
+  package "Cross-cutting" as XC {
+    component "JwtUtil\naccess + refresh tokens" as JWT
+    component "GlobalExceptionHandler\n@RestControllerAdvice" as GEH
+    component "LoggingAspect (AOP)" as AOP
+    component "DataSeeder\nCommandLineRunner" as SEED
+    component "AsyncConfig\notpMailExecutor pool" as ASYNC
+  }
+
+  package "Repositories (Spring Data JPA)" as REPO {
+    component "UserRepository" as R1
+    component "AccountRepository" as R2
+    component "TransactionLogRepository" as R3
+    component "BankDetailsRepository" as R4
+    component "OtpTokenRepository" as R5
+    component "RewardLedgerRepository" as R6
+  }
+}
+
+' ============================== DATA / EXTERNAL ==============================
+package "MySQL — money_transfer_db" as DB {
+  database "users" as T1
+  database "accounts" as T2
+  database "transaction_logs" as T3
+  database "bank_details" as T4
+  database "otp_tokens" as T5
+  database "reward_ledger" as T6
+}
+
+node "Gmail SMTP" as SMTP
+
+' ============================== WIRING ==============================
+' --- client internal ---
+GUARDS ..> UI
+UI --> NGSVC
+NGCRYPTO ..> UI : decrypt balance on reveal
+NGSVC --> INTERCEPT
+
+' --- client -> API across the wire ---
+INTERCEPT --> CORS : HTTPS JSON + Bearer JWT
+CORS --> JWTF
+JWTF --> CTRL : authenticated request
+JWTF ..> ENTRY : missing / invalid token
+JWTF --> JWT
+SECCFG ..> JWTF
+
+' --- controllers -> services ---
+AC --> OS
+AC --> US
+AC --> JWT
+UC --> US
+ACC --> ACS
+ACC --> PS
+TC --> TS
+RC --> RS
+
+' --- service collaborations ---
+OS --> ES
+ES --> SMTP
+ACS --> AES
+US --> AES
+TS --> ACS
+TS --> RS
+TS --> TLS
+
+' --- services -> repositories (representative) ---
+US --> R1
+ACS --> R2
+ACS --> R3
+TS --> R2
+TS --> R3
+TS --> R4
+RS --> R1
+RS --> R6
+OS --> R5
+
+' --- repositories -> tables ---
+R1 --> T1
+R2 --> T2
+R3 --> T3
+R4 --> T4
+R5 --> T5
+R6 --> T6
+
+' --- startup seeding ---
+SEED ..> DB : seed admin, bank_details,\nCASHBACK account
+
+note bottom of BIZ
+  Key g_c behaviours:
+  • Login step 2 is **password-less** (OTP only); step 1 already verified the password.
+  • User balances are AES-encrypted (AesCryptoService) end-to-end; admin lists stay plaintext.
+  • Failed transfers are logged via TransactionLogService (REQUIRES_NEW) so they survive rollback.
+  • Reward failures never fail a transfer; redeem pays cash from the corporate CASHBACK account.
+end note
+@enduml
