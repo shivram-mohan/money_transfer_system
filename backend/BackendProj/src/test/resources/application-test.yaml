@@ -1,6 +1,6 @@
 spring:
   datasource:
-    url: jdbc:h2:mem:testdb
+    url: jdbc:h2:mem:testdb;MODE=MySQL;DB_CLOSE_DELAY=-1
     driver-class-name: org.h2.Driver
     username: sa
     password:
@@ -11,12 +11,29 @@ spring:
     properties:
       hibernate:
         format_sql: true
+        dialect: org.hibernate.dialect.H2Dialect
+  # Dummy mail config so the JavaMailSender bean exists and @SpringBootTest loads.
+  mail:
+    host: localhost
+    port: 3025
+    username: test@moneytransfer.com
+    password: test
 
 app:
   jwt:
     secret: "3f8b2c9d4e5a6f7g8h9i0j1k2l3m4n5o6p7q8r9s0t1u2v3w4x5y6z7a8b9c0d"
-    expiration: 86400000
+    expiration: 600000             # 10 minutes (access token)
+    refresh-expiration: 604800000  # 7 days (refresh token)
+  otp:
+    expiration: 300
+  admin:
+    username: admin
+    password: admin123
+    name: System Administrator
+    email: admin@moneytransfer.com
+  crypto:
+    secret: "test-balance-encryption-secret"
 
 logging:
   level:
-    com.fidelity.moneytransfer: DEBUG
+    com.fidelity.moneytransfer: INFO

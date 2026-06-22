@@ -1,5 +1,6 @@
 package com.fidelity.moneytransfer.service;
 
+import com.fidelity.moneytransfer.config.CryptoService;
 import com.fidelity.moneytransfer.dto.DeactivateUserRequest;
 import com.fidelity.moneytransfer.dto.LinkBankResponse;
 import com.fidelity.moneytransfer.dto.SetPasswordRequest;
@@ -32,6 +33,7 @@ public class UserService {
     private final AccountRepository accountRepository;
     private final PasswordEncoder passwordEncoder;
     private final BankDetailsRepository bankDetailsRepository;
+    private final CryptoService cryptoService;
 
     // ─── QUERY METHODS ───────────────────────────────────────────────
 
@@ -184,7 +186,8 @@ public class UserService {
         return LinkBankResponse.builder()
                 .accountId(savedAccount.getId())
                 .holderName(savedAccount.getHolderName())
-                .balance(savedAccount.getBalance())
+                // Encrypted so the freshly linked balance isn't exposed in the clear.
+                .encryptedBalance(cryptoService.encrypt(savedAccount.getBalance().toPlainString()))
                 .message("Bank account linked successfully")
                 .build();
     }

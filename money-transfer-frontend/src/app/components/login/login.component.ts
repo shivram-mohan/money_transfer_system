@@ -100,9 +100,10 @@ export class LoginComponent {
     if (this.otpForm.valid) {
       this.isLoading = true;
 
+      // Step 2 sends only the username + OTP. The password was already verified
+      // in step 1 (which is what dispatched the OTP), so we don't resend it.
       this.authService.loginVerifyOtp({
         username: this.username,
-        password: this.password,
         otp: this.otpForm.value.otp
       }).subscribe({
         next: (response) => {

@@ -1,5 +1,6 @@
 package com.fidelity.moneytransfer.service;
 
+import com.fidelity.moneytransfer.config.CryptoService;
 import com.fidelity.moneytransfer.constants.RewardConstants;
 import com.fidelity.moneytransfer.dto.AccountResponse;
 import com.fidelity.moneytransfer.dto.CreateAccountRequest;
@@ -31,6 +32,7 @@ public class AccountService {
 
     private final AccountRepository accountRepository;
     private final TransactionLogRepository transactionLogRepository;
+    private final CryptoService cryptoService;
 
     // ─── ACCOUNT ID GENERATION ──────────────────────────────────────────
 
@@ -53,12 +55,18 @@ public class AccountService {
 
     public AccountResponse getAccountDetails(Long id) {
         Account account = getAccountById(id);
-        return mapToAccountResponse(account);
+        // User-facing: balance is returned encrypted, never in the clear.
+        return mapToUserAccountResponse(account);
     }
 
-    public BigDecimal getBalance(Long id) {
+    /**
+     * Returns the account's balance AES-encrypted (see {@link CryptoService}) so
+     * it cannot be read from the browser's network tab. The Angular client
+     * decrypts it only when the user reveals their balance.
+     */
+    public String getBalance(Long id) {
         Account account = getAccountById(id);
-        return account.getBalance();
+        return cryptoService.encrypt(account.getBalance().toPlainString());
     }
 
     public List<TransactionLog> getTransactionHistory(Long accountId) {
@@ -168,11 +176,27 @@ public class AccountService {
         }
     }
 
+    /** Admin-facing mapping: balance is returned in the clear. */
     private AccountResponse mapToAccountResponse(Account account) {
         return AccountResponse.builder()
                 .id(account.getId())
                 .holderName(account.getHolderName())
                 .balance(account.getBalance())
+                .status(account.getStatus().name())
+                .lastUpdated(account.getLastUpdated())
+                .build();
+    }
+
+    /**
+     * User-facing mapping: the balance is AES-encrypted and the plaintext
+     * {@code balance} is left null, so a user can never read their own balance
+     * straight off the wire (it is decrypted client-side only on reveal).
+     */
+    private AccountResponse mapToUserAccountResponse(Account account) {
+        return AccountResponse.builder()
+                .id(account.getId())
+                .holderName(account.getHolderName())
+                .encryptedBalance(cryptoService.encrypt(account.getBalance().toPlainString()))
                 .status(account.getStatus().name())
                 .lastUpdated(account.getLastUpdated())
                 .build();

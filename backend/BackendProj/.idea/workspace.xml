@@ -6,9 +6,44 @@
   <component name="ChangeListManager">
     <list default="true" id="9abde197-823a-4056-bf58-1fba2e1bff4f" name="Changes" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/pom.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/fidelity/moneytransfer/config/DataSeeder.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/fidelity/moneytransfer/config/DataSeeder.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/fidelity/moneytransfer/controller/AccountController.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/fidelity/moneytransfer/controller/AccountController.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/fidelity/moneytransfer/controller/AuthController.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/fidelity/moneytransfer/controller/AuthController.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/fidelity/moneytransfer/dto/AccountResponse.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/fidelity/moneytransfer/dto/AccountResponse.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/fidelity/moneytransfer/dto/LinkBankResponse.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/fidelity/moneytransfer/dto/LinkBankResponse.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/fidelity/moneytransfer/dto/LoginVerifyRequest.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/fidelity/moneytransfer/dto/LoginVerifyRequest.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/fidelity/moneytransfer/service/AccountService.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/fidelity/moneytransfer/service/AccountService.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/fidelity/moneytransfer/service/UserService.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/fidelity/moneytransfer/service/UserService.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/application.yaml" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/application.yaml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/test/java/com/fidelity/moneytransfer/service/AccountServiceTest.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/test/java/com/fidelity/moneytransfer/service/AccountServiceTest.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/test/java/com/fidelity/moneytransfer/service/UserServiceTest.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/test/java/com/fidelity/moneytransfer/service/UserServiceTest.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/test/resources/application-test.yaml" beforeDir="false" afterPath="$PROJECT_DIR$/src/test/resources/application-test.yaml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/application.yaml" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/application.yaml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/com/fidelity/moneytransfer/config/SecurityConfig.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/com/fidelity/moneytransfer/config/SecurityConfig.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/com/fidelity/moneytransfer/controller/AccountController.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/com/fidelity/moneytransfer/controller/AccountController.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/com/fidelity/moneytransfer/dto/AccountResponse$AccountResponseBuilder.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/com/fidelity/moneytransfer/dto/AccountResponse$AccountResponseBuilder.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/com/fidelity/moneytransfer/dto/AccountResponse.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/com/fidelity/moneytransfer/dto/AccountResponse.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/com/fidelity/moneytransfer/dto/ErrorResponse$ErrorResponseBuilder.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/com/fidelity/moneytransfer/dto/ErrorResponse$ErrorResponseBuilder.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/com/fidelity/moneytransfer/dto/ErrorResponse.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/com/fidelity/moneytransfer/dto/ErrorResponse.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/com/fidelity/moneytransfer/dto/TransferRequest$TransferRequestBuilder.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/com/fidelity/moneytransfer/dto/TransferRequest$TransferRequestBuilder.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/com/fidelity/moneytransfer/dto/TransferRequest.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/com/fidelity/moneytransfer/dto/TransferRequest.class" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/target/classes/com/fidelity/moneytransfer/dto/TransferResponse$TransferResponseBuilder.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/com/fidelity/moneytransfer/dto/TransferResponse$TransferResponseBuilder.class" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/target/classes/com/fidelity/moneytransfer/dto/TransferResponse.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/com/fidelity/moneytransfer/dto/TransferResponse.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/com/fidelity/moneytransfer/entity/Account$AccountBuilder.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/com/fidelity/moneytransfer/entity/Account$AccountBuilder.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/com/fidelity/moneytransfer/entity/Account.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/com/fidelity/moneytransfer/entity/Account.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/com/fidelity/moneytransfer/entity/TransactionLog$TransactionLogBuilder.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/com/fidelity/moneytransfer/entity/TransactionLog$TransactionLogBuilder.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/com/fidelity/moneytransfer/entity/TransactionLog.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/com/fidelity/moneytransfer/entity/TransactionLog.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/com/fidelity/moneytransfer/service/AccountService.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/com/fidelity/moneytransfer/service/AccountService.class" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/target/classes/com/fidelity/moneytransfer/service/TransferService.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/com/fidelity/moneytransfer/service/TransferService.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../money-transfer-frontend/src/app/components/dashboard/dashboard.component.ts" beforeDir="false" afterPath="$PROJECT_DIR$/../../money-transfer-frontend/src/app/components/dashboard/dashboard.component.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../money-transfer-frontend/src/app/components/login/login.component.ts" beforeDir="false" afterPath="$PROJECT_DIR$/../../money-transfer-frontend/src/app/components/login/login.component.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../money-transfer-frontend/src/app/components/transfer/transfer.component.ts" beforeDir="false" afterPath="$PROJECT_DIR$/../../money-transfer-frontend/src/app/components/transfer/transfer.component.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../money-transfer-frontend/src/app/models/account.model.ts" beforeDir="false" afterPath="$PROJECT_DIR$/../../money-transfer-frontend/src/app/models/account.model.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../money-transfer-frontend/src/app/models/user.model.ts" beforeDir="false" afterPath="$PROJECT_DIR$/../../money-transfer-frontend/src/app/models/user.model.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../money-transfer-frontend/src/app/services/account.service.ts" beforeDir="false" afterPath="$PROJECT_DIR$/../../money-transfer-frontend/src/app/services/account.service.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../money-transfer-frontend/src/environments/environment.prod.ts" beforeDir="false" afterPath="$PROJECT_DIR$/../../money-transfer-frontend/src/environments/environment.prod.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../money-transfer-frontend/src/environments/environment.ts" beforeDir="false" afterPath="$PROJECT_DIR$/../../money-transfer-frontend/src/environments/environment.ts" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -43,6 +78,7 @@
   <component name="PropertiesComponent">{
   &quot;keyToString&quot;: {
     &quot;Application.MTS.executor&quot;: &quot;Run&quot;,
+    &quot;JUnit.java in money-transfer-system.executor&quot;: &quot;Coverage&quot;,
     &quot;RunOnceActivity.OpenProjectViewOnStart&quot;: &quot;true&quot;,
     &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
     &quot;RunOnceActivity.TerminalTabsStorage.copyFrom.TerminalArrangementManager.252&quot;: &quot;true&quot;,
@@ -65,10 +101,18 @@
       <recent name="C:\Users\labuser\Desktop\capstone_project\money_transfer_system\backend\BackendProj\src\test\resources" />
     </key>
   </component>
-  <component name="RunManager">
+  <component name="RunManager" selected="Application.MTS">
     <configuration name="MTS" type="Application" factoryName="Application">
       <option name="MAIN_CLASS_NAME" value="com.fidelity.moneytransfer.MoneyTransferApplication" />
       <module name="money-transfer-system" />
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="java in money-transfer-system" type="JUnit" factoryName="JUnit" temporary="true" nameIsGenerated="true">
+      <module name="money-transfer-system" />
+      <option name="TEST_OBJECT" value="directory" />
+      <dir value="$PROJECT_DIR$/src/test/java" />
       <method v="2">
         <option name="Make" enabled="true" />
       </method>
@@ -86,6 +130,11 @@
         <option name="Make" enabled="true" />
       </method>
     </configuration>
+    <recent_temporary>
+      <list>
+        <item itemvalue="JUnit.java in money-transfer-system" />
+      </list>
+    </recent_temporary>
   </component>
   <component name="SharedIndexes">
     <attachedChunks>
@@ -115,5 +164,8 @@
         </entry>
       </map>
     </option>
+  </component>
+  <component name="com.intellij.coverage.CoverageDataManagerImpl">
+    <SUITE FILE_PATH="coverage/BackendProj$java_in_money_transfer_system.ic" NAME="java in money-transfer-system Coverage Results" MODIFIED="1782150038704" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="idea" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="true" />
   </component>
 </project>

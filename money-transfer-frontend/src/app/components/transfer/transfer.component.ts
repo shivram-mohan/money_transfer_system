@@ -15,6 +15,7 @@ import { MatDialog, MatDialogModule } from '@angular/material/dialog';
 import { AuthService } from '../../services/auth.service';
 import { TransferService } from '../../services/transfer.service';
 import { AccountService } from '../../services/account.service';
+import { CryptoService } from '../../services/crypto.service';
 import { NavbarComponent } from '../navbar/navbar.component';
 import { TransferRequest } from '../../models/transaction.model';
 import { ConfirmDialogComponent } from '../admin/confirm-dialog/confirm-dialog.component';
@@ -52,6 +53,7 @@ export class TransferComponent implements OnInit {
     private authService: AuthService,
     private transferService: TransferService,
     private accountService: AccountService,
+    private cryptoService: CryptoService,
     private router: Router,
     private snackBar: MatSnackBar,
     private dialog: MatDialog
@@ -85,8 +87,11 @@ export class TransferComponent implements OnInit {
   loadBalance(): void {
     if (this.currentAccountId) {
       this.accountService.getBalance(this.currentAccountId).subscribe({
-        next: (response: number) => {
-          this.currentBalance = response;
+        next: (encrypted: string) => {
+          // Balance arrives AES-encrypted; decrypt it for the available-balance display.
+          this.cryptoService.decryptToNumber(encrypted)
+            .then((value) => (this.currentBalance = value))
+            .catch((e) => console.error('Error decrypting balance:', e));
         },
         error: (error: any) => {
           console.error('Error loading balance:', error);

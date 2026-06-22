@@ -18,7 +18,10 @@ export interface Account {
 export interface AccountResponse {
   id: number;
   holderName: string;
-  balance: number;
+  // Plaintext balance is only present on admin responses. For the logged-in
+  // user's own account the backend sends `encryptedBalance` instead.
+  balance?: number;
+  encryptedBalance?: string;
   status: string;
 }
 

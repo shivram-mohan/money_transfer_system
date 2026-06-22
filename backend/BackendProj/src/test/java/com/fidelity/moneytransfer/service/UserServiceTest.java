@@ -1,5 +1,6 @@
 package com.fidelity.moneytransfer.service;
 
+import com.fidelity.moneytransfer.config.CryptoService;
 import com.fidelity.moneytransfer.dto.DeactivateUserRequest;
 import com.fidelity.moneytransfer.dto.LinkBankResponse;
 import com.fidelity.moneytransfer.dto.SetPasswordRequest;
@@ -43,6 +44,9 @@ class UserServiceTest {
 
     @Mock
     private BankDetailsRepository bankDetailsRepository;
+
+    @Mock
+    private CryptoService cryptoService;
 
     @InjectMocks
     private UserService userService;
@@ -157,12 +161,14 @@ class UserServiceTest {
                 .thenAnswer(inv -> inv.getArgument(0));
         when(userRepository.save(any(AppUser.class)))
                 .thenAnswer(inv -> inv.getArgument(0));
+        when(cryptoService.encrypt("30000.00")).thenReturn("ENC(30000.00)");
 
         LinkBankResponse response = userService.linkBankAccount("alice", 1001001004L);
 
         assertEquals(1001001004L, response.getAccountId());
         assertEquals("Alice Brown", response.getHolderName());
-        assertEquals(new BigDecimal("30000.00"), response.getBalance());
+        // Balance is returned encrypted, not as a plaintext number
+        assertEquals("ENC(30000.00)", response.getEncryptedBalance());
         assertEquals(1001001004L, unlinkedUser.getAccountId());
         assertTrue(bankDetails.getRegistered());
         verify(accountRepository, times(1)).save(any(Account.class));

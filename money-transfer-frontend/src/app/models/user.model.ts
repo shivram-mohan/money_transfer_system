@@ -81,7 +81,8 @@ export interface LinkBankRequest {
 export interface LinkBankResponse {
   accountId: number;
   holderName: string;
-  balance: number;
+  // AES-encrypted balance of the freshly linked account (decrypted on reveal).
+  encryptedBalance: string;
   message: string;
 }
 
@@ -94,7 +95,8 @@ export interface LoginOtpRequest {
 
 export interface LoginVerifyRequest {
   username: string;
-  password: string;
+  // Password is intentionally omitted: it was already validated in login step 1
+  // (which triggered the OTP). Step 2 only needs the username and OTP.
   otp: string;
 }
 

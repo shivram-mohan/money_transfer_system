@@ -57,4 +57,10 @@ app:
     password: admin123
     name: System Administrator
     email: admin@moneytransfer.com
+  crypto:
+    # Shared secret used to AES-encrypt the user's balance in API responses so it
+    # is not readable in the browser's network tab. The Angular client decrypts
+    # it (same secret) only when the user reveals the balance. Must match the
+    # frontend's environment `balanceSecret`.
+    secret: "b4l4nc3-3ncrypt10n-s3cr3t-ch4ng3-m3-1n-pr0d"
 

@@ -5,8 +5,6 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.math.BigDecimal;
-
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
@@ -14,6 +12,8 @@ import java.math.BigDecimal;
 public class LinkBankResponse {
     private Long accountId;
     private String holderName;
-    private BigDecimal balance;
+    // AES-encrypted balance of the freshly linked account (see CryptoService);
+    // the client decrypts it only when the user reveals their balance.
+    private String encryptedBalance;
     private String message;
 }

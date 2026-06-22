@@ -155,7 +155,9 @@ public class AuthController {
     }
 
     /**
-     * Step 2: User provides username + password + OTP. Returns JWT on success.
+     * Step 2: User provides username + OTP. Returns JWT on success. The password
+     * was already validated in step 1 (which is what sent the OTP), so it is
+     * deliberately not part of this request and is not re-checked here.
      */
     @PostMapping("/login/verify-otp")
     public ResponseEntity<AuthResponse> loginVerifyOtp(
@@ -163,12 +165,7 @@ public class AuthController {
 
         log.info("Login step 2 - OTP verification for: {}", request.getUsername());
 
-        // Re-authenticate credentials
-        Authentication authentication = authenticationManager.authenticate(
-                new UsernamePasswordAuthenticationToken(
-                        request.getUsername(), request.getPassword()));
-
-        // Get user
+        // Resolve the user (password already verified in step 1).
         var appUser = userRepository.findByUsername(request.getUsername())
                 .orElseThrow(() -> new BadCredentialsException("User not found"));
 
@@ -180,8 +177,9 @@ public class AuthController {
             throw new IllegalArgumentException("Invalid or expired OTP");
         }
 
-        // Generate JWT
-        UserDetails userDetails = (UserDetails) authentication.getPrincipal();
+        // Resolve authorities (and re-assert the account is active) without a
+        // password by going through the user details service.
+        UserDetails userDetails = userDetailsService.loadUserByUsername(request.getUsername());
         String role = userDetails.getAuthorities().stream()
                 .anyMatch(a -> a.getAuthority().equals("ROLE_ADMIN"))
                 ? "ADMIN" : "USER";

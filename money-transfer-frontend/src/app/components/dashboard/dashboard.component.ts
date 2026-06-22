@@ -15,6 +15,7 @@ import { MatDialog, MatDialogModule } from '@angular/material/dialog';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { AuthService } from '../../services/auth.service';
 import { AccountService } from '../../services/account.service';
+import { CryptoService } from '../../services/crypto.service';
 import { NavbarComponent } from '../navbar/navbar.component';
 import { PasswordPromptComponent } from '../password-prompt/password-prompt.component';
 
@@ -44,6 +45,10 @@ export class DashboardComponent implements OnInit {
   balance: number = 0;
   isLoading = true;
 
+  // The balance arrives AES-encrypted and is only decrypted into `balance` when
+  // the user reveals it, so the plaintext value is never held before then.
+  private encryptedBalance: string | null = null;
+
   // Balance is hidden behind a password prompt until the user reveals it
   balanceVisible = false;
 
@@ -55,6 +60,7 @@ export class DashboardComponent implements OnInit {
   constructor(
     private authService: AuthService,
     private accountService: AccountService,
+    private cryptoService: CryptoService,
     private router: Router,
     private fb: FormBuilder,
     private snackBar: MatSnackBar,
@@ -81,8 +87,13 @@ export class DashboardComponent implements OnInit {
     if (this.accountId) {
       this.isLoading = true;
       this.accountService.getBalance(this.accountId).subscribe({
-        next: (response: number) => {
-          this.balance = response;
+        next: (encrypted: string) => {
+          // Keep the ciphertext; decrypt lazily only when the user reveals it.
+          this.encryptedBalance = encrypted;
+          // If the balance is currently shown (e.g. a refresh), update it.
+          if (this.balanceVisible) {
+            this.revealBalance();
+          }
           this.isLoading = false;
         },
         error: (error: any) => {
@@ -90,6 +101,19 @@ export class DashboardComponent implements OnInit {
           this.isLoading = false;
         }
       });
+    }
+  }
+
+  private async revealBalance(): Promise<void> {
+    if (!this.encryptedBalance) {
+      return;
+    }
+    try {
+      this.balance = await this.cryptoService.decryptToNumber(this.encryptedBalance);
+      this.balanceVisible = true;
+    } catch (e) {
+      console.error('Error decrypting balance:', e);
+      this.snackBar.open('Unable to display balance', 'Close', { duration: 4000 });
     }
   }
 
@@ -108,7 +132,9 @@ export class DashboardComponent implements OnInit {
         this.authService.setLinkedAccount(response.accountId, response.holderName);
         this.holderName = response.holderName;
         this.accountId = response.accountId;
-        this.balance = response.balance;
+        // Store the encrypted balance; it's revealed (decrypted) on demand.
+        this.encryptedBalance = response.encryptedBalance;
+        this.balanceVisible = false;
         this.isBankLinked = true;
         this.snackBar.open(
           'Bank account linked! All features are now unlocked.',
@@ -158,7 +184,8 @@ export class DashboardComponent implements OnInit {
 
     dialogRef.afterClosed().subscribe((verified: boolean) => {
       if (verified) {
-        this.balanceVisible = true;
+        // Decrypt the balance only now that the user has re-verified.
+        this.revealBalance();
       }
     });
   }

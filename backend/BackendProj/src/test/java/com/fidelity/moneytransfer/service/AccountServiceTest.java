@@ -1,5 +1,6 @@
 package com.fidelity.moneytransfer.service;
 
+import com.fidelity.moneytransfer.config.CryptoService;
 import com.fidelity.moneytransfer.dto.AccountResponse;
 import com.fidelity.moneytransfer.dto.CreateAccountRequest;
 import com.fidelity.moneytransfer.entity.Account;
@@ -32,6 +33,9 @@ class AccountServiceTest {
 
     @Mock
     private TransactionLogRepository transactionLogRepository;
+
+    @Mock
+    private CryptoService cryptoService;
 
     @InjectMocks
     private AccountService accountService;
@@ -78,33 +82,36 @@ class AccountServiceTest {
     }
 
     @Test
-    void getAccountDetails_Success() {
+    void getAccountDetails_Success_returnsEncryptedBalance() {
         // Arrange
         when(accountRepository.findById(1L))
                 .thenReturn(Optional.of(testAccount));
+        when(cryptoService.encrypt("1000.00")).thenReturn("ENC(1000.00)");
 
         // Act
         AccountResponse response = accountService.getAccountDetails(1L);
 
-        // Assert
+        // Assert: balance is encrypted for the user, plaintext is not exposed
         assertNotNull(response);
         assertEquals(1L, response.getId());
         assertEquals("Test User", response.getHolderName());
-        assertEquals(new BigDecimal("1000.00"), response.getBalance());
+        assertNull(response.getBalance());
+        assertEquals("ENC(1000.00)", response.getEncryptedBalance());
         assertEquals("ACTIVE", response.getStatus());
     }
 
     @Test
-    void getBalance_Success() {
+    void getBalance_Success_returnsEncryptedString() {
         // Arrange
         when(accountRepository.findById(1L))
                 .thenReturn(Optional.of(testAccount));
+        when(cryptoService.encrypt("1000.00")).thenReturn("ENC(1000.00)");
 
         // Act
-        BigDecimal balance = accountService.getBalance(1L);
+        String balance = accountService.getBalance(1L);
 
         // Assert
-        assertEquals(new BigDecimal("1000.00"), balance);
+        assertEquals("ENC(1000.00)", balance);
     }
 
     @Test

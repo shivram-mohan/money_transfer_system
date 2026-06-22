@@ -1,0 +1,290 @@
+================================================================================
+MONEY TRANSFER SYSTEM — PRESENTATION CONTENT
+For PPT generation via Claude Design
+Scope: ONLY features actually implemented in this codebase. No future/aspirational features.
+Format: one slide per block. "Title", "Bullets" (concise, deck-ready), "Notes" (speaker context).
+================================================================================
+
+
+--------------------------------------------------------------------------------
+SLIDE 1 — TITLE
+--------------------------------------------------------------------------------
+Title: Money Transfer System
+Subtitle: A secure, tier-rewarded digital banking application
+Bullets:
+- Angular front end + Spring Boot REST back end + MySQL
+- OTP-verified onboarding, JWT-secured APIs, real-time transfers
+- Tier-based rewards with automatic cashback
+Notes: Capstone project. End-to-end money movement between in-app accounts seeded from a simulated core-banking system.
+
+
+--------------------------------------------------------------------------------
+SLIDE 2 — WHAT IT DOES (AT A GLANCE)
+--------------------------------------------------------------------------------
+Title: What the Application Does
+Bullets:
+- Users sign up, verify their email by OTP, set a password, and link a real bank account
+- Two-factor login (password + emailed OTP) issues short-lived JWTs
+- Send money to any account by ID, with confirmation of the recipient name
+- Earn reward points + guaranteed cashback on qualifying transfers; climb loyalty tiers
+- View transaction history and download PDF statements
+- Admins manage users and accounts from a separate portal
+Notes: All money movement is internal ledger updates between `accounts` rows — no external payment gateway.
+
+
+--------------------------------------------------------------------------------
+SLIDE 3 — TECHNOLOGY STACK
+--------------------------------------------------------------------------------
+Title: Technology Stack
+Bullets:
+- Front end: Angular (standalone components), Angular Material, SSR-capable
+- Back end: Spring Boot 3.2 (Java 17), Spring Web, Spring Data JPA, Spring Security, Spring AOP
+- Database: MySQL (Hibernate ORM, schema auto-managed)
+- Auth: JWT (jjwt, HS256) + BCrypt password hashing
+- Email: Spring Mail over Gmail SMTP (asynchronous)
+- PDF: iText 7 for statements
+- Build & test: Maven, JUnit 5, Mockito, H2, JaCoCo
+Notes: Lombok used throughout for boilerplate. AOP aspect logs every service call with timing.
+
+
+--------------------------------------------------------------------------------
+SLIDE 4 — ARCHITECTURE & LAYERS
+--------------------------------------------------------------------------------
+Title: Layered Architecture
+Bullets:
+- Presentation: Angular components, route guards, HTTP interceptor
+- API: Spring REST controllers under /api/v1/**
+- Service: business logic (Transfer, Reward, Account, User, Otp, Email, Pdf)
+- Persistence: Spring Data JPA repositories
+- Database: MySQL (users, accounts, bank_details, transaction_logs, otp_tokens, reward_ledger)
+Notes: Stateless back end (no server sessions); the Angular app holds JWTs in sessionStorage. CORS restricted to the Angular origin.
+
+
+--------------------------------------------------------------------------------
+SLIDE 5 — DATA MODEL
+--------------------------------------------------------------------------------
+Title: Core Data Model (6 Tables)
+Bullets:
+- users — credentials, role/status, linked account, reward points + tier
+- accounts — the money ledger (balance, status, optimistic-lock version)
+- bank_details — simulated core-banking records users link to
+- transaction_logs — every transfer attempt (SUCCESS / FAILED) + cashback credits
+- otp_tokens — one active OTP per email (signup / login / reset)
+- reward_ledger — audit trail of points + cashback per rewarded transfer
+Notes: An account's ID equals the linked bank account number. A fixed corporate "CASHBACK" account (ID 9999999999) funds all cashback.
+
+
+--------------------------------------------------------------------------------
+SLIDE 6 — USER ONBOARDING (3-STEP SIGNUP)
+--------------------------------------------------------------------------------
+Title: Onboarding — Verified Signup
+Bullets:
+- Step 1: choose username + email → system sends a 6-digit OTP to the email
+- Step 2: enter OTP → email ownership confirmed
+- Step 3: set password → account created (ACTIVE) and auto-logged-in with JWTs
+- Duplicate username or email is rejected up front
+Notes: No admin approval needed — email-OTP verification is the trust anchor. Bank linking happens later, after login.
+
+
+--------------------------------------------------------------------------------
+SLIDE 7 — OTP VERIFICATION
+--------------------------------------------------------------------------------
+Title: One-Time Password (OTP)
+Bullets:
+- 6-digit code generated with a cryptographically secure RNG
+- Valid for 5 minutes; one row per email, overwritten on resend
+- Verified by purpose (SIGNUP / LOGIN / RESET), expiry, and exact match
+- Single-use: the OTP row is deleted on successful verification
+- Delivered asynchronously so the API responds instantly
+Notes: Used in three flows — signup, two-factor login, and password reset.
+
+
+--------------------------------------------------------------------------------
+SLIDE 8 — LOGIN
+--------------------------------------------------------------------------------
+Title: Login — Two-Factor for Users
+Bullets:
+- Step 1: username + password validated → OTP emailed (email shown masked)
+- Step 2: username + password + OTP → JWT access + refresh tokens issued
+- Admins log in through a separate endpoint with no OTP (direct credentials)
+- Password re-verification gates sensitive actions (e.g. revealing balance)
+Notes: Wrong credentials return a generic "Invalid username or password" to limit enumeration.
+
+
+--------------------------------------------------------------------------------
+SLIDE 9 — JWT AUTHENTICATION & SESSION
+--------------------------------------------------------------------------------
+Title: JWT Authentication
+Bullets:
+- HS256-signed tokens carry username, role, and account ID
+- Access token: 10 minutes; refresh token: 7 days
+- A filter validates the bearer token on every protected request
+- Expiry → 401 → the Angular interceptor silently refreshes and retries
+- Refresh rotates both tokens; idle users are auto-logged-out after 10 minutes
+Notes: Sessions are stateless. Tokens live in browser sessionStorage and clear on tab close.
+
+
+--------------------------------------------------------------------------------
+SLIDE 10 — BANK ACCOUNT LINKING
+--------------------------------------------------------------------------------
+Title: Linking a Bank Account
+Bullets:
+- After signup, the user links a pre-existing bank account by its number
+- System verifies the bank record's email matches the user's verified email
+- A money-transfer account is created, seeded with the bank balance
+- The bank record is marked "registered" so it can't be linked twice
+Notes: This is how users get a balance and unlock transfers. Transfers target a raw account ID (no separate beneficiary directory).
+
+
+--------------------------------------------------------------------------------
+SLIDE 11 — MONEY TRANSFER (CORE FLOW)
+--------------------------------------------------------------------------------
+Title: Money Transfer — The Core
+Bullets:
+- User enters recipient account ID + amount; confirms the recipient's name
+- Back end validates: positive amount, different accounts, both active, sufficient balance
+- Atomic debit + credit; balances mirrored back to bank_details
+- A SUCCESS transaction log is written; rewards processed
+- Response returns transaction ID, amounts, and any reward earned
+Notes: Single database transaction — all or nothing.
+
+
+--------------------------------------------------------------------------------
+SLIDE 12 — TRANSFER INTEGRITY & SAFEGUARDS
+--------------------------------------------------------------------------------
+Title: Built for Correctness
+Bullets:
+- Idempotency key blocks accidental double-spend (duplicate → 409 Conflict)
+- Failed transfers are logged in a separate transaction so the record survives rollback
+- Failed attempts are visible to the sender only, never the would-be receiver
+- Optimistic locking (version column) protects concurrent balance updates
+- Reward failures never fail a valid transfer (isolated and logged)
+Notes: Clear error codes per failure type (insufficient balance, inactive account, not found, duplicate).
+
+
+--------------------------------------------------------------------------------
+SLIDE 13 — REWARDS: LOYALTY TIERS
+--------------------------------------------------------------------------------
+Title: Rewards — Loyalty Tiers
+Bullets:
+- Four tiers by lifetime points: BRONZE, SILVER, GOLD, PLATINUM
+- Point multipliers rise with tier: 1.0x → 1.5x → 2.0x → 3.0x
+- Earn 1 base point per ₹100 transferred (transfer must exceed ₹100)
+- Only the first transfer per recipient per day earns rewards
+- Profile shows tier, progress to next tier, and lifetime cashback
+Notes: Thresholds — SILVER 500, GOLD 2000, PLATINUM 5000 points. A user near the next tier is nudged.
+
+
+--------------------------------------------------------------------------------
+SLIDE 14 — REWARDS: CASHBACK & LIFECYCLE
+--------------------------------------------------------------------------------
+Title: Rewards — Cashback & Automation
+Bullets:
+- Guaranteed cashback on every qualifying transfer, paid from the corporate CASHBACK account
+- Cashback credited straight to the user's balance and logged as a transaction
+- Monthly summary email on the 1st (transfers, points, cashback, tier)
+- Inactivity handling: warning at 20 days, one-tier downgrade after 30 days idle
+Notes: Scheduled jobs run the monthly summary and the daily inactivity sweep. Points are derived from activity; there is no manual points-to-cash redemption.
+
+
+--------------------------------------------------------------------------------
+SLIDE 15 — TRANSACTION HISTORY & STATEMENTS
+--------------------------------------------------------------------------------
+Title: History & PDF Statements
+Bullets:
+- Full transaction history with counterparty names and direction (debit/credit)
+- Quick filters: last week, last month, last year, or a custom date range
+- Downloadable PDF statement with summary totals and a styled transaction table
+- The corporate cashback account is masked as "CASHBACK" in user history
+Notes: PDF generated server-side with iText, defaulting to the last month if no dates are given.
+
+
+--------------------------------------------------------------------------------
+SLIDE 16 — EMAIL & NOTIFICATIONS
+--------------------------------------------------------------------------------
+Title: Email Notifications
+Bullets:
+- OTP emails for signup, login, and password reset
+- Monthly reward summary email
+- Tier downgrade warning and downgrade-confirmation emails
+- Sent asynchronously on a dedicated thread pool so APIs stay fast
+Notes: Gmail SMTP over STARTTLS. Email failures are isolated — they never break the user action.
+
+
+--------------------------------------------------------------------------------
+SLIDE 17 — ADMIN CAPABILITIES
+--------------------------------------------------------------------------------
+Title: Administration
+Bullets:
+- Separate admin login (role-protected, no OTP)
+- View all users and all accounts
+- Activate / deactivate users (cascades to their account status)
+- Create accounts and activate / lock accounts
+Notes: Admin endpoints are restricted by role at the security layer; admins have no personal bank account.
+
+
+--------------------------------------------------------------------------------
+SLIDE 18 — SECURITY CONTROLS (IMPLEMENTED)
+--------------------------------------------------------------------------------
+Title: Security Controls
+Bullets:
+- Passwords hashed with BCrypt; never stored in plain text
+- Two-factor login + email-verified signup
+- Stateless JWT auth with short-lived access tokens and rotating refresh tokens
+- Role-based authorization on admin endpoints; CORS locked to the app origin
+- Parameterized JPA queries (SQL-injection safe); Angular output escaping (XSS)
+- Idle-session auto-logout
+Notes: Centralized exception handling returns consistent error codes without leaking internals.
+
+
+--------------------------------------------------------------------------------
+SLIDE 19 — QUALITY & TEST COVERAGE
+--------------------------------------------------------------------------------
+Title: Engineering Quality
+Bullets:
+- 203 automated back-end tests (JUnit 5 + Mockito), all green
+- ~99.9% instruction / ~96.6% branch coverage (JaCoCo)
+- Unit tests for services, controllers, security, and JPA lifecycle
+- Full Spring context integration test on an in-memory H2 database
+Notes: Email/OTP delivery excluded from coverage by design. Remaining gaps are unreachable defensive guards.
+
+
+--------------------------------------------------------------------------------
+SLIDE 20 — API SURFACE (SUMMARY)
+--------------------------------------------------------------------------------
+Title: Key API Endpoints
+Bullets:
+- Auth: /auth/signup/*, /auth/login + /login/verify-otp, /auth/refresh, /auth/forgot-password, /auth/reset-password, /auth/admin/login
+- Accounts: /accounts/{id}, /balance, /transactions (+ filters), /statement/pdf
+- Transfers: POST /transfers
+- Rewards: /rewards/me, /rewards/me/summary
+- Users (admin): /users, /users/{id}/activate, /users/deactivate, /users/link-bank
+Notes: All under base path /api/v1. Everything except the auth endpoints requires a valid JWT.
+
+
+--------------------------------------------------------------------------------
+SLIDE 21 — SCOPE BOUNDARIES (NOT IMPLEMENTED)
+--------------------------------------------------------------------------------
+Title: Out of Scope (Current Build)
+Bullets:
+- No external payment gateway — transfers are internal ledger moves
+- No saved-beneficiary directory — transfers use a raw account ID
+- No manual points-to-cash redemption (rewards are activity-driven)
+- No rate limiting on auth/OTP endpoints
+Notes: Listed for transparency; these are intentional boundaries of the current implementation, not roadmap commitments.
+
+
+--------------------------------------------------------------------------------
+SLIDE 22 — CLOSING
+--------------------------------------------------------------------------------
+Title: Summary
+Bullets:
+- Secure, OTP-and-JWT protected digital money transfer platform
+- Correctness-first transfers: idempotent, atomic, audited
+- Engaging tier-based rewards with automatic cashback
+- Clean layered architecture, strong test coverage
+Notes: End-to-end flow proven from signup through transfer, rewards, and statements.
+
+================================================================================
+END OF CONTENT
+================================================================================

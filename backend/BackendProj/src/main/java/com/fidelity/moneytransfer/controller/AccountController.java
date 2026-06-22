@@ -15,7 +15,6 @@ import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import java.time.LocalDate;
-import java.math.BigDecimal;
 import java.util.List;
 
 @RestController
@@ -37,10 +36,11 @@ public class AccountController {
     }
 
     @GetMapping("/{id}/balance")
-    public ResponseEntity<BigDecimal> getBalance(@PathVariable Long id) {
+    public ResponseEntity<String> getBalance(@PathVariable Long id) {
         log.info("Fetching balance for account id: {}", id);
-        BigDecimal balance = accountService.getBalance(id);
-        return ResponseEntity.ok(balance);
+        // Returned AES-encrypted; the client decrypts it only on reveal.
+        String encryptedBalance = accountService.getBalance(id);
+        return ResponseEntity.ok(encryptedBalance);
     }
 
     @GetMapping("/{id}/transactions")

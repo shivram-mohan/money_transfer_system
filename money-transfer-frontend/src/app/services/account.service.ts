@@ -31,9 +31,12 @@ export class AccountService {
     );
   }
 
-  getBalance(accountId: number): Observable<number> {
-    return this.http.get<number>(
-      `${this.apiUrl}/accounts/${accountId}/balance`
+  // Returns the balance AES-encrypted (plain text ciphertext); callers decrypt
+  // it via CryptoService only when the user reveals it.
+  getBalance(accountId: number): Observable<string> {
+    return this.http.get(
+      `${this.apiUrl}/accounts/${accountId}/balance`,
+      { responseType: 'text' }
     );
   }
 
